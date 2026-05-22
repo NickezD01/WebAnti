@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AntiPhisher.API/AntiPhisher.API.csproj" />
+  <Project Path="AntiPhisher.Application/AntiPhisher.Application.csproj" />
+  <Project Path="AntiPhisher.Domain/AntiPhisher.Domain.csproj" />
+  <Project Path="AntiPhisher.Infrastructure/AntiPhisher.Infrastructure.csproj" />
+</Solution>
