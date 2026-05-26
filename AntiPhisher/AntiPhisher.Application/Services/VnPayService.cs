@@ -54,8 +54,8 @@ namespace AntiPhisher.Application.Services
             }
             //payment.Amount = order.TotalPrice;
             model.Amount = order.Price.Value;
-            model.Name = "Mom Care";
-            model.OrderDescription = "Mom Care";
+            model.Name = "AntiPhisher";
+            model.OrderDescription = "AntiPhisher";
             model.OrderType = "VnPay";
 
 

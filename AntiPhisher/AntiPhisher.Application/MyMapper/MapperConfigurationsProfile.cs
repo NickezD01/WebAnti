@@ -1,11 +1,17 @@
 ﻿using AntiPhisher.Application.Request.AttemptRequest;
+using AntiPhisher.Application.Request.Orders;
 using AntiPhisher.Application.Request.ScenarioRequest;
+using AntiPhisher.Application.Request.Subscription;
+using AntiPhisher.Application.Request.SubscriptionPlan;
 using AntiPhisher.Application.Request.User;
 using AntiPhisher.Application.Request.UserAccount;
 using AntiPhisher.Application.Response.AttemptRespond;
 using AntiPhisher.Application.Response.CampaignResponse;
+using AntiPhisher.Application.Response.Orders;
 using AntiPhisher.Application.Response.Role;
 using AntiPhisher.Application.Response.ScenarioRespond;
+using AntiPhisher.Application.Response.Subscription;
+using AntiPhisher.Application.Response.SubscriptionPlan;
 using AntiPhisher.Application.Response.UserAccount;
 using AntiPhisher.Domain.Models;
 using AutoMapper;
@@ -113,6 +119,52 @@ namespace AntiPhisher.Application.MyMapper
                             .Select(cs => cs.Scenario)
                             .ToList()
                         : new List<Scenario>()));
+
+            // SubscriptionPlan mappings
+            CreateMap<CreateSubscriptionPlanRequest, SubscriptionPlan>()
+                .ForMember(dest => dest.DurationMonth, opt => opt.MapFrom(src => src.DurationInMonths))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow));
+
+            CreateMap<UpdateSubscriptionPlanRequest, SubscriptionPlan>()
+                .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<SubscriptionPlan, SubscriptionPlanResponse>()
+                .ForMember(dest => dest.DurationInMonths, opt => opt.MapFrom(src => src.DurationMonth))
+                .ForMember(dest => dest.ActiveSubscribersCount, opt =>
+                    opt.MapFrom(src => src.Subscriptions != null ?
+                        src.Subscriptions.Count(s => s.Status == SubscriptionStatus.Active &&
+                                     s.PaymentStatus == PaymentStatus.Paid &&
+                                     s.EndDate > DateTime.Now) : 0));
+
+            // Subscription mappings
+            CreateMap<CreateSubscriptionRequest, Subscription>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Active"))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => "Pending"))
+                .ForMember(dest => dest.EndDate, opt => opt.Ignore()); // Will be calculated in service
+
+            CreateMap<UpdateSubscriptionRequest, Subscription>()
+                .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<Subscription, SubscriptionResponse>()
+                .ForMember(dest => dest.AccountName, opt =>
+                    opt.MapFrom(src => src.Account != null ?
+                        $"{src.Account.FullName} " : ""))
+                .ForMember(dest => dest.PlanName, opt =>
+                    opt.MapFrom(src => src.SubscriptionPlans != null ?
+                        src.SubscriptionPlans.Name.ToString() : ""))
+                .ForMember(dest => dest.Price, opt =>
+                    opt.MapFrom(src => src.SubscriptionPlans != null ?
+                        src.SubscriptionPlans.Price : 0))
+                .ForMember(dest => dest.Features, opt =>
+                    opt.MapFrom(src => src.SubscriptionPlans != null ?
+                        src.SubscriptionPlans.Feature : ""));
+
+            //Order
+            CreateMap<OrderRequest, Order>();
+            CreateMap<Order, OrderResponse>();
         }
     }
 }
