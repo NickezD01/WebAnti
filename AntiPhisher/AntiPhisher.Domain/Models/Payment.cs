@@ -11,15 +11,22 @@ namespace AntiPhisher.Domain.Models
     public class Payment : Base
     {
         public int Id { get; set; }
+        public int AccountId { get; set; }
         public StatusPayment StatusPayment { get; set; }
         public decimal Amount { get; set; }
-        /* public string OrderType { get; set; }
-         //public double Amount { get; set; }
-         public string OrderDescription { get; set; }
-         public string Name { get; set; }*/
-        //
+        //public int OrderId { get; set; }
+        public int? TransactionHId { get; set; }
+        public string? Note { get; set; }
+        //public Order? Order { get; set; }
+        public User? Account { get; set; }
+        public PaymentMethodEnum PaymentMethod { get; set; } = PaymentMethodEnum.VNPay;
+        public TransactionHistory? TransactionHistory { get; set; }
+
+        //public int Id { get; set; }
+
+
         public int OrderId { get; set; }
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
     }
     public enum StatusPayment
     {
@@ -28,5 +35,11 @@ namespace AntiPhisher.Domain.Models
         Failed,
         Pending,
         Paid
+    }
+    public enum PaymentMethodEnum
+    {
+        VNPay,
+        Momo,
+        CreditCard
     }
 }

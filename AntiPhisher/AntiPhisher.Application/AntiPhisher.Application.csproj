@@ -24,10 +24,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AntiPhisher.Domain\AntiPhisher.Domain.csproj" />
   </ItemGroup>
 

@@ -3,8 +3,10 @@ using AntiPhisher.Application;
 using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.MyMapper;
 using AntiPhisher.Application.Services;
+using AntiPhisher.Application.Validation; // Import để nhận diện SubPlanValidator
 using AntiPhisher.Domain;
 using AntiPhisher.Infrastructure;
+using FluentValidation; // Import thư viện FluentValidation
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -20,42 +22,45 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURATION
 // ======================================================
 var configuration = builder.Configuration.Get<AppSetting>();
-builder.Services.AddSingleton(configuration!);
+if (configuration != null)
+{
+    builder.Services.AddSingleton(configuration);
+}
 
 // ======================================================
-// CONTROLLERS
+// CONTROLLERS & VALIDATION
 // ======================================================
 builder.Services.AddControllers();
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
+
+// Kích hoạt tính năng tự động validate đầu vào của FluentValidation trên Controller
 builder.Services.AddFluentValidationAutoValidation();
 
+// Nạp toàn bộ các class Validator (bao gồm cả SubPlanValidator) trong tầng Application vào DI Container
+builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
+
 // ======================================================
-// DATABASE
+// DATABASE (Đã fix lỗi Design-time Migration)
 // ======================================================
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(
-        configuration!.ConnectionStrings.DefaultConnection
-    );
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(connectionString);
 
     options.ConfigureWarnings(warnings =>
-        warnings.Ignore(
-            CoreEventId.NavigationBaseIncludeIgnored
-        ));
+        warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
 });
 
 // ======================================================
-// JWT
+// JWT AUTHENTICATION (Đã fix cách đọc dữ liệu từ JSON)
 // ======================================================
-var secretValue = configuration?.SecretToken?.Value;
+var secretValue = builder.Configuration["SecretToken:Value"];
 if (string.IsNullOrWhiteSpace(secretValue))
 {
-    throw new Exception(
-        "SecretToken:Value missing in appsettings.json"
-    );
+    throw new Exception("SecretToken:Value is missing or invalid in appsettings.json");
 }
 
 builder.Services
@@ -64,19 +69,15 @@ builder.Services
     {
         options.RequireHttpsMetadata = false;
         options.SaveToken = true;
-        options.TokenValidationParameters =
-            new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey =
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(secretValue)
-                    ),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretValue)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
     });
 
 // ======================================================
@@ -85,99 +86,72 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc(
-        "v1",
-        new OpenApiInfo
-        {
-            Title = "AntiPhisher API",
-            Version = "v1"
-        });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "AntiPhisher API", Version = "v1" });
 
-    options.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
-        {
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT",
-            In = ParameterLocation.Header,
-            Description = "Enter JWT Token"
-        });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter JWT Token"
+    });
 
-    options.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
+            new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
-            }
-        });
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 // ======================================================
-// HTTP CONTEXT
+// DEPENDENCY INJECTION (DI CONTAINER)
 // ======================================================
 builder.Services.AddHttpContextAccessor();
-
-// ======================================================
-// UNIT OF WORK
-// ======================================================
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// ======================================================
-// SERVICES
-// ======================================================
+// Services Registration
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
-// Tích hợp HttpClient chuyên dụng cho ScenarioService để gọi OpenAI API an toàn
+// HttpClient cho ScenarioService (OpenAI)
 builder.Services.AddHttpClient<IScenarioService, ScenarioService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
-
-// ĐĂNG KÝ MỚI: Kích hoạt LessonService vào DI Container để sửa lỗi sập Controller
 builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
-// ======================================================
-// AUTOMAPPER
-// ======================================================
-builder.Services.AddAutoMapper(
-    typeof(MapperConfigurationsProfile).Assembly
-);
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 
-// ======================================================
 // CORS
-// ======================================================
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-        "AllowAll",
-        policy =>
-        {
-            policy
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
 });
 
-// ======================================================
-// APP
-// ======================================================
 var app = builder.Build();
 
 // ======================================================
-// MIDDLEWARE
+// MIDDLEWARE PIPELINE (Thứ tự chuẩn hóa toàn hệ thống)
 // ======================================================
+
+// Luôn đặt ExceptionMiddleware lên đầu tiên để bắt mọi lỗi ngoại lệ (bao gồm lỗi từ các Middleware khác)
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -186,11 +160,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+
+// Khớp dữ liệu Request đầu vào và validate trước khi chạy qua phân quyền
+app.UseMiddleware<ValidationMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<ExceptionMiddleware>();
-app.UseMiddleware<ValidationMiddleware>();
-
 app.MapControllers();
+
 app.Run();

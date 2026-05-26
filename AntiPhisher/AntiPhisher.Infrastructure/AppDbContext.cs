@@ -48,6 +48,7 @@ namespace AntiPhisher.Infrastructure
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<TransactionHistory> Transactions { get; set; }
 
         // --- HỆ THỐNG BÀI HỌC LÝ THUYẾT (MỚI BỔ SUNG) ---
         public DbSet<Phase> Phases { get; set; }
