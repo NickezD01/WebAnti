@@ -20,8 +20,10 @@ namespace AntiPhisher.Application.Validation
                  .MinimumLength(7).WithMessage("Password must be more than 6 characters.");
             RuleFor(user => user.FullName)
                 .NotEmpty().WithMessage("FullName is required.");
-
-
+            RuleFor(user => user.PhoneNumber)
+                .NotEmpty().WithMessage("PhoneNumber is required.");
+            RuleFor(user => user.IsAgreedToTerms)
+                .Equal(true).WithMessage("You must agree to the terms.");
         }
     }
 }

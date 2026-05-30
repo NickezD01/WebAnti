@@ -28,12 +28,20 @@ namespace AntiPhisher.API.Controllers
             var result = await _service.UpdateUserProfileAsync(updateUserRequest);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllAccountAsync")]
-        public async Task<IActionResult> GetAllAccountAsync()
+        public async Task<IActionResult> GetAllAccountAsync([FromQuery] string? searchTerm = "", [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {
-            var resposne = await _service.GetAllAccountAsync();
+            var resposne = await _service.GetAllAccountAsync(searchTerm ?? "", pageIndex, pageSize);
             return resposne.IsSuccess ? Ok(resposne) : BadRequest(resposne);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("UpdateUserStatusOrRole")]
+        public async Task<IActionResult> UpdateUserStatusOrRoleAsync([FromBody] UpdateUserStatusOrRoleRequest request)
+        {
+            var result = await _service.UpdateUserStatusOrRoleAsync(request);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }
 }

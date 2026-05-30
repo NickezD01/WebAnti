@@ -11,10 +11,10 @@ namespace AntiPhisher.Application.Request.UserAccount
     public class UserRegisterRequest
     {
         public string Email { get; set; } = string.Empty;
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+        public string Password { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
-        public RoleResponse Role { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
+        public bool IsAgreedToTerms { get; set; }
     }
 
 

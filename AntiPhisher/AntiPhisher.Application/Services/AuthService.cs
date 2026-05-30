@@ -46,16 +46,6 @@ namespace AntiPhisher.Application.Services
 
             try
             {
-                // CHECK PASSWORD
-                if (!CheckUserPassword(userRequest))
-                {
-                    response.SetBadRequest(
-                        "Confirm password does not match"
-                    );
-
-                    return response;
-                }
-
                 // CHECK EMAIL EXIST
                 var existingUser =
                     await _unitOfWork.Users.GetAsync(
@@ -64,27 +54,26 @@ namespace AntiPhisher.Application.Services
 
                 if (existingUser != null)
                 {
-                    response.SetBadRequest(
-                        "Email already exists"
-                    );
-
-                    return response;
+                    if (existingUser.IsEmailVerified)
+                    {
+                        response.SetBadRequest("Email already exists");
+                        return response;
+                    }
+                    else
+                    {
+                        // Remove unverified user to let them register again
+                        var oldVerifications = await _unitOfWork.EmailVerifications.GetAllAsync(x => x.UserId == existingUser.UserId);
+                        foreach (var v in oldVerifications)
+                        {
+                            _unitOfWork.EmailVerifications.Remove(v);
+                        }
+                        _unitOfWork.Users.Remove(existingUser);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
                 }
 
-                // CHECK ROLE
-                var role =
-                    await _unitOfWork.Roles.GetAsync(
-                        x => x.RoleId == userRequest.Role.RoleId
-                    );
-
-                if (role == null)
-                {
-                    response.SetBadRequest(
-                        "Role not found"
-                    );
-
-                    return response;
-                }
+                // Default RoleId for new User is 3
+                int defaultRoleId = 3;
 
                 // HASH PASSWORD
                 var passwordData =
@@ -94,31 +83,15 @@ namespace AntiPhisher.Application.Services
                 User user = new User
                 {
                     FullName = userRequest.FullName,
-
                     Email = userRequest.Email,
-
-                    PasswordHash =
-                        Convert.ToBase64String(
-                            passwordData.PasswordHash
-                        ),
-
-                    PasswordSalt =
-                        Convert.ToBase64String(
-                            passwordData.PasswordSalt
-                        ),
-
-                    RoleId = userRequest.Role.RoleId,
-
+                    PasswordHash = Convert.ToBase64String(passwordData.PasswordHash),
+                    PasswordSalt = Convert.ToBase64String(passwordData.PasswordSalt),
+                    RoleId = defaultRoleId,
                     CompanyId = null,
-
                     AvatarUrl = null,
-
                     IsActive = true,
-
                     IsEmailVerified = false,
-
                     CreatedAt = DateTime.UtcNow,
-
                     UpdatedAt = DateTime.UtcNow
                 };
 
@@ -471,23 +444,6 @@ namespace AntiPhisher.Application.Services
                 return computedHash
                     .SequenceEqual(storedHash);
             }
-        }
-
-        // =====================================================
-        // CHECK PASSWORD
-        // =====================================================
-
-        private bool CheckUserPassword(
-            UserRegisterRequest user
-        )
-        {
-            if (user.Password == null)
-            {
-                return false;
-            }
-
-            return user.Password
-                == user.ConfirmPassword;
         }
 
         // =====================================================

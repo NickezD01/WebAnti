@@ -22,7 +22,7 @@ namespace AntiPhisher.Application.Services
             {
 
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("AntiPhisher", "AntiPhisher@gmail.com"));
+                message.From.Add(new MailboxAddress("AntiPhisher System", EmailUserSystem));
                 message.To.Add(new MailboxAddress("", recievedUser));
                 message.Subject = $"Notification";
 
@@ -53,7 +53,7 @@ namespace AntiPhisher.Application.Services
 
 
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("AntiPhisher", "AntiPhisher@gmail.com"));
+                message.From.Add(new MailboxAddress("AntiPhisher System", EmailUserSystem));
                 message.To.Add(new MailboxAddress("", recievedUser));
                 message.Subject = $"Verification Email";
 

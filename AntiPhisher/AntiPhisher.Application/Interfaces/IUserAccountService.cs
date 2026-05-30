@@ -12,6 +12,7 @@ namespace AntiPhisher.Application.Interfaces
     {
         Task<ApiResponse> GetUserProfileAsync();
         Task<ApiResponse> UpdateUserProfileAsync(UpdateUserRequest updateUserRequest);
-        Task<ApiResponse> GetAllAccountAsync();
+        Task<ApiResponse> GetAllAccountAsync(string searchTerm, int pageIndex, int pageSize);
+        Task<ApiResponse> UpdateUserStatusOrRoleAsync(UpdateUserStatusOrRoleRequest request);
     }
 }
