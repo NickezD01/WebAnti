@@ -44,7 +44,9 @@ namespace AntiPhisher.Application.MyMapper
                 .ForMember(dest => dest.Id,
                     opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Role,
-                    opt => opt.MapFrom(src => src.Role));
+                    opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.IsActive ? "Active" : (src.IsEmailVerified ? "Banned" : "Unverified")));
 
             // =========================================================
             // SCENARIO CRUD MAPPING (Khớp 100% với Entity Model Scenario)

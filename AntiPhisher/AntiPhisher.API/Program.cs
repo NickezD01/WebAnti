@@ -146,6 +146,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ======================================================
+// DATABASE SEEDING (Tự động tạo dữ liệu mặc định)
+// ======================================================
+await DbInitializer.SeedAsync(app.Services);
+
+// ======================================================
 // MIDDLEWARE PIPELINE (Thứ tự chuẩn hóa toàn hệ thống)
 // ======================================================
 
