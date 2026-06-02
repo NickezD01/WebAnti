@@ -1,5 +1,6 @@
-﻿using AntiPhisher.Application.Interfaces;
+using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.LessonRequest;
+using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.LessonResponse;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -29,28 +30,30 @@ namespace AntiPhisher.WebAPI.Controllers
         // =========================================================================
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LessonResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CreateLesson([FromBody] CreateLessonRequest request)
         {
+            var response = new ApiResponse();
             if (request == null)
             {
-                return BadRequest("Dữ liệu yêu cầu không được để trống.");
+                response.SetBadRequest(message: "Dữ liệu yêu cầu không được để trống.");
+                return BadRequest(response);
             }
 
             try
             {
                 var result = await _lessonService.CreateLessonAsync(request);
-                return CreatedAtAction(nameof(GetLessonById), new { lessonId = result.LessonId }, result);
+                response.SetOk(result);
+                return Ok(response);
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi tạo bài học.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
@@ -59,17 +62,19 @@ namespace AntiPhisher.WebAPI.Controllers
         // GET: api/Lesson
         // =========================================================================
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LessonResponse>))]
         public async Task<IActionResult> GetAllLessons()
         {
+            var response = new ApiResponse();
             try
             {
                 var lessons = await _lessonService.GetAllLessonsAsync();
-                return Ok(lessons);
+                response.SetOk(lessons);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi lấy danh sách bài học.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
@@ -78,22 +83,24 @@ namespace AntiPhisher.WebAPI.Controllers
         // GET: api/Lesson/{lessonId}
         // =========================================================================
         [HttpGet("{lessonId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LessonResponse))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetLessonById(int lessonId)
         {
+            var response = new ApiResponse();
             try
             {
                 var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
                 if (lesson == null)
                 {
-                    return NotFound(new { message = $"Không tìm thấy bài học lý thuyết với ID {lessonId}" });
+                    response.SetNotFound(message: $"Không tìm thấy bài học lý thuyết với ID {lessonId}");
+                    return NotFound(response);
                 }
-                return Ok(lesson);
+                response.SetOk(lesson);
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi lấy chi tiết bài học.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
@@ -103,22 +110,21 @@ namespace AntiPhisher.WebAPI.Controllers
         // =========================================================================
         [Authorize]
         [HttpPost("track-progress")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserLessonProgressResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> TrackProgress([FromBody] UpdateLessonProgressRequest request)
         {
+            var response = new ApiResponse();
             if (request == null)
             {
-                return BadRequest("Dữ liệu tiến độ không hợp lệ.");
+                response.SetBadRequest(message: "Dữ liệu tiến độ không hợp lệ.");
+                return BadRequest(response);
             }
 
             try
             {
                 var claim = _claimService.GetUserClaim();
                 var result = await _lessonService.TrackProgressAsync(claim.Id, request);
-                return Ok(result);
+                response.SetOk(result);
+                return Ok(response);
             }
             catch (ArgumentNullException)
             {
@@ -126,32 +132,31 @@ namespace AntiPhisher.WebAPI.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi cập nhật tiến độ học tập.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
         // =========================================================================
         // 5. [USER/MANAGER/ADMIN] LẤY TOÀN BỘ TIẾN ĐỘ HỌC LÝ THUYẾT CỦA MỘT USER
         // GET: api/Lesson/user-progress/{userId}
-        // User xem của mình; Manager chỉ xem nhân viên cùng công ty; Admin xem tất cả.
         // =========================================================================
         [Authorize]
         [HttpGet("user-progress/{userId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserLessonProgressResponse>))]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserProgress(int userId)
         {
+            var response = new ApiResponse();
             try
             {
                 var claim = _claimService.GetUserClaim();
                 var progress = await _lessonService.GetUserProgressAsync(claim.Id, claim.Role, userId);
-                return Ok(progress);
+                response.SetOk(progress);
+                return Ok(response);
             }
             catch (ArgumentNullException)
             {
@@ -163,31 +168,31 @@ namespace AntiPhisher.WebAPI.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi lấy tiến độ học viên.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
         // =========================================================================
         // 6. [USER] KIỂM TRA ĐIỀU KIỆN USER CÓ ĐƯỢC VÀO CHIẾN DỊCH THỰC HÀNH KHÔNG
         // GET: api/Lesson/check-eligibility?campaignId=5
-        // userId lấy từ JWT token, không nhận từ client.
         // =========================================================================
         [Authorize]
         [HttpGet("check-eligibility")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CheckCampaignEligibility([FromQuery] int campaignId)
         {
+            var response = new ApiResponse();
             try
             {
                 var claim = _claimService.GetUserClaim();
                 bool isEligible = await _lessonService.IsUserEligibleForCampaignAsync(claim.Id, campaignId);
-                return Ok(isEligible);
+                response.SetOk(isEligible);
+                return Ok(response);
             }
             catch (ArgumentNullException)
             {
@@ -195,11 +200,13 @@ namespace AntiPhisher.WebAPI.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi hệ thống khi kiểm tra điều kiện chiến dịch.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
@@ -211,37 +218,41 @@ namespace AntiPhisher.WebAPI.Controllers
         [HttpPost("set-prerequisites")]
         public async Task<IActionResult> SetCampaignPrerequisites([FromBody] SetPrerequisitesRequest request)
         {
+            var response = new ApiResponse();
             if (request == null || request.LessonIds == null)
             {
-                return BadRequest("Dữ liệu cấu hình không hợp lệ.");
+                response.SetBadRequest(message: "Dữ liệu cấu hình không hợp lệ.");
+                return BadRequest(response);
             }
 
             try
             {
                 await _lessonService.SetCampaignPrerequisitesAsync(request.CampaignId, request.LessonIds);
-                return Ok(new { message = $"Đã cấu hình {request.LessonIds.Count} bài học bắt buộc cho chiến dịch {request.CampaignId}" });
+                response.SetOk(new { message = $"Đã cấu hình {request.LessonIds.Count} bài học bắt buộc cho chiến dịch {request.CampaignId}" });
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Lỗi khi cấu hình điều kiện.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
 
         // =========================================================================
-        // PHẦN 2: [USER] Lấy danh sách bài học được giao từ Campaign đang active
+        // 8. [USER] Lấy danh sách bài học được giao từ Campaign đang active
         // GET: api/Lesson/my-lessons
         // =========================================================================
-
         [Authorize]
         [HttpGet("my-lessons")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<MyLessonResponse>))]
         public async Task<IActionResult> GetMyLessons()
         {
+            var response = new ApiResponse();
             try
             {
                 var claim = _claimService.GetUserClaim();
                 var lessons = await _lessonService.GetMyLessonsAsync(claim.Id);
-                return Ok(lessons);
+                response.SetOk(lessons);
+                return Ok(response);
             }
             catch (ArgumentNullException)
             {
@@ -249,8 +260,8 @@ namespace AntiPhisher.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { message = "Lỗi hệ thống khi lấy danh sách bài học.", detail = ex.Message });
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
             }
         }
     }

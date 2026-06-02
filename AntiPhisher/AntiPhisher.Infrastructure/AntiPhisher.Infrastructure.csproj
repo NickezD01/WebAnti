@@ -29,4 +29,10 @@
     <ProjectReference Include="..\AntiPhisher.Domain\AntiPhisher.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="SeedData\lessons_seed.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
