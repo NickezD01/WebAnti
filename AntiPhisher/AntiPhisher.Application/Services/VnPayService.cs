@@ -127,16 +127,20 @@ namespace AntiPhisher.Application.Services
                                     payment.OrderId = orderId;
                                     payment.CreatedDate = DateTime.UtcNow;
                                     payment.PaymentMethod = PaymentMethodEnum.VNPay;
-                                    var sub = await _unitOfWork.Subscriptions.GetAsync(s => s.Id == order.Id);
-                                    sub.PaymentStatus = PaymentStatus.Paid;
+
+                                    // BUG 1 FIX: order.SubscriptionId thay vì order.Id
+                                    var sub = await _unitOfWork.Subscriptions.GetAsync(s => s.Id == order.SubscriptionId);
+                                    if (sub != null) sub.PaymentStatus = PaymentStatus.Paid;
                                 }
                                 else
                                 {
                                     payment.StatusPayment = StatusPayment.Failed;
                                     payment.OrderId = orderId;
                                     apiResponse.SetBadRequest("The payment amount does not match the order amount.");
-                                    var sub = await _unitOfWork.Subscriptions.GetAsync(s => s.Id == order.Id);
-                                    sub.PaymentStatus = PaymentStatus.Failed;
+
+                                    // BUG 1 FIX: order.SubscriptionId thay vì order.Id
+                                    var sub = await _unitOfWork.Subscriptions.GetAsync(s => s.Id == order.SubscriptionId);
+                                    if (sub != null) sub.PaymentStatus = PaymentStatus.Failed;
                                     return apiResponse;
                                 }
                                 await _unitOfWork.Payments.AddAsync(payment);
@@ -148,7 +152,8 @@ namespace AntiPhisher.Application.Services
                             }
 
                             await _unitOfWork.SaveChangeAsync();
-                            var redirectUrl = "http://localhost:5173/paymentfail";
+                            // BUG 3 FIX: trả đúng URL success thay vì paymentfail
+                            var redirectUrl = "http://localhost:5173/paymentsuccess";
                             return apiResponse.SetOk(redirectUrl);
                         }
                         else

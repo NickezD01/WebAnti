@@ -28,6 +28,8 @@ namespace AntiPhisher.Infrastructure
                 await SeedUsers(context, logger);
                 await SeedDifficultyLevels(context, logger);
                 await SeedCategories(context, logger);
+                await SeedSubscriptionPlans(context, logger);
+                await SeedCompanyAndEmployees(context, logger);
 
                 logger?.LogInformation("✅ Database seeding completed successfully.");
             }
@@ -115,6 +117,115 @@ namespace AntiPhisher.Infrastructure
             await context.DifficultyLevels.AddRangeAsync(levels);
             await context.SaveChangesAsync();
             logger?.LogInformation("📊 Seeded {Count} difficulty levels.", levels.Count);
+        }
+
+        // ─── SUBSCRIPTION PLANS ──────────────────────────────────────
+        // CHANGED: Name từ enum (Bronze/Silver/Gold) → string tiếng Việt thân thiện
+        private static async Task SeedSubscriptionPlans(AppDbContext context, ILogger? logger)
+        {
+            if (await context.SubscriptionPlans.AnyAsync()) return;
+
+            var plans = new List<SubscriptionPlan>
+            {
+                new SubscriptionPlan
+                {
+                    Name        = "Gói Cơ Bản",
+                    Price       = 990_000m,
+                    DurationMonth = 1,
+                    MaxSlots    = 10,
+                    Description = "Phù hợp cho nhóm nhỏ dưới 10 nhân viên.",
+                    Feature     = "10 nhân viên, 50 kịch bản, Báo cáo cơ bản",
+                    IsActive    = true
+                },
+                new SubscriptionPlan
+                {
+                    Name        = "Gói Chuyên Nghiệp",
+                    Price       = 2_490_000m,
+                    DurationMonth = 1,
+                    MaxSlots    = 30,
+                    Description = "Phù hợp cho doanh nghiệp vừa 10-30 nhân viên.",
+                    Feature     = "30 nhân viên, 200 kịch bản, Báo cáo nâng cao, AI Feedback",
+                    IsActive    = true
+                },
+                new SubscriptionPlan
+                {
+                    Name        = "Gói Doanh Nghiệp Pro",
+                    Price       = 5_990_000m,
+                    DurationMonth = 1,
+                    MaxSlots    = 100,
+                    Description = "Giải pháp toàn diện cho doanh nghiệp lớn.",
+                    Feature     = "100 nhân viên, Không giới hạn kịch bản, Analytics chuyên sâu, Hỗ trợ ưu tiên",
+                    IsActive    = true
+                }
+            };
+
+            await context.SubscriptionPlans.AddRangeAsync(plans);
+            await context.SaveChangesAsync();
+            logger?.LogInformation("📦 Seeded {Count} subscription plans.", plans.Count);
+        }
+
+        // ─── COMPANY + EMPLOYEE (dữ liệu demo cho Analytics) ────────
+        private static async Task SeedCompanyAndEmployees(AppDbContext context, ILogger? logger)
+        {
+            // Bỏ qua nếu đã có công ty
+            if (await context.Companies.AnyAsync()) return;
+
+            // Tạo công ty demo
+            var company = new Company
+            {
+                CompanyName = "AntiPhisher Demo Corp",
+                Domain      = "antiphisher.vn",
+                LogoUrl     = "",
+                IsActive    = true,
+                CreatedAt   = DateTime.UtcNow,
+                UpdatedAt   = DateTime.UtcNow
+            };
+            await context.Companies.AddAsync(company);
+            await context.SaveChangesAsync();
+
+            // Gán CompanyId cho Manager seed
+            var manager = await context.Users.FirstOrDefaultAsync(u => u.Email == "manager@gmail.com");
+            if (manager != null)
+            {
+                manager.CompanyId = company.CompanyId;
+                manager.UpdatedAt = DateTime.UtcNow;
+            }
+
+            // Tạo 3 nhân viên demo để Analytics có dữ liệu hiển thị
+            using var hmac = new HMACSHA512();
+            var demoEmployees = new[]
+            {
+                new { Email = "nv1@demo.vn", FullName = "Nguyễn Văn An" },
+                new { Email = "nv2@demo.vn", FullName = "Trần Thị Bình" },
+                new { Email = "nv3@demo.vn", FullName = "Lê Minh Cường" },
+            };
+
+            var userRole = await context.Roles.FirstOrDefaultAsync(r => r.RoleName == "User");
+            if (userRole != null)
+            {
+                foreach (var emp in demoEmployees)
+                {
+                    if (await context.Users.AnyAsync(u => u.Email == emp.Email)) continue;
+
+                    using var h = new HMACSHA512();
+                    await context.Users.AddAsync(new User
+                    {
+                        Email           = emp.Email,
+                        FullName        = emp.FullName,
+                        PasswordHash    = Convert.ToBase64String(h.ComputeHash(System.Text.Encoding.UTF8.GetBytes("demo123"))),
+                        PasswordSalt    = Convert.ToBase64String(h.Key),
+                        RoleId          = userRole.RoleId,
+                        CompanyId       = company.CompanyId,
+                        IsActive        = true,
+                        IsEmailVerified = true,
+                        CreatedAt       = DateTime.UtcNow,
+                        UpdatedAt       = DateTime.UtcNow
+                    });
+                }
+            }
+
+            await context.SaveChangesAsync();
+            logger?.LogInformation("🏢 Seeded demo company + {Count} employees.", demoEmployees.Length);
         }
 
         // ─── CATEGORIES ─────────────────────────────────────────────

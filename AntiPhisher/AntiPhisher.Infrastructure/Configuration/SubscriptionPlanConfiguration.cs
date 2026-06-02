@@ -1,11 +1,6 @@
-﻿using AntiPhisher.Domain.Models;
+using AntiPhisher.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AntiPhisher.Infrastructure.Configuration
 {
@@ -17,6 +12,15 @@ namespace AntiPhisher.Infrastructure.Configuration
 
             builder.Property(x => x.Price)
                 .HasColumnType("decimal(18,2)");
+
+            // CHANGED: Name từ int(enum) → nvarchar(200) linh hoạt
+            builder.Property(x => x.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            // NEW: MaxSlots mặc định 10 nếu không truyền
+            builder.Property(x => x.MaxSlots)
+                .HasDefaultValue(10);
         }
     }
 }

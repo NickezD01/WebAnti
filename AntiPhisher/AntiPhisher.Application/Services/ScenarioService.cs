@@ -33,7 +33,8 @@ namespace AntiPhisher.Application.Services
         }
 
         // =========================================================
-        // LOGIC LÀM BÀI TEST & PHÂN TÍCH AI (GIỮ NGUYÊN GỐC)
+        // LOGIC LÀM BÀI TEST & PHÂN TÍCH AI — REFACTORED
+        // Dùng 3 boolean hành vi thay vì UserAnswer string
         // =========================================================
         public async Task<AttemptResultResponse> SubmitAttemptAsync(SubmitAttemptRequest request, int userId)
         {
@@ -46,43 +47,57 @@ namespace AntiPhisher.Application.Services
             if (scenario == null)
                 throw new Exception($"Không tìm thấy kịch bản với ID {request.ScenarioId}.");
 
-            // 2. Xử lý logic tính điểm
-            bool userThinksPhishing = request.UserAnswer.Equals("Phishing", StringComparison.OrdinalIgnoreCase);
-            bool isCorrect = (userThinksPhishing == scenario.IsPhishing);
-            int scoreEarned = isCorrect ? (scenario.Difficulty?.BaseScore ?? 0) : 0;
+            bool isPhishingScenario = scenario.IsPhishing;
+            int baseScore = scenario.Difficulty?.BaseScore ?? 10;
 
-            // 3. Đếm số lần thử của người dùng
+            // 2. Tính điểm và mức rủi ro dựa trên hành vi
+            var (isCorrect, scoreEarned, riskLevel) = CalculateScoreAndRisk(
+                isPhishingScenario,
+                request.IsClickedLink,
+                request.IsCredentialLeaked,
+                request.IsReported,
+                baseScore);
+
+            // 3. Chuyển đổi hành vi → UserAnswer dạng chuỗi (backward compat, lưu DB)
+            string behaviorSummary = request.IsReported ? "Reported"
+                : request.IsClickedLink ? "Clicked"
+                : "NoAction";
+
+            // 4. Đếm số lần thử
             var pastAttempts = await _unitOfWork.UserAttempts.GetAllAsync(
                 filter: a => a.UserId == userId && a.ScenarioId == request.ScenarioId
             );
             int currentAttemptCount = pastAttempts?.Count ?? 0;
 
-            // 4. Khởi tạo đối tượng Attempt
+            // 5. Khởi tạo Attempt với 3 trường boolean mới
             var attempt = new UserAttempt
             {
                 UserId = userId,
                 ScenarioId = request.ScenarioId,
                 CampaignId = request.CampaignId,
-                // Lưu ý: Đảm bảo đã chạy lệnh ALTER TABLE ALTER COLUMN UserAnswer NVARCHAR(500)
-                UserAnswer = request.UserAnswer,
+                UserAnswer = behaviorSummary,      // computed from behavior
                 IsCorrect = isCorrect,
                 Score = scoreEarned,
                 TimeTakenSeconds = request.TimeTakenSeconds,
                 AttemptNumber = currentAttemptCount + 1,
-                SubmittedAt = DateTime.UtcNow
+                SubmittedAt = DateTime.UtcNow,
+                // NEW behavior fields
+                IsClickedLink = request.IsClickedLink,
+                IsCredentialLeaked = request.IsCredentialLeaked,
+                IsReported = request.IsReported
             };
 
             try
             {
-                // 5. Lưu kết quả bài làm vào DB
                 await _unitOfWork.UserAttempts.AddAsync(attempt);
                 await _unitOfWork.SaveChangeAsync();
 
-                // 6. Gọi AI phân tích
-                var aiFeedback = await FetchAIFeedbackFromOpenAI(scenario, isCorrect, request.UserAnswer);
+                // 6. Gọi AI với context hành vi phong phú hơn
+                var aiFeedback = await FetchAIFeedbackFromOpenAI(
+                    scenario, isCorrect,
+                    request.IsClickedLink, request.IsCredentialLeaked, request.IsReported);
                 aiFeedback.AttemptId = attempt.AttemptId;
 
-                // 7. Lưu phản hồi của AI
                 await _unitOfWork.AIFeedbacks.AddAsync(aiFeedback);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -91,6 +106,10 @@ namespace AntiPhisher.Application.Services
                     AttemptId = attempt.AttemptId,
                     IsCorrect = isCorrect,
                     ScoreEarned = scoreEarned,
+                    IsClickedLink = request.IsClickedLink,
+                    IsCredentialLeaked = request.IsCredentialLeaked,
+                    IsReported = request.IsReported,
+                    RiskLevel = riskLevel,
                     FeedbackText = aiFeedback.FeedbackText ?? "Không có phản hồi.",
                     IndicatorsExplained = aiFeedback.IndicatorsExplained ?? "Không có giải thích.",
                     ImprovementTips = aiFeedback.ImprovementTips ?? "Không có mẹo.",
@@ -99,13 +118,58 @@ namespace AntiPhisher.Application.Services
             }
             catch (DbUpdateException ex)
             {
-                // Trích xuất chi tiết lỗi từ SQL Server (thường do độ dài chuỗi hoặc FK constraint)
-                var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                var message = ex.InnerException?.Message ?? ex.Message;
                 throw new Exception($"Lỗi lưu vào database: {message}");
             }
             catch (Exception ex)
             {
                 throw new Exception($"Có lỗi xảy ra trong quá trình xử lý: {ex.Message}");
+            }
+        }
+
+        // =========================================================
+        // HELPER: Tính điểm + Mức rủi ro dựa trên 3 hành vi phishing
+        // =========================================================
+
+        /// <returns>(isCorrect, scoreEarned, riskLevel)</returns>
+        private static (bool isCorrect, int score, string riskLevel) CalculateScoreAndRisk(
+            bool isPhishingScenario,
+            bool isClickedLink,
+            bool isCredentialLeaked,
+            bool isReported,
+            int baseScore)
+        {
+            if (isPhishingScenario)
+            {
+                // Kịch bản phishing thật
+                if (isCredentialLeaked)
+                    // Tệ nhất: nhập thông tin đăng nhập vào trang giả mạo
+                    return (false, 0, "Critical");
+
+                if (isClickedLink && !isReported)
+                    // Bị lừa click link nhưng không báo cáo
+                    return (false, 0, "High");
+
+                if (isClickedLink && isReported)
+                    // Báo cáo được nhưng đã lỡ click — partial credit
+                    return (true, baseScore / 2, "Medium");
+
+                if (isReported && !isClickedLink)
+                    // Hoàn hảo: phát hiện và báo cáo mà không click
+                    return (true, baseScore, "Low");
+
+                // Không làm gì (không click, không báo cáo) — trung tính
+                return (false, 0, "Medium");
+            }
+            else
+            {
+                // Kịch bản email an toàn (không phải phishing)
+                if (isReported)
+                    // Báo cáo nhầm email an toàn → false positive
+                    return (false, 0, "Medium");
+
+                // Không báo cáo email an toàn → xử lý đúng
+                return (true, baseScore, "Low");
             }
         }
 
@@ -191,7 +255,9 @@ namespace AntiPhisher.Application.Services
         // =========================================================
         // HÀM PRIVATE GỌI OPENAI GPT-4O (GIỮ NGUYÊN GỐC)
         // =========================================================
-        private async Task<AIFeedback> FetchAIFeedbackFromOpenAI(Scenario scenario, bool isCorrect, string userAnswer)
+        private async Task<AIFeedback> FetchAIFeedbackFromOpenAI(
+            Scenario scenario, bool isCorrect,
+            bool isClickedLink, bool isCredentialLeaked, bool isReported)
         {
             var fallbackFeedback = new AIFeedback
             {
@@ -206,18 +272,23 @@ namespace AntiPhisher.Application.Services
 
             string systemPrompt = "Bạn là chuyên gia phân tích bảo mật thông tin (Phishing Security Expert). " +
                                   "Hãy đưa ra phản hồi bằng tiếng Việt dưới định dạng JSON Object chứa chính xác 3 key: " +
-                                  "\"feedbackText\" (nhận xét lựa chọn của user), " +
-                                  "\"indicatorsExplained\" (giải thích các điểm nghi vấn/an toàn trong nội dung email), " +
-                                  "\"improvementTips\" (mẹo bảo mật cốt lõi).";
+                                  "\"feedbackText\" (nhận xét hành vi của user trong bài test này), " +
+                                  "\"indicatorsExplained\" (giải thích các dấu hiệu phishing/an toàn trong email), " +
+                                  "\"improvementTips\" (mẹo bảo mật cốt lõi để không bị lừa lần sau).";
 
-            string userPrompt = $"[Thông tin Email]\n" +
+            // CHANGED: Prompt mới dùng 3 hành vi cụ thể thay vì "Safe"/"Phishing"
+            string behaviorDesc = $"- Đã bấm vào link giả mạo: {(isClickedLink ? "CÓ ⚠️" : "KHÔNG ✅")}\n" +
+                                  $"- Đã nhập thông tin đăng nhập/thẻ: {(isCredentialLeaked ? "CÓ 🚨" : "KHÔNG ✅")}\n" +
+                                  $"- Đã báo cáo email đáng ngờ: {(isReported ? "CÓ ✅" : "KHÔNG")}";
+
+            string userPrompt = $"[Thông tin Email Phishing]\n" +
                                $"- Tiêu đề: {scenario.Subject}\n" +
                                $"- Người gửi: {scenario.SenderEmail}\n" +
                                $"- Nội dung HTML: {scenario.EmailBodyHtml}\n" +
                                $"- Dấu hiệu lừa đảo gốc: {scenario.PhishingIndicators}\n\n" +
-                               $"[Kết quả bài làm]\n" +
-                               $"- Người dùng đoán là: {userAnswer}\n" +
-                               $"- Kết quả: {(isCorrect ? "ĐÚNG" : "SAI")}";
+                               $"[Hành vi của người dùng]\n" +
+                               behaviorDesc + "\n" +
+                               $"- Kết quả đánh giá: {(isCorrect ? "ĐÚNG ✅ — Đã nhận diện được tấn công" : "SAI ❌ — Bị mắc bẫy lừa đảo")}";
 
             var requestBody = new
             {

@@ -100,7 +100,7 @@ namespace AntiPhisher.API.Controllers
         #region ================= ADMIN ENDPOINTS =================
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateScenario([FromBody] CreateScenarioRequest request)
         {
             var response = new ApiResponse();
@@ -118,7 +118,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateScenario(int id, [FromBody] UpdateScenarioRequest request)
         {
             var response = new ApiResponse();
@@ -136,7 +136,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteScenario(int id)
         {
             var response = new ApiResponse();

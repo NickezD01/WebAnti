@@ -43,6 +43,12 @@ namespace AntiPhisher.API.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+        {
+            var result = await _service.LoginWithGoogleAsync(request);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
 
         [HttpPost("Verification")]
         public async Task<IActionResult> Verification(VerificationEmailRequest request)

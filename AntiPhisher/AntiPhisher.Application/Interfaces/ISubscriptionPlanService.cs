@@ -14,7 +14,8 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> CreatePlanAsync(CreateSubscriptionPlanRequest request);
         Task<ApiResponse> UpdatePlanAsync(int Id, UpdateSubscriptionPlanRequest request);
         Task<ApiResponse> DeletePlanAsync(int planId);
-        Task<ApiResponse> GetPlanByIdAsync(int planId);
+        Task<ApiResponse> GetPlanByIdAsync(int planId);   // Public — chỉ field bán hàng
+        Task<ApiResponse> GetPlanStatsAsync(int planId);  // Admin — thêm subscriber + revenue
 
         // Plan listing operations
         Task<ApiResponse> GetAllPlansAsync();

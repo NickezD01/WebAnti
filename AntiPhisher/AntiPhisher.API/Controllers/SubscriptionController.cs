@@ -2,6 +2,7 @@
 using AntiPhisher.Application.Request.Subscription;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AntiPhisher.API.Controllers
 {
@@ -61,6 +62,53 @@ namespace AntiPhisher.API.Controllers
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
+        // =====================================================================
+        // PHẦN 1: Quota & Quản lý nhân viên (Manager only)
+        // =====================================================================
 
+        /// <summary>
+        /// Mời / thêm nhân viên mới vào công ty. Kiểm tra quota slot của gói hiện tại.
+        /// POST: api/Subscription/invite-employee
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpPost("invite-employee")]
+        public async Task<IActionResult> InviteEmployee([FromBody] InviteEmployeeRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { errorMessage = string.Join("; ", errors) });
+            }
+
+            var claim = _claimService.GetUserClaim();
+            var response = await _subscriptionService.InviteEmployeeAsync(request, claim.Id);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
+
+        /// <summary>
+        /// Xem thông tin slot đã dùng / tổng / còn lại.
+        /// GET: api/Subscription/slots-usage
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpGet("slots-usage")]
+        public async Task<IActionResult> GetSlotsUsage()
+        {
+            var claim = _claimService.GetUserClaim();
+            var response = await _subscriptionService.GetSlotsUsageAsync(claim.Id);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
+
+        /// <summary>
+        /// Xóa nhân viên khỏi công ty, giải phóng 1 slot.
+        /// DELETE: api/Subscription/remove-employee/{userId}
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpDelete("remove-employee/{employeeUserId:int}")]
+        public async Task<IActionResult> RemoveEmployee(int employeeUserId)
+        {
+            var claim = _claimService.GetUserClaim();
+            var response = await _subscriptionService.RemoveEmployeeAsync(employeeUserId, claim.Id);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
     }
 }

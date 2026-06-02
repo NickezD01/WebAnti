@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AntiPhisher.Domain.Models;
 
 namespace AntiPhisher.Application.Services
 {
@@ -29,7 +30,7 @@ namespace AntiPhisher.Application.Services
             try
             {
                 var claim = _claim.GetUserClaim();
-                var user = await _unitOfWork.Users.GetAsync(x => x.UserId == claim.Id);
+                var user = await _unitOfWork.Users.GetAsync(x => x.UserId == claim.Id, include: source => source.Include(x => x.Role));
                 var userResponse = _mapper.Map<UserProfileResponse>(user);
                 return apiResponse.SetOk(userResponse);
             }
@@ -107,7 +108,7 @@ namespace AntiPhisher.Application.Services
                     return apiResponse.SetBadRequest("User not found");
 
                 user.RoleId = request.RoleId;
-                
+
                 if (request.Status == "Active")
                 {
                     user.IsActive = true;
@@ -131,5 +132,71 @@ namespace AntiPhisher.Application.Services
             }
         }
 
+        // =====================================================================
+        // PHẦN 1 — Lấy danh sách nhân viên thuộc công ty của Manager
+        // =====================================================================
+
+        public async Task<ApiResponse> GetCompanyEmployeesAsync(int managerId, string searchTerm, int pageIndex, int pageSize)
+        {
+            ApiResponse apiResponse = new ApiResponse();
+            try
+            {
+                // 1. Lấy CompanyId của Manager
+                var manager = await _unitOfWork.Users.GetAsync(x => x.UserId == managerId);
+                if (manager == null)
+                    return apiResponse.SetNotFound("Không tìm thấy Manager");
+
+                if (manager.CompanyId == null)
+                    return apiResponse.SetBadRequest("Manager chưa được gán vào công ty.");
+
+                int companyId = manager.CompanyId.Value;
+
+                // 2. Lấy tất cả nhân viên (RoleId=3) cùng CompanyId, loại trừ Manager
+                var allEmployees = await _unitOfWork.Users.GetAllAsync(
+                    x => x.CompanyId == companyId && x.UserId != managerId && x.RoleId == 3);
+
+                if (allEmployees == null) allEmployees = new List<User>();
+
+                // 3. Tìm kiếm theo tên / email
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    var term = searchTerm.ToLower();
+                    allEmployees = allEmployees
+                        .Where(u => u.FullName.ToLower().Contains(term) || u.Email.ToLower().Contains(term))
+                        .ToList();
+                }
+
+                int total = allEmployees.Count;
+
+                // 4. Phân trang
+                var paged = allEmployees
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(u => new CompanyEmployeeResponse
+                    {
+                        UserId = u.UserId,
+                        FullName = u.FullName,
+                        Email = u.Email,
+                        AvatarUrl = u.AvatarUrl ?? string.Empty,
+                        IsActive = u.IsActive,
+                        IsEmailVerified = u.IsEmailVerified,
+                        CreatedAt = u.CreatedAt,
+                        LastLoginAt = u.LastLoginAt
+                    })
+                    .ToList();
+
+                return apiResponse.SetOk(new CompanyEmployeePagedResponse
+                {
+                    Items = paged,
+                    TotalCount = total,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
+            }
+            catch (Exception ex)
+            {
+                return apiResponse.SetBadRequest(ex.Message);
+            }
+        }
     }
 }

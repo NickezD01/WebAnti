@@ -14,5 +14,8 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> UpdateUserProfileAsync(UpdateUserRequest updateUserRequest);
         Task<ApiResponse> GetAllAccountAsync(string searchTerm, int pageIndex, int pageSize);
         Task<ApiResponse> UpdateUserStatusOrRoleAsync(UpdateUserStatusOrRoleRequest request);
+
+        /// <summary>Lấy danh sách nhân viên thuộc công ty của Manager (hỗ trợ tìm kiếm + phân trang).</summary>
+        Task<ApiResponse> GetCompanyEmployeesAsync(int managerId, string searchTerm, int pageIndex, int pageSize);
     }
 }

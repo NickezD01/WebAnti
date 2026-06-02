@@ -123,10 +123,12 @@ namespace AntiPhisher.Application.MyMapper
                         : new List<Scenario>()));
 
             // SubscriptionPlan mappings
+            // CHANGED: Name từ enum → string, AutoMapper tự map string→string
             CreateMap<CreateSubscriptionPlanRequest, SubscriptionPlan>()
                 .ForMember(dest => dest.DurationMonth, opt => opt.MapFrom(src => src.DurationInMonths))
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
-                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow));
+                .ForMember(dest => dest.MaxSlots,      opt => opt.MapFrom(src => src.MaxSlots))
+                .ForMember(dest => dest.IsActive,      opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.CreatedDate,   opt => opt.MapFrom(src => DateTime.UtcNow));
 
             CreateMap<UpdateSubscriptionPlanRequest, SubscriptionPlan>()
                 .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))

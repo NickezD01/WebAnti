@@ -130,6 +130,7 @@ builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
