@@ -1,5 +1,6 @@
 ﻿using AntiPhisher.Application.Request.CampaignRequest;
 using AntiPhisher.Application.Response.CampaignResponse;
+using System.Collections.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +22,6 @@ namespace AntiPhisher.Application.Interfaces
         /// Admin thao tác bất kỳ; Manager chỉ campaign thuộc công ty mình.
         /// </summary>
         Task<CampaignDetailResponse> UpdateCampaignStatusAsync(int campaignId, bool isActive, int callerId, string callerRole);
+        Task<IEnumerable<MyCampaignResponse>> GetMyCampaignsAsync(int userId);
     }
 }

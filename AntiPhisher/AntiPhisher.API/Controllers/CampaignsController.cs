@@ -40,6 +40,29 @@ namespace AntiPhisher.API.Controllers
             }
         }
 
+        // GET api/Campaigns/my-campaigns
+        [HttpGet("my-campaigns")]
+        public async Task<IActionResult> GetMyCampaigns()
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                var campaigns = await _campaignService.GetMyCampaignsAsync(claim.Id);
+                response.SetOk(campaigns);
+                return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetCampaignById(int id)
         {

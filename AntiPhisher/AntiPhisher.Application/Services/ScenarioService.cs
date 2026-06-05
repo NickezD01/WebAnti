@@ -173,6 +173,25 @@ namespace AntiPhisher.Application.Services
             }
         }
 
+        public async Task<IEnumerable<UserCampaignAttemptResponse>> GetUserCampaignAttemptsAsync(int userId, int campaignId)
+        {
+            var attempts = await _unitOfWork.UserAttempts.GetAllAsync(
+                x => x.UserId == userId && x.CampaignId == campaignId);
+
+            return (attempts ?? Enumerable.Empty<UserAttempt>())
+                .Select(a => new UserCampaignAttemptResponse
+                {
+                    AttemptId          = a.AttemptId,
+                    ScenarioId         = a.ScenarioId,
+                    IsCorrect          = a.IsCorrect,
+                    Score              = a.Score,
+                    IsClickedLink      = a.IsClickedLink,
+                    IsCredentialLeaked = a.IsCredentialLeaked,
+                    IsReported         = a.IsReported,
+                    SubmittedAt        = a.SubmittedAt
+                });
+        }
+
         // =========================================================
         // LOGIC CÁC HÀM CRUD MỚI (ĐÃ CHUẨN HÓA TOÀN DIỆN)
         // =========================================================

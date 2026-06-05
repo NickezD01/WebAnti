@@ -190,5 +190,46 @@ namespace AntiPhisher.Application.Services
 
             throw new UnauthorizedAccessException("Không có quyền thao tác campaign này.");
         }
+
+        public async Task<IEnumerable<MyCampaignResponse>> GetMyCampaignsAsync(int userId)
+        {
+            // 1. Campaign gán trực tiếp cho user
+            var directAssignments = await _unitOfWork.CampaignUserAssignments.GetAllAsync(x => x.UserId == userId);
+            var campaignIds = directAssignments?.Select(a => a.CampaignId).ToHashSet() ?? new HashSet<int>();
+
+            // 2. Campaign gán qua team
+            var teamMemberships = await _unitOfWork.TeamMembers.GetAllAsync(x => x.UserId == userId);
+            var userTeamIds = teamMemberships?.Select(tm => tm.TeamId).ToHashSet() ?? new HashSet<int>();
+
+            if (userTeamIds.Any())
+            {
+                var teamAssignments = await _unitOfWork.CampaignTeamAssignments.GetAllAsync(
+                    x => userTeamIds.Contains(x.TeamId));
+                foreach (var ta in teamAssignments ?? new List<CampaignTeamAssignment>())
+                    campaignIds.Add(ta.CampaignId);
+            }
+
+            if (!campaignIds.Any())
+                return Enumerable.Empty<MyCampaignResponse>();
+
+            // 3. Chỉ lấy campaign IsActive + trong ngày hiệu lực (không filter theo prerequisites)
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var campaigns = await _unitOfWork.Campaigns.GetAllAsync(
+                x => campaignIds.Contains(x.CampaignId) && x.IsActive);
+
+            return (campaigns ?? Enumerable.Empty<Campaign>())
+                .Where(c =>
+                    (c.StartDate == null || c.StartDate <= today) &&
+                    (c.EndDate == null || c.EndDate >= today))
+                .Select(c => new MyCampaignResponse
+                {
+                    CampaignId   = c.CampaignId,
+                    CampaignName = c.CampaignName,
+                    IsActive     = c.IsActive,
+                    StartDate    = c.StartDate,
+                    EndDate      = c.EndDate,
+                    CompanyId    = c.CompanyId
+                });
+        }
     }
 }
