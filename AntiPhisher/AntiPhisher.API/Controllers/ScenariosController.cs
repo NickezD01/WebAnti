@@ -1,12 +1,11 @@
-﻿using AntiPhisher.Application.Interfaces;
+using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.AttemptRequest;
-using AntiPhisher.Application.Request.ScenarioRequest; // Mở Khóa Namespace DTO mới
+using AntiPhisher.Application.Request.ScenarioRequest;
 using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.ScenarioRespond;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Security.Claims;
 
 namespace AntiPhisher.API.Controllers
 {
@@ -16,10 +15,12 @@ namespace AntiPhisher.API.Controllers
     public class ScenariosController : ControllerBase
     {
         private readonly IScenarioService _scenarioService;
+        private readonly IClaimService _claimService;
 
-        public ScenariosController(IScenarioService scenarioService)
+        public ScenariosController(IScenarioService scenarioService, IClaimService claimService)
         {
             _scenarioService = scenarioService;
+            _claimService = claimService;
         }
 
         #region ================= USER ENDPOINTS =================
@@ -53,7 +54,6 @@ namespace AntiPhisher.API.Controllers
                     response.SetNotFound(message: $"Không tìm thấy kịch bản với ID {id}");
                     return NotFound(response);
                 }
-
                 response.SetOk(scenario);
                 return Ok(response);
             }
@@ -68,25 +68,39 @@ namespace AntiPhisher.API.Controllers
         public async Task<IActionResult> SubmitAttempt([FromBody] SubmitAttemptRequest request)
         {
             var response = new ApiResponse();
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("id")?.Value;
-
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                response.SetApiResponse(HttpStatusCode.Unauthorized, false, "Xác thực tài khoản thất bại.");
-                return Unauthorized(response);
-            }
-
-            if (!int.TryParse(userIdClaim, out int userId))
-            {
-                response.SetBadRequest(message: "Định dạng định danh người dùng không hợp lệ.");
-                return BadRequest(response);
-            }
-
             try
             {
-                var result = await _scenarioService.SubmitAttemptAsync(request, userId);
+                var claim = _claimService.GetUserClaim();
+                var result = await _scenarioService.SubmitAttemptAsync(request, claim.Id);
                 response.SetOk(result);
                 return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        // GET api/Scenarios/my-campaign-attempts?campaignId=1
+        [HttpGet("my-campaign-attempts")]
+        public async Task<IActionResult> GetMyCampaignAttempts([FromQuery] int campaignId)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                var attempts = await _scenarioService.GetUserCampaignAttemptsAsync(claim.Id, campaignId);
+                response.SetOk(attempts);
+                return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
             }
             catch (Exception ex)
             {
@@ -100,7 +114,7 @@ namespace AntiPhisher.API.Controllers
         #region ================= ADMIN ENDPOINTS =================
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateScenario([FromBody] CreateScenarioRequest request)
         {
             var response = new ApiResponse();
@@ -118,7 +132,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         [HttpPut("{id:int}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateScenario(int id, [FromBody] UpdateScenarioRequest request)
         {
             var response = new ApiResponse();
@@ -136,7 +150,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteScenario(int id)
         {
             var response = new ApiResponse();

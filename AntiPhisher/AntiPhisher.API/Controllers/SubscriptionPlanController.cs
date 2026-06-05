@@ -27,7 +27,7 @@ namespace AntiPhisher.API.Controllers
         }
 
 
-        [Authorize(Roles = "Manager")]
+        // Public — chỉ field bán hàng (trang pricing)
         [HttpGet("{planId}")]
         public async Task<IActionResult> GetPlanById(int planId)
         {
@@ -35,8 +35,17 @@ namespace AntiPhisher.API.Controllers
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
+        // Admin-only — kèm dữ liệu nội bộ (subscriber count + revenue)
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{planId}/stats")]
+        public async Task<IActionResult> GetPlanStats(int planId)
+        {
+            var response = await _subscriptionPlanService.GetPlanStatsAsync(planId);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
 
-        [Authorize(Roles = "Manager")]
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreatePlan([FromBody] CreateSubscriptionPlanRequest request)
         {
@@ -56,7 +65,7 @@ namespace AntiPhisher.API.Controllers
             }
         }
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{planId}")]
         public async Task<IActionResult> UpdatePlan(int planId, [FromBody] UpdateSubscriptionPlanRequest request)
         {
@@ -64,7 +73,7 @@ namespace AntiPhisher.API.Controllers
             return resposne.IsSuccess ? Ok(resposne) : BadRequest(resposne);
         }
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{planId}")]
         public async Task<IActionResult> DeletePlan(int planId)
         {
@@ -74,7 +83,7 @@ namespace AntiPhisher.API.Controllers
 
         //DashBoard
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("NumberOfSubscribers")]
         public async Task<IActionResult> countPlan()
         {
@@ -82,7 +91,7 @@ namespace AntiPhisher.API.Controllers
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("CalculateTotalRevenue")]
         public async Task<IActionResult> CalculateTotalRevenue()
         {
@@ -90,7 +99,7 @@ namespace AntiPhisher.API.Controllers
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("TotalPrice")]
         public async Task<IActionResult> TotalPrice()
         {

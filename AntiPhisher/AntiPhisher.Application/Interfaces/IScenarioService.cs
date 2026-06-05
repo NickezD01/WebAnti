@@ -13,7 +13,7 @@ namespace AntiPhisher.Application.Interfaces
     public interface IScenarioService
     {
         Task<AttemptResultResponse> SubmitAttemptAsync(SubmitAttemptRequest request, int userId);
-
+        Task<IEnumerable<UserCampaignAttemptResponse>> GetUserCampaignAttemptsAsync(int userId, int campaignId);
 
         // Các hàm CRUD mới thêm
         Task<IEnumerable<ScenarioDetailResponse>> GetAllScenariosAsync();

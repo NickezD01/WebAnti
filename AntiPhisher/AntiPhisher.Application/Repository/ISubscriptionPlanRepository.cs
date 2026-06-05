@@ -1,9 +1,6 @@
-﻿using AntiPhisher.Application.Features;
+using AntiPhisher.Application.Features;
 using AntiPhisher.Domain.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AntiPhisher.Application.Repository
@@ -14,8 +11,11 @@ namespace AntiPhisher.Application.Repository
         Task<SubscriptionPlan> GetPlanWithSubscribers(int planId);
         Task<bool> IsPlanActive(int planId);
         Task<List<SubscriptionPlan>> GetPlansByPriceRange(decimal minPrice, decimal maxPrice);
-        Task<bool> IsPlanNameExists(SubscriptionPlanName planName);
-        Task<SubscriptionPlan> GetPlanByName(SubscriptionPlanName name);
+
+        // CHANGED: SubscriptionPlanName enum → string
+        Task<bool> IsPlanNameExists(string planName);
+        Task<SubscriptionPlan> GetPlanByName(string name);
+
         Task<List<SubscriptionPlan>> GetPlansByFeature(string feature);
         Task<int> GetTotalSubscribersCount(int planId);
     }

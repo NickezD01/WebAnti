@@ -41,6 +41,10 @@ public partial class Scenario
 
     public string ExplanationHint { get; set; }
 
+    public string SimulationId { get; set; }
+
+    public string SimulationMetaJson { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

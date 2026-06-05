@@ -1,10 +1,10 @@
 ﻿using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.CampaignRequest;
 using AntiPhisher.Application.Response;
+using AntiPhisher.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AntiPhisher.API.Controllers
@@ -15,10 +15,12 @@ namespace AntiPhisher.API.Controllers
     public class CampaignsController : ControllerBase
     {
         private readonly ICampaignService _campaignService;
+        private readonly IClaimService _claimService;
 
-        public CampaignsController(ICampaignService campaignService)
+        public CampaignsController(ICampaignService campaignService, IClaimService claimService)
         {
             _campaignService = campaignService;
+            _claimService = claimService;
         }
 
         [HttpGet]
@@ -30,6 +32,29 @@ namespace AntiPhisher.API.Controllers
                 var campaigns = await _campaignService.GetAllCampaignsAsync();
                 response.SetOk(campaigns);
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        // GET api/Campaigns/my-campaigns
+        [HttpGet("my-campaigns")]
+        public async Task<IActionResult> GetMyCampaigns()
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                var campaigns = await _campaignService.GetMyCampaignsAsync(claim.Id);
+                response.SetOk(campaigns);
+                return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
             }
             catch (Exception ex)
             {
@@ -60,23 +85,25 @@ namespace AntiPhisher.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         public async Task<IActionResult> CreateCampaign([FromBody] CreateCampaignRequest request)
         {
             var response = new ApiResponse();
-            var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("id")?.Value;
-
-            if (string.IsNullOrEmpty(adminIdClaim) || !int.TryParse(adminIdClaim, out int adminId))
-            {
-                response.SetBadRequest(message: "Không thể xác thực danh tính tài khoản quản trị viên.");
-                return BadRequest(response);
-            }
-
             try
             {
-                var createdCampaign = await _campaignService.CreateCampaignAsync(request, adminId);
+                var claim = _claimService.GetUserClaim();
+                var createdCampaign = await _campaignService.CreateCampaignAsync(request, claim.Id, claim.Role);
                 response.SetOk(createdCampaign);
                 return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -85,15 +112,68 @@ namespace AntiPhisher.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteCampaign(int id)
         {
             var response = new ApiResponse();
             try
             {
-                await _campaignService.DeleteCampaignAsync(id);
+                var claim = _claimService.GetUserClaim();
+                await _campaignService.DeleteCampaignAsync(id, claim.Id, claim.Role);
                 response.SetOk(new { Message = $"Đã xóa thành công chiến dịch ID {id}" });
                 return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        /// <summary>
+        /// Chuyển trạng thái campaign: isActive=true (Activate) hoặc isActive=false (Tạm dừng).
+        /// Khi activate (false→true): tự động sinh UserLessonProgress cho tất cả user được assign.
+        /// PUT /api/Campaigns/{id}/status
+        /// Body: { "isActive": true }
+        /// </summary>
+        [Authorize(Roles = "Admin,Manager")]
+        [HttpPut("{id:int}/status")]
+        public async Task<IActionResult> UpdateCampaignStatus(int id, [FromBody] UpdateCampaignStatusRequest request)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                var updated = await _campaignService.UpdateCampaignStatusAsync(id, request.IsActive, claim.Id, claim.Role);
+                response.SetOk(updated);
+                return Ok(response);
+            }
+            catch (ArgumentNullException)
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
             }
             catch (Exception ex)
             {
@@ -102,4 +182,6 @@ namespace AntiPhisher.API.Controllers
             }
         }
     }
+
+    public record UpdateCampaignStatusRequest(bool IsActive);
 }

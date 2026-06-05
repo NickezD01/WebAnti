@@ -10,9 +10,12 @@ namespace AntiPhisher.API.Controllers
     public class UserAccountController : ControllerBase
     {
         public IUserAccountService _service;
-        public UserAccountController(IUserAccountService service)
+        private readonly IClaimService _claimService;
+
+        public UserAccountController(IUserAccountService service, IClaimService claimService)
         {
             _service = service;
+            _claimService = claimService;
         }
         [Authorize]
         [HttpGet("GetUserProfile")]
@@ -41,6 +44,23 @@ namespace AntiPhisher.API.Controllers
         public async Task<IActionResult> UpdateUserStatusOrRoleAsync([FromBody] UpdateUserStatusOrRoleRequest request)
         {
             var result = await _service.UpdateUserStatusOrRoleAsync(request);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+
+        // =====================================================================
+        // PHẦN 1: Danh sách nhân viên của công ty (Manager only)
+        // GET: api/UserAccount/company-employees?searchTerm=&pageIndex=1&pageSize=10
+        // =====================================================================
+
+        [Authorize(Roles = "Manager")]
+        [HttpGet("company-employees")]
+        public async Task<IActionResult> GetCompanyEmployeesAsync(
+            [FromQuery] string? searchTerm = "",
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var claim = _claimService.GetUserClaim();
+            var result = await _service.GetCompanyEmployeesAsync(claim.Id, searchTerm ?? "", pageIndex, pageSize);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }

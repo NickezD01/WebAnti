@@ -1,19 +1,21 @@
-﻿using AntiPhisher.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace AntiPhisher.Application.Request.SubscriptionPlan
 {
     public class CreateSubscriptionPlanRequest
     {
-        public SubscriptionPlanName Name { get; set; }
+        // CHANGED: Từ SubscriptionPlanName enum → string tự do
+        [Required(ErrorMessage = "Tên gói không được để trống")]
+        [MaxLength(200)]
+        public string Name { get; set; } = string.Empty;
+
         public decimal? Price { get; set; }
         public int DurationInMonths { get; set; }
-        public string Description { get; set; }
-        public string Feature { get; set; }
-        public bool IsActive { get; set; }
+        public string? Description { get; set; }
+        public string? Feature { get; set; }
+        public bool IsActive { get; set; } = true;
+
+        // NEW: MaxSlots được cấu hình khi tạo gói (default 10)
+        public int MaxSlots { get; set; } = 10;
     }
 }

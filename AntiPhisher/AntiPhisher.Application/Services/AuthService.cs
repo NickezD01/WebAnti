@@ -243,6 +243,78 @@ namespace AntiPhisher.Application.Services
         }
 
         // =====================================================
+        // LOGIN WITH GOOGLE
+        // =====================================================
+
+        public async Task<ApiResponse> LoginWithGoogleAsync(GoogleLoginRequest request)
+        {
+            ApiResponse response = new ApiResponse();
+
+            try
+            {
+                // Verify Google token
+                var payload = await Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync(request.Credential, new Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings
+                {
+                    // You can specify your Client ID here or let it validate signature without checking audience.
+                    Audience = new[] { "87250051752-p12lltrop700iehbui5pije6r1h6jn4e.apps.googleusercontent.com" }
+                });
+
+                if (payload == null)
+                {
+                    response.SetBadRequest("Invalid Google token");
+                    return response;
+                }
+
+                // GET USER
+                var user = await _unitOfWork.Users.GetAsync(
+                    x => x.Email == payload.Email,
+                    include: source => source.Include(x => x.Role)
+                );
+
+                if (user == null)
+                {
+                    // CREATE NEW USER IF NOT EXISTS
+                    var passwordData = CreatePasswordHash(Guid.NewGuid().ToString());
+                    int defaultRoleId = 3; // Use 3 for User Role
+
+                    user = new User
+                    {
+                        FullName = payload.Name ?? "Google User",
+                        Email = payload.Email,
+                        PasswordHash = Convert.ToBase64String(passwordData.PasswordHash),
+                        PasswordSalt = Convert.ToBase64String(passwordData.PasswordSalt),
+                        RoleId = defaultRoleId,
+                        AvatarUrl = payload.Picture,
+                        IsActive = true,
+                        IsEmailVerified = true, // Trusted from Google
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    await _unitOfWork.Users.AddAsync(user);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    // Re-fetch to include role
+                    user = await _unitOfWork.Users.GetAsync(
+                        x => x.Email == payload.Email,
+                        include: source => source.Include(x => x.Role)
+                    );
+                }
+
+                // CREATE TOKEN
+                string token = CreateToken(user);
+                response.SetOk(token);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest($"Google login error: {ex.Message}");
+                return response;
+            }
+        }
+
+        // =====================================================
         // VERIFY EMAIL
         // =====================================================
 

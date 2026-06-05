@@ -8,7 +8,6 @@ namespace AntiPhisher.Application.Request.LessonRequest
 {
     public class UpdateLessonProgressRequest
     {
-        public int UserId { get; set; }
         public int LessonId { get; set; }
         public bool IsCompleted { get; set; }
     }

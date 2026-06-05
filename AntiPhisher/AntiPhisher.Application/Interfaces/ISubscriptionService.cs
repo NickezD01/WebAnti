@@ -16,14 +16,25 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> CancelSubscriptionAsync(int subscriptionId);
         Task<ApiResponse> GetSubscriptionByIdAsync(int subscriptionId);
         Task<ApiResponse> DeleteSubPlanData(int Id);
+
         // User-related subscription operations
         Task<ApiResponse> GetUserSubscriptionsAsync(int accountId);
 
         // Subscription management operations
         Task<ApiResponse> ProcessSubscriptionPaymentAsync(int subscriptionId);
-
-        // Subscription status operations
-
         Task<ApiResponse> HandleExpiredSubscriptionsAsync();
+
+        // =====================================================
+        // PHẦN 1: Quota & Quản lý nhân viên (dành cho Manager)
+        // =====================================================
+
+        /// <summary>Mời / thêm nhân viên vào công ty, kiểm tra quota slot.</summary>
+        Task<ApiResponse> InviteEmployeeAsync(InviteEmployeeRequest request, int managerId);
+
+        /// <summary>Lấy thông tin slot đã dùng / còn lại của gói hiện tại.</summary>
+        Task<ApiResponse> GetSlotsUsageAsync(int managerId);
+
+        /// <summary>Xóa nhân viên ra khỏi công ty, giải phóng 1 slot.</summary>
+        Task<ApiResponse> RemoveEmployeeAsync(int employeeUserId, int managerId);
     }
 }

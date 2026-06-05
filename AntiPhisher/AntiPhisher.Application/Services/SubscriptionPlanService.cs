@@ -36,6 +36,7 @@ namespace AntiPhisher.Application.Services
         public async Task<ApiResponse> CreatePlanAsync(CreateSubscriptionPlanRequest request)
         {
             ApiResponse apiResponse = new ApiResponse();
+            if (request == null) return apiResponse.SetBadRequest("Dữ liệu request không được để trống.");
             var validationResult = _subplanValidator.Validate(request);
             if (!validationResult.IsValid)
             {
@@ -45,9 +46,9 @@ namespace AntiPhisher.Application.Services
             try
             {
                 var userClaim = _claimService.GetUserClaim();
-                if (userClaim.Role != "Manager")
+                if (userClaim.Role != "Admin")
                 {
-                    return apiResponse.SetBadRequest("Only managers can create subscription plans");
+                    return apiResponse.SetBadRequest("Only admins can create subscription plans");
                 }
 
                 //if (await _unitOfWork.SubscriptionPlans.IsPlanNameExists(request.Name))
@@ -81,9 +82,9 @@ namespace AntiPhisher.Application.Services
             try
             {
                 var userClaim = _claimService.GetUserClaim();
-                if (userClaim.Role != "Manager")
+                if (userClaim.Role != "Admin")
                 {
-                    return new ApiResponse().SetBadRequest("Only managers can update subscription plans");
+                    return new ApiResponse().SetBadRequest("Only admins can update subscription plans");
                 }
 
                 var plan = await _unitOfWork.SubscriptionPlans.GetAsync(p => p.Id == Id);
@@ -107,11 +108,10 @@ namespace AntiPhisher.Application.Services
         {
             try
             {
-                // Verify if user is Manager
                 var userClaim = _claimService.GetUserClaim();
-                if (userClaim.Role != "Manager")
+                if (userClaim.Role != "Admin")
                 {
-                    return new ApiResponse().SetBadRequest("Only managers can delete subscription plans");
+                    return new ApiResponse().SetBadRequest("Only admins can delete subscription plans");
                 }
                 var plan = await _unitOfWork.SubscriptionPlans.GetAsync(p => p.Id == planId);
                 if (plan == null)
@@ -138,43 +138,67 @@ namespace AntiPhisher.Application.Services
             }
         }
 
+        // Public — chỉ trả field bán hàng, không lộ dữ liệu nội bộ
         public async Task<ApiResponse> GetPlanByIdAsync(int planId)
         {
             try
             {
-                // Lấy plan với thông tin về subscribers
-                var plan = await _unitOfWork.SubscriptionPlans.GetPlanWithSubscribers(planId);
-
-                if (plan == null || plan.IsDeleted)
-                {
+                var plan = await _unitOfWork.SubscriptionPlans.GetAsync(p => p.Id == planId && !p.IsDeleted);
+                if (plan == null)
                     return new ApiResponse().SetNotFound("Subscription plan not found");
-                }
 
-                // Tính tổng doanh thu
-                decimal totalRevenue = 0;
-                if (plan.Subscriptions != null && plan.Subscriptions.Any())
+                var response = new
                 {
-                    totalRevenue = plan.Subscriptions
-                        .Where(s => s.PaymentStatus == PaymentStatus.Paid)
-                        .Sum(s => s.Price);
-                }
-
-                // Tạo anonymous object mới chỉ chứa các trường cần thiết
-                var filteredResponse = new
-                {
-                    Id = plan.Id,
-                    Name = plan.Name,
-                    Price = plan.Price,
-                    ActiveSubscribersCount = plan.Subscriptions?.Count(s => s.Status == SubscriptionStatus.Active) ?? 0,
-
-                    TotalRevenue = totalRevenue
+                    plan.Id,
+                    plan.Name,
+                    plan.Price,
+                    plan.Description,
+                    plan.Feature,
+                    plan.MaxSlots,
+                    DurationInMonths = plan.DurationMonth,
+                    plan.IsActive
                 };
 
-                return new ApiResponse().SetOk(filteredResponse);
+                return new ApiResponse().SetOk(response);
             }
             catch (Exception ex)
             {
                 return new ApiResponse().SetBadRequest($"Error retrieving subscription plan: {ex.Message}");
+            }
+        }
+
+        // Admin-only — trả thêm ActiveSubscribersCount và TotalRevenue
+        public async Task<ApiResponse> GetPlanStatsAsync(int planId)
+        {
+            try
+            {
+                var plan = await _unitOfWork.SubscriptionPlans.GetPlanWithSubscribers(planId);
+                if (plan == null || plan.IsDeleted)
+                    return new ApiResponse().SetNotFound("Subscription plan not found");
+
+                decimal totalRevenue = plan.Subscriptions?
+                    .Where(s => s.PaymentStatus == PaymentStatus.Paid)
+                    .Sum(s => s.Price) ?? 0;
+
+                var response = new
+                {
+                    plan.Id,
+                    plan.Name,
+                    plan.Price,
+                    plan.Description,
+                    plan.Feature,
+                    plan.MaxSlots,
+                    DurationInMonths = plan.DurationMonth,
+                    plan.IsActive,
+                    ActiveSubscribersCount = plan.Subscriptions?.Count(s => s.Status == SubscriptionStatus.Active) ?? 0,
+                    TotalRevenue = totalRevenue
+                };
+
+                return new ApiResponse().SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse().SetBadRequest($"Error retrieving subscription plan stats: {ex.Message}");
             }
         }
 
@@ -210,128 +234,55 @@ namespace AntiPhisher.Application.Services
         }
 
 
-        //admindashboard
-        //admindashboard
+        // =====================================================================
+        // Admin Dashboard: Đếm số subscriber theo từng gói
+        // CHANGED: SubscriptionPlanName enum → string comparison
+        // =====================================================================
         public async Task<ApiResponse> CountPlan()
         {
             var plans = await _unitOfWork.SubscriptionPlans.GetAllAsync(null);
-            var subs = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
-            var counts = new Dictionary<SubscriptionPlanName, int>();
-            int totalBronzeCount = 0;
-            int totalSilverCount = 0;
-            int totalGoldCount = 0;
-            foreach (var plan in plans)
-            {
-                if (plan.Name == SubscriptionPlanName.Bronze)
-                {
-                    totalBronzeCount += subs.Count(sub => sub.PlanId == plan.Id);
-                }
-                else if (plan.Name == SubscriptionPlanName.Silver)
-                {
-                    totalSilverCount += subs.Count(sub => sub.PlanId == plan.Id);
-                }
-                else if (plan.Name == SubscriptionPlanName.Gold)
-                {
-                    totalGoldCount += subs.Count(sub => sub.PlanId == plan.Id);
-                }
-            }
-            counts[SubscriptionPlanName.Bronze] = totalBronzeCount;
-            counts[SubscriptionPlanName.Silver] = totalSilverCount;
-            counts[SubscriptionPlanName.Gold] = totalGoldCount;
+            var subs  = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
+
+            // Group động theo tên gói (không lock cứng Bronze/Silver/Gold nữa)
+            var counts = plans.ToDictionary(
+                plan => plan.Name,
+                plan => subs.Count(sub => sub.PlanId == plan.Id)
+            );
+
             return new ApiResponse().SetOk(counts);
         }
+
         public async Task<ApiResponse> CalculateTotalRevenue()
         {
-            var Bronzeplans = await _unitOfWork.SubscriptionPlans.GetAllAsync(b => b.Name == SubscriptionPlanName.Bronze);
-            var Silverplans = await _unitOfWork.SubscriptionPlans.GetAllAsync(b => b.Name == SubscriptionPlanName.Silver);
-            var Goldplans = await _unitOfWork.SubscriptionPlans.GetAllAsync(b => b.Name == SubscriptionPlanName.Gold);
-            var subs = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
+            var plans = await _unitOfWork.SubscriptionPlans.GetAllAsync(null);
+            var subs  = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
 
-
-            var totalRevenue = new Dictionary<SubscriptionPlanName, decimal>();
-            decimal totalBronzePrize = 0;
-            decimal totalSilverPrize = 0;
-            decimal totalGoldPrize = 0;
-
-            foreach (var bplan in Bronzeplans)
-            {
-                int userCount = subs.Count(sub => sub.PlanId == bplan.Id);
-                totalBronzePrize += userCount * bplan.Price;
-            }
-            foreach (var splan in Silverplans)
-            {
-                int userCount = subs.Count(sub => sub.PlanId == splan.Id);
-                totalSilverPrize += userCount * splan.Price;
-            }
-            foreach (var gplan in Goldplans)
-            {
-                int userCount = subs.Count(sub => sub.PlanId == gplan.Id);
-                totalGoldPrize += userCount * gplan.Price;
-            }
-            totalRevenue[SubscriptionPlanName.Bronze] = totalBronzePrize;
-            totalRevenue[SubscriptionPlanName.Silver] = totalSilverPrize;
-            totalRevenue[SubscriptionPlanName.Gold] = totalGoldPrize;
+            // Tính doanh thu động theo từng gói
+            var totalRevenue = plans.ToDictionary(
+                plan => plan.Name,
+                plan =>
+                {
+                    int userCount = subs.Count(sub => sub.PlanId == plan.Id);
+                    return userCount * plan.Price;
+                }
+            );
 
             return new ApiResponse().SetOk(totalRevenue);
         }
+
         public async Task<ApiResponse> TotalPrice()
         {
-            var planBronze = await _unitOfWork.SubscriptionPlans.GetAsync(b => b.Name == SubscriptionPlanName.Bronze);
-            var subs = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
-            int bronzeUser = 0;
-            if (subs != null)
+            var plans = await _unitOfWork.SubscriptionPlans.GetAllAsync(null);
+            var subs  = await _unitOfWork.Subscriptions.GetAllAsync(s => s.PaymentStatus == PaymentStatus.Paid);
+
+            decimal total = 0;
+            foreach (var plan in plans)
             {
-                foreach (var sub in subs)
-                {
-                    if (sub.PlanId == planBronze.Id)
-                    {
-                        bronzeUser++;
-                    }
-                }
-            }
-            else
-            {
-                bronzeUser = 0;
+                int count = subs.Count(sub => sub.PlanId == plan.Id);
+                total += count * plan.Price;
             }
 
-
-            var planSilver = await _unitOfWork.SubscriptionPlans.GetAsync(b => b.Name == SubscriptionPlanName.Silver);
-            int silverUser = 0;
-            if (subs != null)
-            {
-                foreach (var sub in subs)
-                {
-                    if (sub.PlanId == planSilver.Id)
-                    {
-                        silverUser++;
-                    }
-                }
-            }
-            else
-            {
-                silverUser = 0;
-            }
-
-
-            var planGold = await _unitOfWork.SubscriptionPlans.GetAsync(b => b.Name == SubscriptionPlanName.Gold);
-            int goldUser = 0;
-            if (subs != null)
-            {
-                foreach (var sub in subs)
-                {
-                    if (sub.PlanId == planGold.Id)
-                    {
-                        goldUser++;
-                    }
-                }
-            }
-            else
-            {
-                goldUser = 0;
-            }
-
-            var totalprice = (bronzeUser * planBronze.Price) + (silverUser * planSilver.Price) + (goldUser * planGold.Price);
-            return new ApiResponse().SetOk(totalprice);
+            return new ApiResponse().SetOk(total);
         }
 
 

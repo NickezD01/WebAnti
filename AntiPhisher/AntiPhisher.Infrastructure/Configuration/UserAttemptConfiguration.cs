@@ -1,11 +1,6 @@
-﻿using AntiPhisher.Domain.Models;
+using AntiPhisher.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AntiPhisher.Infrastructure.Configuration
 {
@@ -15,8 +10,15 @@ namespace AntiPhisher.Infrastructure.Configuration
         {
             builder.HasKey(x => x.AttemptId);
 
+            // CHANGED: UserAnswer nullable, tối đa 50 ký tự (Reported/Clicked/NoAction)
             builder.Property(x => x.UserAnswer)
-                .HasMaxLength(20);
+                .HasMaxLength(50)
+                .IsRequired(false);
+
+            // NEW: 3 trường hành vi phishing, mặc định false
+            builder.Property(x => x.IsClickedLink).HasDefaultValue(false);
+            builder.Property(x => x.IsCredentialLeaked).HasDefaultValue(false);
+            builder.Property(x => x.IsReported).HasDefaultValue(false);
 
             builder.HasOne(x => x.User)
                 .WithMany(x => x.UserAttempts)

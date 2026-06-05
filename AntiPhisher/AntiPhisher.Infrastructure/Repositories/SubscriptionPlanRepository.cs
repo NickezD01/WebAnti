@@ -1,10 +1,8 @@
-﻿using AntiPhisher.Application.Repository;
+using AntiPhisher.Application.Repository;
 using AntiPhisher.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AntiPhisher.Infrastructure.Repositories
@@ -14,20 +12,21 @@ namespace AntiPhisher.Infrastructure.Repositories
         public SubscriptionPlanRepository(AppDbContext context) : base(context)
         {
         }
+
         public async Task<List<SubscriptionPlan>> GetActivePlans()
         {
             return await _db.Where(p => p.IsActive && !p.IsDeleted)
-                          .Include(p => p.Subscriptions)
-                          .OrderBy(p => p.Price)
-                          .ToListAsync();
+                            .Include(p => p.Subscriptions)
+                            .OrderBy(p => p.Price)
+                            .ToListAsync();
         }
 
         public async Task<SubscriptionPlan> GetPlanWithSubscribers(int planId)
         {
             return await _db.Where(p => p.Id == planId)
-                          .Include(p => p.Subscriptions)
-                            .ThenInclude(s => s.Account)
-                          .FirstOrDefaultAsync();
+                            .Include(p => p.Subscriptions)
+                                .ThenInclude(s => s.Account)
+                            .FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsPlanActive(int planId)
@@ -38,37 +37,35 @@ namespace AntiPhisher.Infrastructure.Repositories
 
         public async Task<List<SubscriptionPlan>> GetPlansByPriceRange(decimal minPrice, decimal maxPrice)
         {
-            return await _db.Where(p => p.IsActive &&
-                                      !p.IsDeleted &&
-                                      p.Price >= minPrice &&
-                                      p.Price <= maxPrice)
-                          .OrderBy(p => p.Price)
-                          .ToListAsync();
+            return await _db.Where(p => p.IsActive && !p.IsDeleted
+                                     && p.Price >= minPrice && p.Price <= maxPrice)
+                            .OrderBy(p => p.Price)
+                            .ToListAsync();
         }
 
-        public async Task<bool> IsPlanNameExists(SubscriptionPlanName planName)
+        // CHANGED: SubscriptionPlanName enum → string
+        public async Task<bool> IsPlanNameExists(string planName)
         {
             return await _db.AnyAsync(p => p.Name == planName && !p.IsDeleted);
         }
 
-        public async Task<SubscriptionPlan> GetPlanByName(SubscriptionPlanName name)
+        public async Task<SubscriptionPlan> GetPlanByName(string name)
         {
             return await _db.FirstOrDefaultAsync(p => p.Name == name && !p.IsDeleted);
         }
 
         public async Task<List<SubscriptionPlan>> GetPlansByFeature(string feature)
         {
-            return await _db.Where(p => p.IsActive &&
-                                      !p.IsDeleted &&
-                                      p.Feature.Contains(feature))
-                          .ToListAsync();
+            return await _db.Where(p => p.IsActive && !p.IsDeleted
+                                     && p.Feature != null && p.Feature.Contains(feature))
+                            .ToListAsync();
         }
 
         public async Task<int> GetTotalSubscribersCount(int planId)
         {
             return await _db.Where(p => p.Id == planId)
-                          .SelectMany(p => p.Subscriptions)
-                          .CountAsync(s => s.Status == SubscriptionStatus.Active);
+                            .SelectMany(p => p.Subscriptions)
+                            .CountAsync(s => s.Status == SubscriptionStatus.Active);
         }
     }
 }
