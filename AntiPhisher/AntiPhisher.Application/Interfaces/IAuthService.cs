@@ -14,6 +14,9 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> LoginAsync(LoginRequest request);
         Task<ApiResponse> LoginWithGoogleAsync(GoogleLoginRequest request);
         Task<ApiResponse> VerifyEmailAsync(int userId, string verificationCode);
+        Task<ApiResponse> ChangePasswordAsync(ChangePasswordRequest request, int userId);
+        Task<ApiResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
+        Task<ApiResponse> ResetPasswordAsync(ResetPasswordRequest request);
 
     }
 }

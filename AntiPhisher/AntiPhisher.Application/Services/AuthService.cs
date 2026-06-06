@@ -545,6 +545,169 @@ namespace AntiPhisher.Application.Services
         }
 
         // =====================================================
+        // CHANGE PASSWORD
+        // =====================================================
+
+        public async Task<ApiResponse> ChangePasswordAsync(ChangePasswordRequest request, int userId)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                // 1. User tồn tại không
+                var user = await _unitOfWork.Users.GetAsync(x => x.UserId == userId);
+                if (user == null)
+                    return response.SetNotFound("Không tìm thấy tài khoản.");
+
+                // 2. Độ dài mật khẩu mới
+                if (request.NewPassword.Length < 6)
+                    return response.SetBadRequest("Mật khẩu mới phải có ít nhất 6 ký tự.");
+
+                // 3. Xác nhận khớp
+                if (request.NewPassword != request.ConfirmPassword)
+                    return response.SetBadRequest("Mật khẩu xác nhận không khớp.");
+
+                // 4. Mật khẩu mới không được trùng cũ
+                if (request.NewPassword == request.CurrentPassword)
+                    return response.SetBadRequest("Mật khẩu mới không được trùng mật khẩu hiện tại.");
+
+                // 5. Verify mật khẩu hiện tại
+                var storedHash = Convert.FromBase64String(user.PasswordHash);
+                var storedSalt = Convert.FromBase64String(user.PasswordSalt);
+                if (!VerifyPasswordHash(request.CurrentPassword, storedHash, storedSalt))
+                    return response.SetBadRequest("Mật khẩu hiện tại không đúng.");
+
+                // 6. Hash + lưu mật khẩu mới
+                var pwd = CreatePasswordHash(request.NewPassword);
+                user.PasswordHash = Convert.ToBase64String(pwd.PasswordHash);
+                user.PasswordSalt = Convert.ToBase64String(pwd.PasswordSalt);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.SaveChangeAsync();
+                return response.SetOk("Đổi mật khẩu thành công.");
+            }
+            catch (Exception ex)
+            {
+                return response.SetBadRequest($"Lỗi khi đổi mật khẩu: {ex.Message}");
+            }
+        }
+
+        // =====================================================
+        // FORGOT PASSWORD
+        // =====================================================
+
+        public async Task<ApiResponse> ForgotPasswordAsync(ForgotPasswordRequest request)
+        {
+            var response = new ApiResponse();
+            const string ALWAYS_OK = "Nếu email tồn tại trong hệ thống, bạn sẽ nhận được link đặt lại mật khẩu trong vài phút.";
+            try
+            {
+                var user = await _unitOfWork.Users.GetAsync(x => x.Email == request.Email);
+
+                // Always return 200 — don't reveal whether email exists
+                if (user == null)
+                    return response.SetOk(ALWAYS_OK);
+
+                // Invalidate all pending (unused) tokens for this user
+                var oldTokens = await _unitOfWork.PasswordResetTokens.GetAllAsync(
+                    x => x.UserId == user.UserId && x.UsedAt == null);
+                foreach (var t in oldTokens)
+                    t.UsedAt = DateTime.UtcNow;
+
+                // Generate crypto-safe plain token → send in link
+                byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
+                string plainToken = Convert.ToBase64String(randomBytes); // 44 chars
+
+                // SHA256(plainToken) → store in DB
+                byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(plainToken));
+                string tokenHash = Convert.ToBase64String(hashBytes); // 44 chars
+
+                await _unitOfWork.PasswordResetTokens.AddAsync(new PasswordResetToken
+                {
+                    UserId = user.UserId,
+                    TokenHash = tokenHash,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await _unitOfWork.SaveChangeAsync();
+
+                // plainToken is Base64 — Uri.EscapeDataString handles +, /, = safely
+                // FE reads ?token= via useSearchParams which auto-decodes → no double-decode needed
+                var resetLink = $"{_appSettings.FrontendUrl}/dat-lai-mat-khau?token={Uri.EscapeDataString(plainToken)}";
+
+                string emailContent = $@"
+                    Dear {user.FullName},<br/><br/>
+                    Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản <strong>{user.Email}</strong>.<br/>
+                    Click vào link bên dưới để đặt lại mật khẩu (hiệu lực 30 phút):<br/><br/>
+                    <a href=""{resetLink}"">{resetLink}</a><br/><br/>
+                    Nếu bạn không yêu cầu điều này, hãy bỏ qua email này.
+                ";
+
+                var emailResult = await _emailService.SendNotiMail(user.Email, emailContent);
+                if (!emailResult.IsSuccess)
+                    Console.Error.WriteLine($"[FORGOT PWD WARNING] SendNotiMail fail: {emailResult.ErrorMessage}");
+
+                return response.SetOk(ALWAYS_OK);
+            }
+            catch (Exception ex)
+            {
+                return response.SetBadRequest($"Lỗi: {ex.Message}");
+            }
+        }
+
+        // =====================================================
+        // RESET PASSWORD
+        // =====================================================
+
+        public async Task<ApiResponse> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                // 1. Hash the received plain token (same way A2 stores it)
+                byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(request.Token));
+                string tokenHash = Convert.ToBase64String(hashBytes);
+
+                // 2. Verify: valid hash, not used, not expired — gộp chung mọi case sai/hết hạn/đã dùng
+                var tokenRecord = await _unitOfWork.PasswordResetTokens.GetAsync(
+                    x => x.TokenHash == tokenHash
+                      && x.UsedAt == null
+                      && x.ExpiresAt > DateTime.UtcNow);
+                if (tokenRecord == null)
+                    return response.SetBadRequest("Link đặt lại không hợp lệ hoặc đã hết hạn.");
+
+                // 3. Validate password
+                if (request.NewPassword.Length < 6)
+                    return response.SetBadRequest("Mật khẩu phải có ít nhất 6 ký tự.");
+                if (request.NewPassword != request.ConfirmPassword)
+                    return response.SetBadRequest("Mật khẩu xác nhận không khớp.");
+
+                // 4. Get user (FK guarantees existence)
+                var user = await _unitOfWork.Users.GetAsync(x => x.UserId == tokenRecord.UserId);
+
+                // 5. Hash new password — reuse CreatePasswordHash (private, same class)
+                var pwd = CreatePasswordHash(request.NewPassword);
+                user.PasswordHash = Convert.ToBase64String(pwd.PasswordHash);
+                user.PasswordSalt = Convert.ToBase64String(pwd.PasswordSalt);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                // 6. Invalidate ALL unused tokens for this user (incl. current) — chặn replay & multi-token
+                var allUnused = await _unitOfWork.PasswordResetTokens.GetAllAsync(
+                    x => x.UserId == tokenRecord.UserId && x.UsedAt == null);
+                foreach (var t in allUnused)
+                    t.UsedAt = DateTime.UtcNow;
+
+                // 7. Persist user + tokens in one shot
+                await _unitOfWork.SaveChangeAsync();
+                return response.SetOk("Đặt lại mật khẩu thành công. Vui lòng đăng nhập.");
+            }
+            catch (Exception ex)
+            {
+                return response.SetBadRequest($"Lỗi: {ex.Message}");
+            }
+        }
+
+        // =====================================================
         // UNUSED
         // =====================================================
 
