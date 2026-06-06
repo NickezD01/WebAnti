@@ -86,7 +86,8 @@ namespace AntiPhisher.Application.MyMapper
 
             // 3. Map từ Entity gốc ra Response (Lấy kèm thông tin tên độ khó)
             CreateMap<Scenario, ScenarioDetailResponse>()
-                .ForMember(dest => dest.DifficultyName, opt => opt.MapFrom(src => src.Difficulty != null ? src.Difficulty.LevelName : null));
+                .ForMember(dest => dest.DifficultyName, opt => opt.MapFrom(src => src.Difficulty != null ? src.Difficulty.LevelName : null))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null));
 
             // =========================================================
             // ATTEMPT MAPPING

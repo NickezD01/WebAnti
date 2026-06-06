@@ -327,12 +327,14 @@ namespace AntiPhisher.Application.Services
                 activeSub.ModifiedDate = DateTime.UtcNow;
                 await _unitOfWork.SaveChangeAsync();
 
-                await _emailService.SendNotiMail(request.Email,
+                var mailResult = await _emailService.SendNotiMail(request.Email,
                     $"Xin chào <b>{request.FullName}</b>,<br/><br/>" +
                     $"Bạn đã được mời tham gia hệ thống đào tạo <b>AntiPhisher</b>.<br/>" +
                     $"• Email: <b>{request.Email}</b><br/>" +
                     $"• Mật khẩu tạm thời: <b>{tempPassword}</b><br/><br/>" +
                     $"Vui lòng đổi mật khẩu sau lần đăng nhập đầu tiên.");
+                if (!mailResult.IsSuccess)
+                    Console.Error.WriteLine($"[INVITE WARNING] SendNotiMail fail: {mailResult.ErrorMessage}");
 
                 return new ApiResponse().SetOk(new
                 {

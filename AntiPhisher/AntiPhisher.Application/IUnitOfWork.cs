@@ -16,6 +16,7 @@ namespace AntiPhisher.Application
         IRoleRepository Roles { get; }
         IRefreshTokenRepository RefreshTokens { get; }
         IEmailVerificationRepository EmailVerifications { get; }
+        IPasswordResetTokenRepository PasswordResetTokens { get; }
         ILoginHistoryRepository LoginHistories { get; }
 
         // =========================

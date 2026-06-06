@@ -12,6 +12,7 @@ namespace AntiPhisher.Domain
         public Logging Logging { get; set; }
         public string AllowedHosts { get; set; }
         public SecretToken SecretToken { get; set; }
+        public string FrontendUrl { get; set; } = "http://localhost:5173";
     }
     public class ConnectionStrings
     {

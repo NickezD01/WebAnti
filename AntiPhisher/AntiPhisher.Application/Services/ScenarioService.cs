@@ -201,7 +201,7 @@ namespace AntiPhisher.Application.Services
         {
             var scenarios = await _unitOfWork.Scenarios.GetAllAsync(
                 filter: null,
-                include: query => query.Include(s => s.Difficulty),
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category),
                 pageIndex: 1,
                 pageSize: 100
             );
@@ -213,7 +213,7 @@ namespace AntiPhisher.Application.Services
         {
             var scenario = await _unitOfWork.Scenarios.GetAsync(
                 filter: s => s.ScenarioId == id,
-                include: query => query.Include(s => s.Difficulty)
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category)
             );
             return scenario == null ? null : _mapper.Map<ScenarioDetailResponse>(scenario);
         }

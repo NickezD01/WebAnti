@@ -22,6 +22,7 @@ namespace AntiPhisher.Infrastructure
         public IRoleRepository Roles { get; }
         public IRefreshTokenRepository RefreshTokens { get; }
         public IEmailVerificationRepository EmailVerifications { get; }
+        public IPasswordResetTokenRepository PasswordResetTokens { get; }
         public ILoginHistoryRepository LoginHistories { get; }
 
         // =========================
@@ -83,6 +84,7 @@ namespace AntiPhisher.Infrastructure
             Roles = new RoleRepository(context);
             RefreshTokens = new RefreshTokenRepository(context);
             EmailVerifications = new EmailVerificationRepository(context);
+            PasswordResetTokens = new PasswordResetTokenRepository(context);
             LoginHistories = new LoginHistoryRepository(context);
 
             // COMPANY / TEAM
