@@ -504,6 +504,37 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.ToTable("Order");
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -1325,6 +1356,17 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("Subscription");
 
                     b.Navigation("UserAccount");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.Payment", b =>

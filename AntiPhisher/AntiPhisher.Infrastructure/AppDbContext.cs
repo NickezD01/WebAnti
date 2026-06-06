@@ -43,6 +43,7 @@ namespace AntiPhisher.Infrastructure
         public DbSet<LoginHistory> LoginHistories { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<EmailVerification> EmailVerifications { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         // --- Gói dịch vụ & Thanh toán (Subscription) ---
         public DbSet<Subscription> Subscriptions { get; set; }
