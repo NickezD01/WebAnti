@@ -6,9 +6,8 @@ namespace AntiPhisher.Application.Response.ScenarioRespond
     {
         public int ScenarioId { get; set; }
         public int CategoryId { get; set; }
+        public string? CategoryName { get; set; }
         public int DifficultyId { get; set; }
-
-        // Bổ sung thuộc tính này để nhận dữ liệu Tên độ khó (Ví dụ: Cơ bản, Trung bình) từ Mapper
         public string? DifficultyName { get; set; }
 
         public int? CreatedByUserId { get; set; }
