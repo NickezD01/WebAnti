@@ -1,7 +1,9 @@
 ﻿using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.User;
 using AntiPhisher.Application.Response;
+using AntiPhisher.Application.Response.TeamMemberResponse;
 using AntiPhisher.Application.Response.UserAccount;
+using AntiPhisher.Domain.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AntiPhisher.Domain.Models;
 
 namespace AntiPhisher.Application.Services
 {
@@ -196,6 +197,142 @@ namespace AntiPhisher.Application.Services
             catch (Exception ex)
             {
                 return apiResponse.SetBadRequest(ex.Message);
+            }
+        }
+        // =====================================================================
+        // CHỨC NĂNG 1 — Nhân viên tự xem thông tin Manager của mình
+        // =====================================================================
+        public async Task<ApiResponse> GetMyManagerAsync()
+        {
+            ApiResponse apiResponse = new ApiResponse();
+            try
+            {
+                var claim = _claim.GetUserClaim();
+                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
+
+                var teamMember = await _unitOfWork.TeamMembers.GetAsync(
+                    tm => tm.UserId == claim.Id,
+                    include: query => query.Include(tm => tm.Team));
+
+                if (teamMember == null || teamMember.Team == null)
+                    return apiResponse.SetOk((object)null);
+
+                var team = teamMember.Team;
+
+                // Kiểm tra int: không dùng .Value hay null
+                if (team.ManagerId <= 0)
+                    return apiResponse.SetOk((object)null);
+
+                var manager = await _unitOfWork.Users.GetAsync(u => u.UserId == team.ManagerId);
+                if (manager == null)
+                    return apiResponse.SetOk((object)null);
+
+                var response = new MyManagerResponse
+                {
+                    ManagerId = manager.UserId,
+                    ManagerName = manager.FullName,
+                    ManagerEmail = manager.Email,
+                    TeamName = team.TeamName
+                };
+
+                return apiResponse.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                return apiResponse.SetBadRequest($"Lỗi khi tìm quản lý: {ex.Message}");
+            }
+        }
+
+        // =====================================================================
+        // CHỨC NĂNG 2 — Manager xem danh sách thành viên trong NHÓM của mình
+        // =====================================================================
+        public async Task<ApiResponse> GetMyTeamMembersAsync()
+        {
+            ApiResponse apiResponse = new ApiResponse();
+            try
+            {
+                var claim = _claim.GetUserClaim();
+                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
+
+                // Lấy Team dựa trên ManagerId (Id người đang đăng nhập)
+                var team = await _unitOfWork.Teams.GetAsync(t => t.ManagerId == claim.Id);
+                if (team == null)
+                    return apiResponse.SetOk(new List<TeamMemberResponse>()); // Trả mảng rỗng nếu chưa quản lý team nào
+
+                // Quét bảng trung gian TeamMembers để lấy danh sách thành viên nhóm
+                var members = await _unitOfWork.TeamMembers.GetAllAsync(
+                    tm => tm.TeamId == team.TeamId,
+                    include: query => query.Include(tm => tm.User).Include(tm => tm.User.Role)
+                );
+
+                if (members == null || !members.Any())
+                    return apiResponse.SetOk(new List<TeamMemberResponse>());
+
+                var response = members
+                    .Where(tm => tm.User != null)
+                    .Select(tm => new TeamMemberResponse
+                    {
+                        UserId = tm.User.UserId,
+                        FullName = tm.User.FullName,
+                        Email = tm.User.Email,
+                        AvatarUrl = tm.User.AvatarUrl ?? string.Empty,
+                        Role = tm.User.Role?.RoleName ?? "User"
+                    }).ToList();
+
+                return apiResponse.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                return apiResponse.SetBadRequest($"Lỗi khi lấy thành viên nhóm: {ex.Message}");
+            }
+        }
+
+        // =====================================================================
+        // CHỨC NĂNG 3 — Manager xem danh sách toàn bộ nhân viên trong CÔNG TY
+        // =====================================================================
+        public async Task<ApiResponse> GetEmployeesInCompanyAsync()
+        {
+            ApiResponse apiResponse = new ApiResponse();
+            try
+            {
+                var claim = _claim.GetUserClaim();
+                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
+
+                // Lấy thông tin tài khoản Manager hiện tại
+                var manager = await _unitOfWork.Users.GetAsync(x => x.UserId == claim.Id);
+                if (manager == null)
+                    return apiResponse.SetNotFound("Không tìm thấy thông tin tài khoản.");
+
+                // Kiểm tra CompanyId (kiểu int hoặc int? tùy thuộc DB của bạn)
+                if (manager.CompanyId == null || manager.CompanyId <= 0)
+                    return apiResponse.SetOk(new List<CompanyEmployeeResponse>());
+
+                int currentCompanyId = manager.CompanyId.Value;
+
+                // Lấy tất cả User thuộc cùng CompanyId này, loại trừ chính Manager đang xem
+                var employees = await _unitOfWork.Users.GetAllAsync(
+                    x => x.CompanyId == currentCompanyId && x.UserId != manager.UserId,
+                    include: query => query.Include(u => u.Role)
+                );
+
+                if (employees == null || !employees.Any())
+                    return apiResponse.SetOk(new List<CompanyEmployeeResponse>());
+
+                var response = employees.Select(u => new CompanyEmployeeResponse
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    AvatarUrl = u.AvatarUrl ?? string.Empty,
+                    IsActive = u.IsActive,
+                    //Role = u.Role?.RoleName ?? "User"
+                }).ToList();
+
+                return apiResponse.SetOk(response);
+            }
+            catch (Exception ex)
+            {
+                return apiResponse.SetBadRequest($"Lỗi khi lấy nhân viên công ty: {ex.Message}");
             }
         }
     }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AntiPhisher.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class AddAnalyticsAndNewBehaviors : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,6 +60,22 @@ namespace AntiPhisher.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Phases",
+                columns: table => new
+                {
+                    PhaseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhaseName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Phases", x => x.PhaseId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PhishingTypes",
                 columns: table => new
                 {
@@ -93,12 +109,13 @@ namespace AntiPhisher.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DurationMonth = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     Feature = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MaxSlots = table.Column<int>(type: "int", nullable: false, defaultValue: 10),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -111,6 +128,47 @@ namespace AntiPhisher.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Modules",
+                columns: table => new
+                {
+                    ModuleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhaseId = table.Column<int>(type: "int", nullable: false),
+                    ModuleName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modules", x => x.ModuleId);
+                    table.ForeignKey(
+                        name: "FK_Modules_Phases_PhaseId",
+                        column: x => x.PhaseId,
+                        principalTable: "Phases",
+                        principalColumn: "PhaseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -120,6 +178,7 @@ namespace AntiPhisher.Infrastructure.Migrations
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
+                    PasswordSalt = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     AvatarUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -143,6 +202,32 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalTable: "Roles",
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lessons",
+                columns: table => new
+                {
+                    LessonId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ModuleId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    TheoryContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SimulationGuide = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lessons", x => x.LessonId);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Modules_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Modules",
+                        principalColumn: "ModuleId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -295,6 +380,8 @@ namespace AntiPhisher.Infrastructure.Migrations
                     AttachmentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhishingIndicators = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExplanationHint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SimulationId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SimulationMetaJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -336,11 +423,19 @@ namespace AntiPhisher.Infrastructure.Migrations
                     PaymentStatus = table.Column<int>(type: "int", nullable: false),
                     LastPaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NextBillingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompanyId = table.Column<int>(type: "int", nullable: true),
+                    UsedSlots = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "CompanyId",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Subscriptions_SubscriptionPlans_PlanId",
                         column: x => x.PlanId,
@@ -384,6 +479,59 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLessonProgresses",
+                columns: table => new
+                {
+                    ProgressId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    LessonId = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLessonProgresses", x => x.ProgressId);
+                    table.ForeignKey(
+                        name: "FK_UserLessonProgresses_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "LessonId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserLessonProgresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CampaignPrerequisites",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CampaignId = table.Column<int>(type: "int", nullable: false),
+                    RequiredLessonId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CampaignPrerequisites", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CampaignPrerequisites_Campaigns_CampaignId",
+                        column: x => x.CampaignId,
+                        principalTable: "Campaigns",
+                        principalColumn: "CampaignId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CampaignPrerequisites_Lessons_RequiredLessonId",
+                        column: x => x.RequiredLessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "LessonId");
                 });
 
             migrationBuilder.CreateTable(
@@ -480,12 +628,15 @@ namespace AntiPhisher.Infrastructure.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ScenarioId = table.Column<int>(type: "int", nullable: false),
                     CampaignId = table.Column<int>(type: "int", nullable: true),
-                    UserAnswer = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    UserAnswer = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     IsCorrect = table.Column<bool>(type: "bit", nullable: false),
                     Score = table.Column<int>(type: "int", nullable: false),
                     TimeTakenSeconds = table.Column<int>(type: "int", nullable: true),
                     AttemptNumber = table.Column<int>(type: "int", nullable: false),
-                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsClickedLink = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsCredentialLeaked = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsReported = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -631,8 +782,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountId = table.Column<int>(type: "int", nullable: false),
                     StatusPayment = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionHId = table.Column<int>(type: "int", nullable: true),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -651,6 +806,18 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Payments_Transactions_TransactionHId",
+                        column: x => x.TransactionHId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_Users_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Payments_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
@@ -661,6 +828,16 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "IX_AIFeedbacks_AttemptId",
                 table: "AIFeedbacks",
                 column: "AttemptId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CampaignPrerequisites_CampaignId",
+                table: "CampaignPrerequisites",
+                column: "CampaignId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CampaignPrerequisites_RequiredLessonId",
+                table: "CampaignPrerequisites",
+                column: "RequiredLessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Campaigns_CompanyId",
@@ -725,9 +902,19 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Lessons_ModuleId",
+                table: "Lessons",
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LoginHistories_UserId",
                 table: "LoginHistories",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_PhaseId",
+                table: "Modules",
+                column: "PhaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_UserId",
@@ -746,9 +933,19 @@ namespace AntiPhisher.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Payments_AccountId",
+                table: "Payments",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderId",
                 table: "Payments",
                 column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_TransactionHId",
+                table: "Payments",
+                column: "TransactionHId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_UserId",
@@ -792,6 +989,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_CompanyId",
+                table: "Subscriptions",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_PlanId",
                 table: "Subscriptions",
                 column: "PlanId");
@@ -833,6 +1035,17 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserLessonProgresses_LessonId",
+                table: "UserLessonProgresses",
+                column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserLessonProgresses_UserId_LessonId",
+                table: "UserLessonProgresses",
+                columns: new[] { "UserId", "LessonId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_CompanyId",
                 table: "Users",
                 column: "CompanyId");
@@ -854,6 +1067,9 @@ namespace AntiPhisher.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AIFeedbacks");
+
+            migrationBuilder.DropTable(
+                name: "CampaignPrerequisites");
 
             migrationBuilder.DropTable(
                 name: "CampaignScenarios");
@@ -886,16 +1102,25 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "TeamMembers");
 
             migrationBuilder.DropTable(
+                name: "UserLessonProgresses");
+
+            migrationBuilder.DropTable(
                 name: "UserAttempts");
 
             migrationBuilder.DropTable(
                 name: "Order");
 
             migrationBuilder.DropTable(
+                name: "Transactions");
+
+            migrationBuilder.DropTable(
                 name: "PhishingTypes");
 
             migrationBuilder.DropTable(
                 name: "Teams");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Campaigns");
@@ -905,6 +1130,9 @@ namespace AntiPhisher.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");
+
+            migrationBuilder.DropTable(
+                name: "Modules");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -917,6 +1145,9 @@ namespace AntiPhisher.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Phases");
 
             migrationBuilder.DropTable(
                 name: "Companies");

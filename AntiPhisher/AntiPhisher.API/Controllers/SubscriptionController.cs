@@ -2,6 +2,7 @@
 using AntiPhisher.Application.Request.Subscription;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AntiPhisher.API.Controllers
@@ -21,17 +22,27 @@ namespace AntiPhisher.API.Controllers
             _subscriptionService = subscriptionService;
             _claimService = claimService;
         }
-        [Authorize]
+
+        /// <summary>
+        /// Doanh nghiệp tiến hành mua/đăng ký gói dịch vụ mới.
+        /// POST: api/Subscription
+        /// </summary>
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<IActionResult> CreateSubscription([FromBody] CreateSubscriptionRequest request)
         {
-            //var userClaim = _claimService.GetUserClaim();
-            //    request.AccountId = userClaim.Id; // Set the authenticated user's ID
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var response = await _subscriptionService.CreateSubscriptionAsync(request);
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
+        /// <summary>
+        /// Lấy lịch sử và thông tin tất cả các gói đăng ký thuộc về CÔNG TY của Manager hiện tại.
+        /// GET: api/Subscription/my-subscriptions
+        /// </summary>
+        [Authorize(Roles = "Manager")]
         [HttpGet("my-subscriptions")]
         public async Task<IActionResult> GetMySubscriptions()
         {
@@ -40,22 +51,39 @@ namespace AntiPhisher.API.Controllers
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
-
-        [HttpGet("{subscriptionId}")]
+        /// <summary>
+        /// Lấy chi tiết thông tin gói đăng ký theo Id.
+        /// GET: api/Subscription/{subscriptionId}
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpGet("{subscriptionId:int}")]
         public async Task<IActionResult> GetSubscriptionById(int subscriptionId)
         {
             var response = await _subscriptionService.GetSubscriptionByIdAsync(subscriptionId);
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPut("{subscriptionId}")]
+        /// <summary>
+        /// Cập nhật thông tin gói đăng ký dịch vụ của doanh nghiệp.
+        /// PUT: api/Subscription/{subscriptionId}
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpPut("{subscriptionId:int}")]
         public async Task<IActionResult> UpdateSubscription(int subscriptionId, [FromBody] UpdateSubscriptionRequest request)
         {
-            var resposne = await _subscriptionService.UpdateSubscriptionAsync(subscriptionId, request);
-            return resposne.IsSuccess ? Ok(resposne) : BadRequest(resposne);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var response = await _subscriptionService.UpdateSubscriptionAsync(subscriptionId, request);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPost("{subscriptionId}/cancel")]
+        /// <summary>
+        /// Hủy kích hoạt gói dịch vụ của công ty.
+        /// POST: api/Subscription/{subscriptionId}/cancel
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpPost("{subscriptionId:int}/cancel")]
         public async Task<IActionResult> CancelSubscription(int subscriptionId)
         {
             var response = await _subscriptionService.CancelSubscriptionAsync(subscriptionId);
@@ -63,7 +91,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         // =====================================================================
-        // PHẦN 1: Quota & Quản lý nhân viên (Manager only)
+        // PHẦN 1: Quota & Quản lý nhân viên (Chỉ dành cho Manager)
         // =====================================================================
 
         /// <summary>
@@ -86,7 +114,7 @@ namespace AntiPhisher.API.Controllers
         }
 
         /// <summary>
-        /// Xem thông tin slot đã dùng / tổng / còn lại.
+        /// Xem thông tin số lượng slot nhân sự đã dùng / tổng số slot của gói dịch vụ công ty.
         /// GET: api/Subscription/slots-usage
         /// </summary>
         [Authorize(Roles = "Manager")]
@@ -99,8 +127,8 @@ namespace AntiPhisher.API.Controllers
         }
 
         /// <summary>
-        /// Xóa nhân viên khỏi công ty, giải phóng 1 slot.
-        /// DELETE: api/Subscription/remove-employee/{userId}
+        /// Xóa nhân viên khỏi công ty, giải phóng 1 vị trí slot trống cho gói.
+        /// DELETE: api/Subscription/remove-employee/{employeeUserId}
         /// </summary>
         [Authorize(Roles = "Manager")]
         [HttpDelete("remove-employee/{employeeUserId:int}")]

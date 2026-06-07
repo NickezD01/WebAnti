@@ -1,5 +1,6 @@
 ﻿using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.User;
+using AntiPhisher.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,5 +64,37 @@ namespace AntiPhisher.API.Controllers
             var result = await _service.GetCompanyEmployeesAsync(claim.Id, searchTerm ?? "", pageIndex, pageSize);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        [Authorize(Roles = "Manager")] // Tùy chọn: Chặn chỉ cho tài khoản có quyền Manager gọi (nếu hệ thống của bạn có phân quyền chặt)
+        [HttpGet("my-manager")]
+        public async Task<IActionResult> GetMyManagerAsync()
+        {
+            var response = await _service.GetMyManagerAsync();
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// API dành cho Manager xem danh sách nhân viên trong NHÓM (TEAM) mình quản lý
+        /// Route từ FE: GET /api/UserAccount/my-team-members
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpGet("my-team-members")]
+        public async Task<IActionResult> GetMyTeamMembers()
+        {
+            var response = await _service.GetMyTeamMembersAsync();
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// API dành cho Manager xem danh sách tất cả nhân viên trong cùng CÔNG TY
+        /// Route từ FE: GET /api/UserAccount/company-employees
+        /// </summary>
+        //[Authorize(Roles = "Manager")]
+        //[HttpGet("company-employee")]
+        //public async Task<IActionResult> GetCompanyEmployees()
+        //{
+        //    var response = await _service.GetEmployeesInCompanyAsync();
+        //    return Ok(response);
+        //}
     }
 }

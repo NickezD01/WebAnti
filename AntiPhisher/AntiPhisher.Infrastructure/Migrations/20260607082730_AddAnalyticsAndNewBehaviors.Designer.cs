@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AntiPhisher.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260601115152_AddAnalyticsAndBugFixes")]
-    partial class AddAnalyticsAndBugFixes
+    [Migration("20260607082730_AddAnalyticsAndNewBehaviors")]
+    partial class AddAnalyticsAndNewBehaviors
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -724,6 +724,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SenderName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SimulationId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SimulationMetaJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Subject")
