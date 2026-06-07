@@ -1,0 +1,575 @@
+{
+  "batch_id": "12",
+  "batch_name": "Phase 3 — Vendor & Invoice Scams",
+  "phase": 3,
+  "lesson": "3.4",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P3-VI-001",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Invoice Fraud",
+      "learning_objective": "Nhận diện email hóa đơn giả từ nhà cung cấp không quen — yêu cầu thanh toán vào tài khoản mới",
+      "email": {
+        "sender_name": "Phòng Kế toán — Sunrise Media",
+        "sender_email": "invoice@sunrise-media-billing.com",
+        "recipient_email": "nguyen.van.son@quangcao-express.com.vn",
+        "subject": "Hóa đơn #SM-2026-0452 — Dịch vụ quảng cáo tháng 5 — Quá hạn 15 ngày",
+        "body": "Kính gửi anh Nguyễn Văn Sơn,\n\nHóa đơn dịch vụ quảng cáo tháng 5/2026 của Sunrise Media đã quá hạn thanh toán 15 ngày.\n\nSố tiền: 42.500.000đ\nHóa đơn số: SM-2026-0452\nHạn thanh toán: 22/05/2026 (đã quá hạn)\n\nDo hệ thống ngân hàng vừa nâng cấp, vui lòng thanh toán vào tài khoản mới:\nNgân hàng: Sacombank\nSố TK: 060137000123456\nTên TK: CTY TNHH SUNRISE MEDIA\n\nXin lưu ý thanh toán trước 10/06 để tránh phí trễ hạn bổ sung.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "invoice@sunrise-media-billing.com",
+          "explanation": "Domain '-billing.com' riêng biệt thay vì domain công ty chính là dấu hiệu bất thường — nhà cung cấp thật dùng một domain nhất quán.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_redirect",
+          "visible_text": "tài khoản mới do hệ thống ngân hàng nâng cấp",
+          "explanation": "Lý do 'nâng cấp ngân hàng' để đổi tài khoản thanh toán là chiêu lừa phổ biến nhất trong Invoice Fraud — phải gọi điện xác nhận với nhà cung cấp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "tránh phí trễ hạn bổ sung",
+          "explanation": "Đe dọa phí trễ hạn tạo áp lực tài chính nhỏ nhưng hiệu quả — người dùng muốn giải quyết nhanh để tránh phát sinh thêm.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["sunrise-media-billing.com", "tài khoản mới", "phí trễ hạn"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Hóa đơn giả kèm tài khoản mới — Invoice Fraud!",
+        "summary": "Hóa đơn quá hạn + lý do đổi tài khoản 'do nâng cấp' là công thức Invoice Fraud cổ điển. Tiền chuyển vào tài khoản kẻ tấn công, không đến nhà cung cấp thật.",
+        "learning_point": "Mọi yêu cầu đổi tài khoản thanh toán phải xác nhận bằng điện thoại với số đã biết tại nhà cung cấp. Không xác nhận qua email reply.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Invoice Fraud"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-002",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Authority",
+      "attack_type": "Fake Vendor Registration",
+      "learning_objective": "Nhận diện email đăng ký nhà cung cấp giả gửi đến bộ phận mua hàng",
+      "email": {
+        "sender_name": "Phòng Kinh doanh — Đông Phương Tech",
+        "sender_email": "sales@dongphuong-tech-vn.net",
+        "recipient_email": "mua.hang@viet-plastic.com.vn",
+        "subject": "Đề xuất hợp tác cung ứng thiết bị văn phòng 2026 — Báo giá ưu đãi",
+        "body": "Kính gửi Phòng Mua hàng Viet Plastic,\n\nĐông Phương Tech là nhà cung cấp thiết bị văn phòng và công nghệ với 10 năm kinh nghiệm. Chúng tôi muốn đề xuất hợp tác cung ứng thiết bị cho quý công ty năm 2026 với mức giá cạnh tranh.\n\nDanh mục: Máy in, máy tính xách tay, thiết bị họp trực tuyến\nỨu đãi: Giảm 15% cho đơn đầu tiên — thanh toán qua tài khoản dưới đây:\n\nNgân hàng: VIB\nSố TK: 008704123456\nTên TK: CTY TNHH DONG PHUONG TECH\n\nLiên hệ: 0938 xxx xxx để nhận báo giá chi tiết.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "unsolicited_vendor",
+          "visible_text": "Đề xuất hợp tác",
+          "explanation": "Email chào hàng không được yêu cầu từ nhà cung cấp lạ — bộ phận mua hàng không nên xử lý đề xuất hợp tác từ email lạnh mà không qua quy trình vetting.",
+          "severity": "medium"
+        },
+        {
+          "id": "rf2",
+          "type": "upfront_payment_info",
+          "visible_text": "thanh toán qua tài khoản dưới đây",
+          "explanation": "Nhà cung cấp thật không cung cấp thông tin tài khoản ngân hàng ngay trong email chào hàng đầu tiên — đây là dấu hiệu lừa đảo để lấy tiền đặt cọc.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_sender_domain",
+          "visible_text": "sales@dongphuong-tech-vn.net",
+          "explanation": "Domain .net thay vì .com.vn là bất thường cho doanh nghiệp Việt Nam — khó xác minh tính hợp lệ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf2", "rf3"],
+      "missable_flags": ["rf1"],
+      "highlight_keywords": ["dongphuong-tech-vn.net", "thanh toán qua tài khoản dưới đây", "đơn đầu tiên"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Nhà cung cấp giả cung cấp tài khoản ngay từ đầu!",
+        "summary": "Nhà cung cấp thật không cung cấp số tài khoản ngay trong email chào hàng. Đây là cách thu tiền đặt cọc từ bộ phận mua hàng không cẩn thận.",
+        "learning_point": "Nhà cung cấp mới phải qua quy trình vetting chính thức (kiểm tra MST, giấy phép kinh doanh, thực địa). Không thanh toán cho nhà cung cấp chưa được phê duyệt.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Fake Vendor"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-003",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Duplicate Invoice Fraud",
+      "learning_objective": "Nhận diện hóa đơn trùng lặp gửi lần hai với tài khoản khác — lợi dụng sự nhầm lẫn",
+      "email": {
+        "sender_name": "Kế toán — Thiên Nam Logistics",
+        "sender_email": "ketoan@thiennam-logistics.net",
+        "recipient_email": "ke.toan@tan-binh-trading.com.vn",
+        "subject": "ĐÍNH CHÍNH: Hóa đơn #TN-2026-0189 — Tài khoản cũ đã đóng, thanh toán vào TK mới",
+        "body": "Kính gửi Phòng Kế toán Tân Bình Trading,\n\nChúng tôi xin thông báo: hóa đơn #TN-2026-0189 đã gửi ngày 28/05/2026 có thông tin tài khoản không chính xác do lỗi hệ thống.\n\nTài khoản cũ (Vietcombank 0011004567890) đã bị đóng. Vui lòng hủy lệnh chuyển khoản vào tài khoản cũ nếu chưa xử lý, và chuyển vào tài khoản mới:\n\nNgân hàng: BIDV\nSố TK: 12110009988776\nTên TK: CTY TNHH THIEN NAM LOGISTICS\n\nXin lỗi về sự bất tiện này.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "ketoan@thiennam-logistics.net",
+          "explanation": "Domain .net thay vì .com.vn — nếu đã làm việc với Thiên Nam trước, cần kiểm tra domain này có khớp với email cũ không.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_redirect_with_excuse",
+          "visible_text": "tài khoản cũ đã bị đóng ... hủy lệnh chuyển khoản cũ",
+          "explanation": "Yêu cầu hủy thanh toán cũ và chuyển sang TK mới là kỹ thuật tinh vi — nếu người dùng đã chuyển vào TK cũ (của nhà cung cấp thật), họ sẽ lo lắng và làm theo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "confusion_tactic",
+          "visible_text": "lỗi hệ thống",
+          "explanation": "Lỗi hệ thống là lý do nghe hợp lý và không thể kiểm tra — tạo cảm giác 'lần này thật' vì có giải thích cụ thể.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["thiennam-logistics.net", "hủy lệnh chuyển khoản cũ", "tài khoản mới"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đính chính hóa đơn giả — chiêu lừa lợi dụng sự nhầm lẫn!",
+        "summary": "Kẻ tấn công theo dõi chu kỳ thanh toán rồi gửi 'đính chính' đúng lúc — lợi dụng khi kế toán đang xử lý hóa đơn thật để chuyển hướng sang TK giả.",
+        "learning_point": "Nhận 'đính chính' đổi tài khoản: gọi điện ngay cho nhà cung cấp qua số đã biết để xác minh trước khi làm bất cứ điều gì.",
+        "psychology_display": "Urgency + Confusion",
+        "attack_type_display": "Duplicate Invoice Redirect"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-004",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email hóa đơn hợp lệ từ nhà cung cấp quen thuộc với tài khoản đã đăng ký",
+      "email": {
+        "sender_name": "Kế toán — Công ty Giấy Sài Gòn",
+        "sender_email": "invoice@giaysaigon.com.vn",
+        "recipient_email": "ke.toan@nam-long-paper.com.vn",
+        "subject": "Hóa đơn #GS-2026-0231 — Đơn hàng giấy in tháng 6",
+        "body": "Kính gửi Phòng Kế toán Nam Long Paper,\n\nGiấy Sài Gòn xuất hóa đơn theo đơn đặt hàng #PO-NL-0612 đã ký ngày 01/06/2026.\n\nHóa đơn số: GS-2026-0231\nGiá trị: 187.500.000đ (đã VAT 10%)\nHạn thanh toán: 30/06/2026\n\nThông tin tài khoản (không thay đổi):\nNgân hàng: Vietcombank — CN Quận 1\nSố TK: 0011001234567\nTên TK: CTY TNHH GIAY SAI GON\n\nFile hóa đơn đính kèm: GS-2026-0231.pdf\nMọi thắc mắc: ketoan@giaysaigon.com.vn | 028 3823 xxxx\n\nTrân trọng,\nNguyễn Thị Hoài — Kế toán trưởng",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email hóa đơn từ nhà cung cấp có thông tin tài khoản — người dùng có thể lo ngại",
+        "why_legitimate": "Domain @giaysaigon.com.vn nhất quán. Có số PO tham chiếu cụ thể (PO-NL-0612). Tài khoản ghi rõ 'không thay đổi'. File đính kèm .pdf. Có số điện thoại xác minh. Hạn thanh toán hợp lý 30 ngày."
+      },
+      "feedback": {
+        "title": "Đây là hóa đơn hợp lệ từ nhà cung cấp quen thuộc!",
+        "summary": "Hóa đơn từ domain nhất quán, tham chiếu PO đã ký, tài khoản ghi 'không thay đổi', và có đầy đủ thông tin liên hệ xác minh.",
+        "learning_point": "Hóa đơn hợp lệ: domain nhất quán với giao dịch trước, có PO reference, tài khoản khớp hệ thống, không yêu cầu đổi TK đột ngột.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-005",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Subscription Renewal Scam",
+      "learning_objective": "Nhận diện email gia hạn phần mềm giả — yêu cầu thanh toán cho sản phẩm không dùng hoặc giả",
+      "email": {
+        "sender_name": "Billing — Adobe Creative Cloud",
+        "sender_email": "billing@adobe-renewal-vn.com",
+        "recipient_email": "do.thi.thu.ha@quang-cao-viet.com",
+        "subject": "HÓA ĐƠN GIA HẠN: Adobe Creative Cloud Team — 12 tháng — 45.600.000đ",
+        "body": "Kính gửi Đỗ Thị Thu Hà,\n\nHóa đơn gia hạn gói Adobe Creative Cloud Team (20 license) cho năm 2026-2027 đã được tạo tự động:\n\nGói: Creative Cloud All Apps — Team\nSố license: 20\nThời hạn: 01/07/2026 – 30/06/2027\nTổng tiền: 45.600.000đ\n\nVui lòng thanh toán trước 15/06/2026 để tránh gián đoạn dịch vụ. Chuyển khoản theo thông tin:\nNgân hàng: Shinhan Bank\nSố TK: 700-01-234567\nTên TK: ADOBE SYSTEMS VIETNAM\n\nHoặc nhấp liên kết để thanh toán qua thẻ.",
+        "cta_text": "Thanh toán ngay",
+        "cta_link": "https://adobe-renewal-vn.com/pay-now"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "billing@adobe-renewal-vn.com",
+          "explanation": "Adobe gửi hóa đơn từ @adobe.com — 'adobe-renewal-vn.com' là domain giả mạo. Adobe không có entity 'ADOBE SYSTEMS VIETNAM' nhận chuyển khoản trực tiếp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unsolicited_invoice",
+          "visible_text": "đã được tạo tự động",
+          "explanation": "Hóa đơn gia hạn 'tự động' không khớp với bất kỳ PO hay đơn hàng nào — người dùng có thể thanh toán vì nghĩ đây là gia hạn tự động hợp lệ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "dual_payment_method",
+          "visible_text": "Chuyển khoản ... hoặc nhấp liên kết",
+          "explanation": "Cung cấp hai phương thức thanh toán — một để lấy tiền trực tiếp (chuyển khoản), một để lấy thông tin thẻ (link).",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["adobe-renewal-vn.com", "tạo tự động", "ADOBE SYSTEMS VIETNAM"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Hóa đơn gia hạn phần mềm giả — lừa cả tiền chuyển khoản lẫn thẻ!",
+        "summary": "Hóa đơn phần mềm giả nguy hiểm vì: số tiền lớn nhưng hợp lý (phần mềm thật cũng đắt), có vẻ là gia hạn tự động, và cung cấp cả hai cách thanh toán.",
+        "learning_point": "Kiểm tra hóa đơn phần mềm qua admin portal chính thức (account.adobe.com) — không qua link email. Adobe tính phí qua thẻ tín dụng đã đăng ký, không nhận chuyển khoản Việt Nam.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Fake Software Invoice"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-006",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Trust",
+      "attack_type": "Look-alike Vendor Domain",
+      "learning_objective": "Nhận diện email từ domain nhà cung cấp giả mạo gần giống domain thật — typosquatting",
+      "email": {
+        "sender_name": "Nguyễn Anh Khoa — Kinh doanh",
+        "sender_email": "anh.khoa@viet-namlottery.com",
+        "recipient_email": "phuong.le@saigon-ads.com.vn",
+        "subject": "Báo giá in ấn banner sự kiện — Quý 3/2026",
+        "body": "Kính gửi chị Phương,\n\nTheo yêu cầu của chị tuần trước, bên em gửi báo giá in ấn banner sự kiện Q3/2026 kèm mẫu thiết kế.\n\nBáo giá tổng: 28.300.000đ\nThời gian hoàn thành: 5 ngày làm việc\n\nĐể xác nhận đơn hàng và đặt lịch sản xuất, chị chuyển cọc 30% (8.490.000đ) vào:\nNgân hàng: ACB\nSố TK: 8888000123456\nTên TK: CTY TNHH IN AN VIET NAM LOTTERY\n\nNguyễn Anh Khoa\nKinh doanh — Vietnam Lottery Print",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "anh.khoa@viet-namlottery.com",
+          "explanation": "'viet-namlottery.com' là domain đáng ngờ — nếu đối tác thật là 'vietnamlottery.com.vn', đây là typosquatting. Cần kiểm tra domain chính xác của đối tác.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "upfront_deposit_request",
+          "visible_text": "chuyển cọc 30%",
+          "explanation": "Yêu cầu đặt cọc qua email từ nhà cung cấp chưa xác minh — cọc một khi chuyển đi rất khó thu hồi nếu đây là lừa đảo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unverified_reference",
+          "visible_text": "theo yêu cầu của chị tuần trước",
+          "explanation": "Tham chiếu cuộc trao đổi 'tuần trước' mà không có chi tiết cụ thể — có thể là social engineering để người nhận không xác minh vì nghĩ đã biết nhau.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["viet-namlottery.com", "chuyển cọc 30%", "tuần trước"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Domain nhà cung cấp giả mạo + yêu cầu đặt cọc!",
+        "summary": "Tham chiếu trao đổi cũ giả tạo cảm giác quen biết — nhưng domain không khớp với nhà cung cấp thật và yêu cầu đặt cọc ngay là dấu hiệu lừa đảo.",
+        "learning_point": "Luôn xác minh domain email đối tác khớp với domain đã dùng trong giao dịch trước. Trước khi chuyển cọc: gọi điện xác nhận qua số đã biết.",
+        "psychology_display": "Trust + Social Proof",
+        "attack_type_display": "Vendor Typosquatting"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-007",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Authority + Fear",
+      "attack_type": "Overdue Debt Collection Scam",
+      "learning_objective": "Nhận diện email thu hồi nợ giả từ công ty luật hoặc đơn vị thu nợ — yêu cầu thanh toán tức thì",
+      "email": {
+        "sender_name": "Pháp lý & Thu hồi Nợ — LexCo Vietnam",
+        "sender_email": "collections@lexco-debt-recovery.com",
+        "recipient_email": "giam.doc@minhphat-construction.com",
+        "subject": "THÔNG BÁO CUỐI CÙNG: Khoản nợ 178.000.000đ — Tránh kiện tụng",
+        "body": "Kính gửi Ban Giám đốc Minh Phát Construction,\n\nLexCo Vietnam được ủy quyền thu hồi khoản nợ thương mại của quý công ty với Đức Long Steel:\n\nSố tiền: 178.000.000đ\nNguồn gốc: Hóa đơn #DLS-2025-0892 (tháng 9/2025)\nTình trạng: Quá hạn 270 ngày\n\nĐây là thông báo cuối cùng trước khi chúng tôi khởi kiện tại Tòa án Nhân dân. Thanh toán toàn bộ trước 10/06/2026 để tránh phát sinh chi phí pháp lý bổ sung (ước tính thêm 25-30% giá trị khoản nợ).\n\nChuyển khoản:\nNgân hàng: Vietinbank\nSố TK: 113000567890\nTên TK: CTY LUAT LEXCO VIETNAM",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "unknown_debt_claim",
+          "visible_text": "khoản nợ 178.000.000đ ... Đức Long Steel",
+          "explanation": "Khoản nợ với nhà cung cấp lạ hoặc không nhớ — cần xác minh với kế toán nội bộ trước khi làm bất cứ điều gì.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "legal_fear_tactic",
+          "visible_text": "khởi kiện tại Tòa án Nhân dân",
+          "explanation": "Đe dọa kiện tụng tạo nỗi sợ pháp lý tối đa — nhiều doanh nghiệp vội thanh toán ngay để 'tránh rắc rối' mà không xác minh khoản nợ có thật không.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_sender_domain",
+          "visible_text": "collections@lexco-debt-recovery.com",
+          "explanation": "Công ty luật thu hồi nợ thật có giấy phép hoạt động và website chính thức có thể xác minh — 'lexco-debt-recovery.com' cần được kiểm tra độc lập.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["lexco-debt-recovery.com", "khởi kiện Tòa án", "thông báo cuối cùng"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả công ty luật đòi nợ — fear tactic tối đa!",
+        "summary": "Khoản nợ không rõ nguồn gốc + đe dọa kiện tụng + deadline ngắn = công thức lừa đảo thu hồi nợ giả. Doanh nghiệp thường vội trả để 'tránh rắc rối'.",
+        "learning_point": "Nhận thông báo thu hồi nợ: (1) xác minh khoản nợ với kế toán nội bộ, (2) tra cứu công ty luật độc lập qua Google/ĐKKD, (3) không chuyển tiền cho đến khi xác minh xong.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Fake Debt Collection"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-008",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email thông báo thay đổi tài khoản ngân hàng hợp lệ — được xác nhận đúng quy trình",
+      "email": {
+        "sender_name": "Kế toán — Minh Anh Packaging",
+        "sender_email": "ketoan@minhanh-packaging.com.vn",
+        "recipient_email": "mua.hang@saigon-food.com.vn",
+        "subject": "Thông báo: Thay đổi tài khoản ngân hàng — Hiệu lực từ 01/07/2026",
+        "body": "Kính gửi Phòng Mua hàng Saigon Food,\n\nMinh Anh Packaging trân trọng thông báo thay đổi tài khoản ngân hàng nhận thanh toán từ 01/07/2026 do hợp nhất ngân hàng:\n\nTài khoản cũ: Vietcombank 0011000789012\nTài khoản mới: MB Bank 0388100234567\nTên TK: CTY TNHH MINH ANH PACKAGING\n\nChúng tôi đã gửi thông báo bằng văn bản có đóng dấu qua đường bưu điện. Nếu chưa nhận, vui lòng liên hệ: kế toán trưởng Trần Thị Hương — 0909 xxx xxx để xác nhận.\n\nCảm ơn sự hợp tác lâu dài của quý công ty.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email thông báo đổi tài khoản ngân hàng — rất dễ nhầm với Invoice Fraud",
+        "why_legitimate": "Domain @minhanh-packaging.com.vn nhất quán. Thông báo có văn bản đóng dấu gửi bưu điện song song. Có số điện thoại kế toán trưởng để xác minh độc lập. Không tạo áp lực deadline ngắn. Chủ động đề nghị xác minh."
+      },
+      "feedback": {
+        "title": "Đây là thông báo đổi tài khoản hợp lệ!",
+        "summary": "Thông báo từ domain nhất quán, kèm văn bản đóng dấu bưu điện, và chủ động đề nghị xác minh qua số điện thoại — đây là quy trình thay đổi tài khoản đúng chuẩn.",
+        "learning_point": "Nhà cung cấp thật đổi TK: thông báo qua nhiều kênh (email + văn bản bưu điện), cung cấp số điện thoại xác minh độc lập, không tạo áp lực. Dù vậy — VẪN NÊN gọi điện xác nhận trước khi cập nhật hệ thống.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-009",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Trust",
+      "attack_type": "Man-in-the-Email (MitE)",
+      "learning_objective": "Nhận diện tấn công Man-in-the-Email — kẻ tấn công theo dõi chuỗi email thật rồi chèn vào đúng lúc",
+      "email": {
+        "sender_name": "Lê Minh Tâm — Kế toán",
+        "sender_email": "le.minh.tam@viet-logistic.com.vn",
+        "recipient_email": "finance@delta-shipping.com.vn",
+        "subject": "Re: Re: Thanh toán cước vận chuyển tháng 5 — Thông tin TK",
+        "body": "Chào anh Hùng,\n\nEm confirm lại thông tin tài khoản để anh xử lý thanh toán 265.000.000đ cước vận chuyển tháng 5:\n\nNgân hàng: Vietcombank\nSố TK: 0011002345678  ← (lưu ý: TK mới, TK cũ 0011001234567 đã đóng)\nTên TK: CTY TNHH VIET LOGISTIC\n\nAnh xử lý nhé, em cần gửi báo cáo cho giám đốc trước 17:00 hôm nay.\n\nLê Minh Tâm",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "mid_thread_account_change",
+          "visible_text": "TK mới, TK cũ 0011001234567 đã đóng",
+          "explanation": "Thay đổi số tài khoản giữa chuỗi email đang xử lý — kẻ tấn công đã theo dõi email và biết đúng số tiền, đúng người, đúng thời điểm để chen vào.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "time_pressure",
+          "visible_text": "cần gửi báo cáo cho giám đốc trước 17:00",
+          "explanation": "Deadline nhỏ nhưng tạo áp lực phải xử lý ngay — không còn thời gian gọi điện xác minh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1"],
+      "missable_flags": ["rf2"],
+      "highlight_keywords": ["TK mới ← lưu ý", "TK cũ đã đóng", "trước 17:00"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Man-in-the-Email — tấn công từ bên trong chuỗi email!",
+        "summary": "MitE là tấn công nguy hiểm nhất trong Invoice Fraud vì kẻ tấn công đã biết: số tiền thật, tên người thật, và thời điểm thanh toán thật. Chỉ có số TK là giả.",
+        "learning_point": "Bất kỳ thay đổi số tài khoản nào trong chuỗi email đang xử lý — dù email trông quen thuộc — đều phải xác minh qua điện thoại trực tiếp. Đây là quy tắc không có ngoại lệ.",
+        "psychology_display": "Trust + Urgency",
+        "attack_type_display": "Man-in-the-Email"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-010",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Authority + Compliance",
+      "attack_type": "Tax Authority Vendor Scam",
+      "learning_objective": "Nhận diện email giả cơ quan thuế thông báo phạt nhà cung cấp, yêu cầu công ty trả hộ",
+      "email": {
+        "sender_name": "Cục Thuế TP.HCM — Bộ phận Thu Nợ",
+        "sender_email": "thu.no@cucthuehcm-thuno.com",
+        "recipient_email": "giam.doc.tai.chinh@phu-my-hung.com.vn",
+        "subject": "Thông báo: Công ty Thiên Phước (MST 0312345678) có khoản thuế nợ liên quan đến Phú Mỹ Hưng",
+        "body": "Kính gửi Ban lãnh đạo Phú Mỹ Hưng,\n\nCục Thuế TP.HCM thông báo nhà cung cấp Thiên Phước (MST: 0312345678) — đối tác của quý công ty — có khoản nợ thuế GTGT 312.000.000đ chưa nộp phát sinh từ các giao dịch với quý công ty.\n\nTheo Điều 68 Luật Quản lý Thuế, quý công ty có thể bị liên đới trách nhiệm thanh toán khoản nợ thuế này nếu nhà cung cấp không thực hiện nghĩa vụ.\n\nĐể tránh ảnh hưởng đến tư cách thuế của quý công ty, vui lòng phối hợp thanh toán hộ khoản thuế và yêu cầu hoàn trả từ Thiên Phước:\n\nTài khoản Kho bạc Nhà nước: 3713.0.1055380.00000\nNgân hàng: Vietinbank",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thu.no@cucthuehcm-thuno.com",
+          "explanation": "Cục Thuế TP.HCM dùng @hcm.gdt.gov.vn — 'cucthuehcm-thuno.com' là domain giả mạo hoàn toàn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "false_legal_liability",
+          "visible_text": "liên đới trách nhiệm thanh toán khoản nợ thuế",
+          "explanation": "Điều 68 Luật Quản lý Thuế không yêu cầu doanh nghiệp mua hàng phải 'thanh toán hộ' thuế của nhà cung cấp — đây là diễn giải sai luật để tạo áp lực compliance.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "pay_on_behalf_request",
+          "visible_text": "thanh toán hộ khoản thuế",
+          "explanation": "Không có quy trình pháp lý nào yêu cầu doanh nghiệp thanh toán thuế hộ nhà cung cấp qua email — đây là cách mới để đánh vào tâm lý compliance.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["cucthuehcm-thuno.com", "liên đới trách nhiệm", "thanh toán hộ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cơ quan thuế — diễn giải sai luật để ép thanh toán!",
+        "summary": "Đây là biến thể Invoice Fraud tinh vi nhất: dùng ngôn ngữ pháp lý nghe có vẻ hợp lệ (Điều 68, MST) nhưng diễn giải sai để tạo nghĩa vụ tài chính giả.",
+        "learning_point": "Cục Thuế liên lạc qua hệ thống eTax và văn bản hành chính — không qua email yêu cầu chuyển khoản. Nhận thông báo thuế bất thường: liên hệ trực tiếp Cục Thuế qua số 028 3930 xxxx.",
+        "psychology_display": "Authority + Compliance",
+        "attack_type_display": "False Tax Liability Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-VI-011",
+      "batch": "12",
+      "phase": 3,
+      "lesson": "3.4",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Vendor & Invoice Scams",
+      "psychology": "Trust",
+      "attack_type": "Supply Chain Invoice Injection",
+      "learning_objective": "Nhận diện hóa đơn được chèn vào hệ thống qua email hợp lệ bị xâm phạm — khó nhất vì domain đúng",
+      "email": {
+        "sender_name": "Trần Thị Lan — Kế toán",
+        "sender_email": "tran.thi.lan@delta-supplies.com.vn",
+        "recipient_email": "ke.toan.truong@long-an-food.com.vn",
+        "subject": "Re: Hóa đơn tháng 5 — Cập nhật thông tin thanh toán",
+        "body": "Chị Hương ơi,\n\nBên em vừa nhận được thông báo từ ngân hàng: tài khoản Vietcombank của công ty em đang bị điều tra giao dịch bất thường và tạm thời bị phong tỏa.\n\nTrong thời gian này, chị vui lòng thanh toán hóa đơn tháng 5 (134.000.000đ) vào tài khoản MB Bank dự phòng:\nSố TK: 0388200567890\nTên TK: TRAN THI LAN (cá nhân — tạm thời)\n\nAnh giám đốc em đã biết và xác nhận dùng TK cá nhân tạm thời. Khi tài khoản công ty được mở lại em sẽ thông báo. Cảm ơn chị nhiều!",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "personal_account_request",
+          "visible_text": "TRAN THI LAN (cá nhân — tạm thời)",
+          "explanation": "Thanh toán B2B vào tài khoản cá nhân — dù có lý do 'tạm thời' — là Red Flag tuyệt đối. Giao dịch hợp lệ giữa công ty luôn qua tài khoản doanh nghiệp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "verbal_director_approval",
+          "visible_text": "Anh giám đốc em đã biết và xác nhận",
+          "explanation": "Xác nhận miệng qua email không thể xác minh — đây là cách bypass quy trình phê duyệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "bank_freeze_excuse",
+          "visible_text": "tài khoản đang bị điều tra ... tạm thời bị phong tỏa",
+          "explanation": "Lý do 'tài khoản bị phong tỏa' nghe có vẻ khẩn cấp và hợp lý — nhưng không có tình huống nào yêu cầu thanh toán B2B vào tài khoản cá nhân.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["tài khoản cá nhân tạm thời", "giám đốc đã xác nhận", "tài khoản bị phong tỏa"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Thanh toán vào TK cá nhân — không bao giờ được phép!",
+        "summary": "Dù email đến từ đối tác quen thuộc với lý do nghe hợp lý — thanh toán doanh nghiệp vào tài khoản cá nhân là không thể chấp nhận được theo bất kỳ quy định nào.",
+        "learning_point": "QUY TẮC TUYỆT ĐỐI: Không bao giờ thanh toán hóa đơn doanh nghiệp vào tài khoản cá nhân — dù lý do nghe hợp lý đến đâu. Gọi điện xác minh trực tiếp với kế toán trưởng và giám đốc qua số đã biết.",
+        "psychology_display": "Trust + Urgency",
+        "attack_type_display": "Personal Account Redirect"
+      }
+    }
+  ]
+}

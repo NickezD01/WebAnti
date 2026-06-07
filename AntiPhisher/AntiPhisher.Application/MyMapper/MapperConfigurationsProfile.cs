@@ -29,62 +29,68 @@ namespace AntiPhisher.Application.MyMapper
             // USER MAPPING
             // =========================================================
             CreateMap<Role, RoleResponse>()
-                .ForMember(dest => dest.RoleId,
-                    opt => opt.MapFrom(src => src.RoleId))
-                .ForMember(dest => dest.RoleName,
-                    opt => opt.MapFrom(src => src.RoleName));
+                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId))
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.RoleName));
 
             CreateMap<User, UserProfileResponse>()
-                .ForMember(dest => dest.Id,
-                    opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Role,
-                    opt => opt.MapFrom(src => src.Role));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
 
             CreateMap<User, AccountResponse>()
-                .ForMember(dest => dest.Id,
-                    opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Role,
-                    opt => opt.MapFrom(src => src.Role))
-                .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.IsActive ? "Active" : (src.IsEmailVerified ? "Banned" : "Unverified")));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive ? "Active" : (src.IsEmailVerified ? "Banned" : "Unverified")));
 
             // =========================================================
-            // SCENARIO CRUD MAPPING (Khớp 100% với Entity Model Scenario)
+            // SCENARIO CREATE MAPPING (ĐÃ ĐỒNG BỘ HOÀN TOÀN KHỚP VỚI CLASS MỚI)
             // =========================================================
-
-            // 1. Map từ CreateScenarioRequest sang Scenario (Xử lý bù đắp các trường NOT NULL)
             CreateMap<CreateScenarioRequest, Scenario>()
-                // Tự động lấy Subject (Tiêu đề email) làm Title cho kịch bản
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Subject))
+                // 1. Map các trường khớp trực tiếp tên và kiểu dữ liệu từ DTO sang Entity
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Subject, opt => opt.MapFrom(src => src.Subject))
+                .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.SenderName))
+                .ForMember(dest => dest.SenderEmail, opt => opt.MapFrom(src => src.SenderEmail))
+                .ForMember(dest => dest.RecipientName, opt => opt.MapFrom(src => src.RecipientName))
+                .ForMember(dest => dest.EmailBodyHtml, opt => opt.MapFrom(src => src.EmailBodyHtml))
+                .ForMember(dest => dest.IsPhishing, opt => opt.MapFrom(src => src.IsPhishing))
+                .ForMember(dest => dest.PhishingIndicators, opt => opt.MapFrom(src => src.PhishingIndicators))
+                .ForMember(dest => dest.ExplanationHint, opt => opt.MapFrom(src => src.ExplanationHint))
+                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
+                .ForMember(dest => dest.DifficultyId, opt => opt.MapFrom(src => src.DifficultyId))
 
-                // Tự động sinh Description dựa trên email người gửi
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => $"Kịch bản mô phỏng Email Phishing gửi từ nguồn giả mạo: {src.SenderEmail}"))
-
-                // Tách phần tên trước ký tự '@' của Email để làm SenderName (Ví dụ: support@paypal.com -> support)
-                .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.SenderEmail.Contains("@") ? src.SenderEmail.Split('@', StringSplitOptions.None)[0] : "Hệ thống"))
-
-                // Đặt tên mặc định cho người nhận giả định
-                .ForMember(dest => dest.RecipientName, opt => opt.MapFrom(src => "Học viên hệ thống"))
-
-                // Đặt lời gợi ý/giải thích mặc định cho học viên dựa trên tài liệu Theory Section
-                .ForMember(dest => dest.ExplanationHint, opt => opt.MapFrom(src => "Hãy chú ý kiểm tra kỹ địa chỉ Email người gửi (Domain mạo danh), các liên kết ẩn khi hover chuột và tính cấp bách thúc giục trong nội dung."))
-
-                // Gán các giá trị mặc định cho hệ thống vận hành hệ thống
-                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => 1)) // Mặc định thuộc nhóm 1 (Email lừa đảo)
+                // 2. Thiết lập các trường hệ thống, trạng thái mặc định lúc tạo mới
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.IsAIGenerated, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
 
-                // Tránh lỗi null cho các trường chuỗi ký tự khác
+                // 3. XỬ LÝ LỖI KHÔNG TỒN TẠI THUỘC TÍNH: 
+                // CreateScenarioRequest không chứa AttachmentUrl, gán giá trị chuỗi rỗng mặc định để tránh lỗi build.
                 .ForMember(dest => dest.AttachmentUrl, opt => opt.MapFrom(src => string.Empty))
-                .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore());
 
-            // 2. Map từ UpdateScenarioRequest sang Scenario (Giữ tính đồng bộ khi chỉnh sửa kịch bản)
+                // Bỏ qua các trường liên quan đến khóa ngoại thực thể hoặc Meta không đi qua Request này
+                .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.SimulationId, opt => opt.Ignore())
+                .ForMember(dest => dest.SimulationMetaJson, opt => opt.Ignore());
+
+            // =========================================================
+            // SCENARIO UPDATE MAPPING (Đã tối ưu hóa)
+            // =========================================================
             CreateMap<UpdateScenarioRequest, Scenario>()
+                .ForMember(dest => dest.Subject, opt => opt.MapFrom(src => src.Subject))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Subject))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => $"Kịch bản mô phỏng Email Phishing gửi từ nguồn giả mạo: {src.SenderEmail}"))
-                .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.SenderEmail.Contains("@") ? src.SenderEmail.Split('@', StringSplitOptions.None)[0] : "Hệ thống"));
+                .ForMember(dest => dest.SenderEmail, opt => opt.MapFrom(src => src.SenderEmail))
+                .ForMember(dest => dest.EmailBodyHtml, opt => opt.MapFrom(src => src.EmailBodyHtml))
+                .ForMember(dest => dest.IsPhishing, opt => opt.MapFrom(src => src.IsPhishing))
+                .ForMember(dest => dest.PhishingIndicators, opt => opt.MapFrom(src => src.PhishingIndicators))
+                .ForMember(dest => dest.DifficultyId, opt => opt.MapFrom(src => src.DifficultyId))
 
-            // 3. Map từ Entity gốc ra Response (Lấy kèm thông tin tên độ khó)
+                // Không ghi đè các trường không thuộc phạm vi UpdateRequest
+                .ForMember(dest => dest.Description, opt => opt.Ignore())
+                .ForMember(dest => dest.SenderName, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+
             CreateMap<Scenario, ScenarioDetailResponse>()
                 .ForMember(dest => dest.DifficultyName, opt => opt.MapFrom(src => src.Difficulty != null ? src.Difficulty.LevelName : null))
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null));
@@ -106,7 +112,7 @@ namespace AntiPhisher.Application.MyMapper
                 .ForMember(dest => dest.AIModel, opt => opt.MapFrom(src => src.AIModel));
 
             // =========================================================
-            // CAMPAIGN MAPPING (Xử lý DateOnly & CampaignScenarios)
+            // CAMPAIGN MAPPING
             // =========================================================
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -118,18 +124,19 @@ namespace AntiPhisher.Application.MyMapper
                 .ForMember(dest => dest.Scenarios, opt => opt.MapFrom(src =>
                     src.CampaignScenarios != null
                         ? src.CampaignScenarios
-                            .OrderBy(cs => cs.OrderIndex) // Sắp xếp theo thứ tự hiển thị kịch bản trong Campaign
+                            .OrderBy(cs => cs.OrderIndex)
                             .Select(cs => cs.Scenario)
                             .ToList()
                         : new List<Scenario>()));
 
-            // SubscriptionPlan mappings
-            // CHANGED: Name từ enum → string, AutoMapper tự map string→string
+            // =========================================================
+            // SUBSCRIPTION PLAN MAPPINGS
+            // =========================================================
             CreateMap<CreateSubscriptionPlanRequest, SubscriptionPlan>()
                 .ForMember(dest => dest.DurationMonth, opt => opt.MapFrom(src => src.DurationInMonths))
-                .ForMember(dest => dest.MaxSlots,      opt => opt.MapFrom(src => src.MaxSlots))
-                .ForMember(dest => dest.IsActive,      opt => opt.MapFrom(src => true))
-                .ForMember(dest => dest.CreatedDate,   opt => opt.MapFrom(src => DateTime.UtcNow));
+                .ForMember(dest => dest.MaxSlots, opt => opt.MapFrom(src => src.MaxSlots))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow));
 
             CreateMap<UpdateSubscriptionPlanRequest, SubscriptionPlan>()
                 .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
@@ -139,15 +146,20 @@ namespace AntiPhisher.Application.MyMapper
                 .ForMember(dest => dest.DurationInMonths, opt => opt.MapFrom(src => src.DurationMonth))
                 .ForMember(dest => dest.ActiveSubscribersCount, opt =>
                     opt.MapFrom(src => src.Subscriptions != null ?
-                        src.Subscriptions.Count(s => s.Status == SubscriptionStatus.Active &&
-                                     s.PaymentStatus == PaymentStatus.Paid &&
-                                     s.EndDate > DateTime.Now) : 0));
+                        src.Subscriptions.Count(s =>
+                            s.Status == SubscriptionStatus.Active &&
+                            s.PaymentStatus == PaymentStatus.Paid &&
+                            s.EndDate > DateTime.UtcNow) : 0));
 
-            // Subscription mappings
+            // =========================================================
+            // SUBSCRIPTION MAPPINGS
+            // =========================================================
             CreateMap<CreateSubscriptionRequest, Subscription>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Active"))
-                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => "Pending"))
-                .ForMember(dest => dest.EndDate, opt => opt.Ignore()); // Will be calculated in service
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => SubscriptionStatus.Active))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => PaymentStatus.Pending))
+                .ForMember(dest => dest.UsedSlots, opt => opt.MapFrom(src => 0))
+                .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.EndDate, opt => opt.Ignore());
 
             CreateMap<UpdateSubscriptionRequest, Subscription>()
                 .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
@@ -155,19 +167,19 @@ namespace AntiPhisher.Application.MyMapper
 
             CreateMap<Subscription, SubscriptionResponse>()
                 .ForMember(dest => dest.AccountName, opt =>
-                    opt.MapFrom(src => src.Account != null ?
-                        $"{src.Account.FullName} " : ""))
+                    opt.MapFrom(src => src.Account != null ? src.Account.FullName : ""))
                 .ForMember(dest => dest.PlanName, opt =>
-                    opt.MapFrom(src => src.SubscriptionPlans != null ?
-                        src.SubscriptionPlans.Name.ToString() : ""))
+                    opt.MapFrom(src => src.SubscriptionPlans != null ? src.SubscriptionPlans.Name : ""))
                 .ForMember(dest => dest.Price, opt =>
-                    opt.MapFrom(src => src.SubscriptionPlans != null ?
-                        src.SubscriptionPlans.Price : 0))
+                    opt.MapFrom(src => src.SubscriptionPlans != null ? src.SubscriptionPlans.Price : 0))
                 .ForMember(dest => dest.Features, opt =>
-                    opt.MapFrom(src => src.SubscriptionPlans != null ?
-                        src.SubscriptionPlans.Feature : ""));
+                    opt.MapFrom(src => src.SubscriptionPlans != null ? src.SubscriptionPlans.Feature : ""))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()));
 
-            //Order
+            // =========================================================
+            // ORDER MAPPING
+            // =========================================================
             CreateMap<OrderRequest, Order>();
             CreateMap<Order, OrderResponse>();
         }

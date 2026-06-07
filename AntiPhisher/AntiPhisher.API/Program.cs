@@ -132,6 +132,9 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
+// Đăng ký dịch vụ Company Service
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 
@@ -147,15 +150,9 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ======================================================
-// DATABASE SEEDING (Tự động tạo dữ liệu mặc định)
-// ======================================================
-await DbInitializer.SeedAsync(app.Services);
-
-// ======================================================
 // MIDDLEWARE PIPELINE (Thứ tự chuẩn hóa toàn hệ thống)
 // ======================================================
-
-// Luôn đặt ExceptionMiddleware lên đầu tiên để bắt mọi lỗi ngoại lệ (bao gồm lỗi từ các Middleware khác)
+// Luôn đặt ExceptionMiddleware lên đầu tiên để bắt mọi lỗi ngoại lệ
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -167,12 +164,31 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
-// Khớp dữ liệu Request đầu vào và validate trước khi chạy qua phân quyền
-app.UseMiddleware<ValidationMiddleware>();
-
+// ⚡ ĐÃ FIX THỨ TỰ: Authenticate (Xác thực) -> Authorize (Phân quyền) -> Rồi mới đến Validation nội bộ
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+// Khớp dữ liệu Request đầu vào và validate sau khi danh tính User đã được xác định qua Token
+app.UseMiddleware<ValidationMiddleware>();
 
+// ======================================================
+// DATABASE SEEDING (Tự động chạy khi khởi động ứng dụng)
+// ======================================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // Khởi tạo và nạp toàn bộ cấu trúc dữ liệu mặc định + 7 file JSON kịch bản mô phỏng
+        await DbInitializer.SeedAsync(services);
+    }
+    catch (Exception ex)
+    {
+        // Log lại chi tiết lỗi hệ thống nếu quá trình Seeding thất bại
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Một lỗi nghiêm trọng đã xảy ra khi đang chạy Seeding dữ liệu kịch bản Phishing.");
+    }
+}
+
+app.MapControllers();
 app.Run();
