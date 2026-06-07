@@ -18,6 +18,7 @@ namespace AntiPhisher.API.Controllers
             _service = service;
             _claimService = claimService;
         }
+
         [Authorize]
         [HttpGet("GetUserProfile")]
         public async Task<IActionResult> GetUserProfileAsync()
@@ -25,6 +26,7 @@ namespace AntiPhisher.API.Controllers
             var resposne = await _service.GetUserProfileAsync();
             return resposne.IsSuccess ? Ok(resposne) : BadRequest(resposne);
         }
+
         [Authorize]
         [HttpPut("UpdateUserProfile")]
         public async Task<IActionResult> UpdateUserProfileAsync(UpdateUserRequest updateUserRequest)
@@ -32,6 +34,7 @@ namespace AntiPhisher.API.Controllers
             var result = await _service.UpdateUserProfileAsync(updateUserRequest);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("GetAllAccountAsync")]
         public async Task<IActionResult> GetAllAccountAsync([FromQuery] string? searchTerm = "", [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
@@ -65,14 +68,23 @@ namespace AntiPhisher.API.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
-        [Authorize(Roles = "Manager")] // Tùy chọn: Chặn chỉ cho tài khoản có quyền Manager gọi (nếu hệ thống của bạn có phân quyền chặt)
+        // =====================================================================
+        // ĐÃ ĐỔI: Thêm claim để lấy ID nhân viên truyền xuống Service
+        // =====================================================================
+        [Authorize]
         [HttpGet("my-manager")]
         public async Task<IActionResult> GetMyManagerAsync()
         {
-            var response = await _service.GetMyManagerAsync();
-            return Ok(response);
+            var claim = _claimService.GetUserClaim();
+            var response = await _service.GetMyManagerAsync(claim.Id); // <-- Đã truyền claim.Id
+
+            // Nên check IsSuccess để đồng bộ với cấu trúc ApiResponse của bạn
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
+        // =====================================================================
+        // ĐÃ ĐỔI: Thêm claim để lấy ID của Manager truyền xuống Service
+        // =====================================================================
         /// <summary>
         /// API dành cho Manager xem danh sách nhân viên trong NHÓM (TEAM) mình quản lý
         /// Route từ FE: GET /api/UserAccount/my-team-members
@@ -81,20 +93,24 @@ namespace AntiPhisher.API.Controllers
         [HttpGet("my-team-members")]
         public async Task<IActionResult> GetMyTeamMembers()
         {
-            var response = await _service.GetMyTeamMembersAsync();
-            return Ok(response);
+            var claim = _claimService.GetUserClaim();
+            var response = await _service.GetMyTeamMembersAsync(claim.Id); // <-- Đã truyền claim.Id
+
+            // Nên check IsSuccess để đồng bộ với cấu trúc ApiResponse của bạn
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
 
         /// <summary>
         /// API dành cho Manager xem danh sách tất cả nhân viên trong cùng CÔNG TY
-        /// Route từ FE: GET /api/UserAccount/company-employees
+        /// Route: GET /api/UserAccount/all-employees-in-company
         /// </summary>
-        //[Authorize(Roles = "Manager")]
-        //[HttpGet("company-employee")]
-        //public async Task<IActionResult> GetCompanyEmployees()
-        //{
-        //    var response = await _service.GetEmployeesInCompanyAsync();
-        //    return Ok(response);
-        //}
+        [Authorize(Roles = "Manager")]
+        [HttpGet("all-employees-in-company")]
+        public async Task<IActionResult> GetAllEmployeesInCompany()
+        {
+            // Controller không cần truyền ID, Service tự xử lý qua ClaimService
+            var response = await _service.GetEmployeesInCompanyAsync();
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
     }
 }

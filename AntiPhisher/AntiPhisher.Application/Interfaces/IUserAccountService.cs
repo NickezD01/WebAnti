@@ -15,13 +15,12 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> GetAllAccountAsync(string searchTerm, int pageIndex, int pageSize);
         Task<ApiResponse> UpdateUserStatusOrRoleAsync(UpdateUserStatusOrRoleRequest request);
 
-        /// <summary>Lấy danh sách nhân viên thuộc công ty của Manager (hỗ trợ tìm kiếm + phân trang).</summary>
         Task<ApiResponse> GetCompanyEmployeesAsync(int managerId, string searchTerm, int pageIndex, int pageSize);
-        Task<ApiResponse> GetMyManagerAsync();
-        // 2. Dành cho Manager: Xem thành viên trong NHÓM (Team) mình quản lý
-        Task<ApiResponse> GetMyTeamMembersAsync();
 
-        // 3. Dành cho Manager: Xem toàn bộ nhân viên trong CÔNG TY (Company) của mình
+        // Sửa 2 hàm này: Nhận ID trực tiếp từ bên ngoài truyền vào
+        Task<ApiResponse> GetMyManagerAsync(int userId);
+        Task<ApiResponse> GetMyTeamMembersAsync(int managerId);
+
         Task<ApiResponse> GetEmployeesInCompanyAsync();
     }
 }

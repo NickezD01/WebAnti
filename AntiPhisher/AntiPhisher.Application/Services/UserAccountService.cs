@@ -1,7 +1,6 @@
 ﻿using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.User;
 using AntiPhisher.Application.Response;
-using AntiPhisher.Application.Response.TeamMemberResponse;
 using AntiPhisher.Application.Response.UserAccount;
 using AntiPhisher.Domain.Models;
 using AutoMapper;
@@ -202,16 +201,14 @@ namespace AntiPhisher.Application.Services
         // =====================================================================
         // CHỨC NĂNG 1 — Nhân viên tự xem thông tin Manager của mình
         // =====================================================================
-        public async Task<ApiResponse> GetMyManagerAsync()
+        public async Task<ApiResponse> GetMyManagerAsync(int userId)
         {
             ApiResponse apiResponse = new ApiResponse();
             try
             {
-                var claim = _claim.GetUserClaim();
-                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
-
+                // Sử dụng luôn userId từ tham số truyền vào
                 var teamMember = await _unitOfWork.TeamMembers.GetAsync(
-                    tm => tm.UserId == claim.Id,
+                    tm => tm.UserId == userId,
                     include: query => query.Include(tm => tm.Team));
 
                 if (teamMember == null || teamMember.Team == null)
@@ -219,7 +216,6 @@ namespace AntiPhisher.Application.Services
 
                 var team = teamMember.Team;
 
-                // Kiểm tra int: không dùng .Value hay null
                 if (team.ManagerId <= 0)
                     return apiResponse.SetOk((object)null);
 
@@ -246,20 +242,16 @@ namespace AntiPhisher.Application.Services
         // =====================================================================
         // CHỨC NĂNG 2 — Manager xem danh sách thành viên trong NHÓM của mình
         // =====================================================================
-        public async Task<ApiResponse> GetMyTeamMembersAsync()
+        public async Task<ApiResponse> GetMyTeamMembersAsync(int managerId)
         {
             ApiResponse apiResponse = new ApiResponse();
             try
             {
-                var claim = _claim.GetUserClaim();
-                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
-
-                // Lấy Team dựa trên ManagerId (Id người đang đăng nhập)
-                var team = await _unitOfWork.Teams.GetAsync(t => t.ManagerId == claim.Id);
+                // Sử dụng luôn managerId từ tham số truyền vào
+                var team = await _unitOfWork.Teams.GetAsync(t => t.ManagerId == managerId);
                 if (team == null)
-                    return apiResponse.SetOk(new List<TeamMemberResponse>()); // Trả mảng rỗng nếu chưa quản lý team nào
+                    return apiResponse.SetOk(new List<TeamMemberResponse>());
 
-                // Quét bảng trung gian TeamMembers để lấy danh sách thành viên nhóm
                 var members = await _unitOfWork.TeamMembers.GetAllAsync(
                     tm => tm.TeamId == team.TeamId,
                     include: query => query.Include(tm => tm.User).Include(tm => tm.User.Role)
@@ -295,44 +287,26 @@ namespace AntiPhisher.Application.Services
             ApiResponse apiResponse = new ApiResponse();
             try
             {
+                // Service tự lấy ID từ token của người đang đăng nhập
                 var claim = _claim.GetUserClaim();
-                if (claim == null) return apiResponse.SetBadRequest("Phiên đăng nhập không hợp lệ.");
+                if (claim == null) return apiResponse.SetBadRequest("Không tìm thấy thông tin xác thực.");
 
-                // Lấy thông tin tài khoản Manager hiện tại
+                // Lấy thông tin Manager
                 var manager = await _unitOfWork.Users.GetAsync(x => x.UserId == claim.Id);
-                if (manager == null)
-                    return apiResponse.SetNotFound("Không tìm thấy thông tin tài khoản.");
-
-                // Kiểm tra CompanyId (kiểu int hoặc int? tùy thuộc DB của bạn)
-                if (manager.CompanyId == null || manager.CompanyId <= 0)
+                if (manager?.CompanyId == null)
                     return apiResponse.SetOk(new List<CompanyEmployeeResponse>());
 
-                int currentCompanyId = manager.CompanyId.Value;
-
-                // Lấy tất cả User thuộc cùng CompanyId này, loại trừ chính Manager đang xem
+                // Lấy danh sách nhân viên trong cùng công ty (loại trừ chính nó)
                 var employees = await _unitOfWork.Users.GetAllAsync(
-                    x => x.CompanyId == currentCompanyId && x.UserId != manager.UserId,
+                    x => x.CompanyId == manager.CompanyId && x.UserId != manager.UserId,
                     include: query => query.Include(u => u.Role)
                 );
 
-                if (employees == null || !employees.Any())
-                    return apiResponse.SetOk(new List<CompanyEmployeeResponse>());
-
-                var response = employees.Select(u => new CompanyEmployeeResponse
-                {
-                    UserId = u.UserId,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    AvatarUrl = u.AvatarUrl ?? string.Empty,
-                    IsActive = u.IsActive,
-                    //Role = u.Role?.RoleName ?? "User"
-                }).ToList();
-
-                return apiResponse.SetOk(response);
+                return apiResponse.SetOk(_mapper.Map<List<CompanyEmployeeResponse>>(employees));
             }
             catch (Exception ex)
             {
-                return apiResponse.SetBadRequest($"Lỗi khi lấy nhân viên công ty: {ex.Message}");
+                return apiResponse.SetBadRequest(ex.Message);
             }
         }
     }

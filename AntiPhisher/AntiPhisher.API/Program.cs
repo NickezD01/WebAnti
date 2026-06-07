@@ -131,6 +131,7 @@ builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 // Đăng ký dịch vụ Company Service
 builder.Services.AddScoped<ICompanyService, CompanyService>();
