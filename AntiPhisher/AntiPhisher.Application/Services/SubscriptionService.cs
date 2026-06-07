@@ -360,14 +360,12 @@ namespace AntiPhisher.Application.Services
                     $"• Email: <b>{request.Email}</b><br/>" +
                     $"• Mật khẩu tạm thời: <b>{tempPassword}</b><br/><br/>" +
                     $"Vui lòng thực hiện đổi mật khẩu ngay trong phiên đăng nhập đầu tiên.");
-<<<<<<< HEAD
+
 
                 if (!mailResult.IsSuccess)
                 {
                     Console.Error.WriteLine($"[INVITE WARNING] SendNotiMail fail: {mailResult.ErrorMessage}");
                 }
-=======
->>>>>>> L
 
                 return new ApiResponse().SetOk(new
                 {
