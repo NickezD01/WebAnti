@@ -103,10 +103,18 @@ namespace AntiPhisher.Application.Services
             ApiResponse apiResponse = new ApiResponse();
             try
             {
+                // 🔒 CHỐT CHẶN BẢO MẬT CUỐI: Đảm bảo RoleId luôn nằm trong tập hợp lệ [1, 2, 3]
+                var validRoleIds = new List<int> { 1, 2, 3 };
+                if (!validRoleIds.Contains(request.RoleId))
+                {
+                    return apiResponse.SetBadRequest($"Mã quyền (RoleId = {request.RoleId}) không hợp lệ. Chỉ chấp nhận giá trị: 1 (Admin), 2 (Manager), 3 (User).");
+                }
+
                 var user = await _unitOfWork.Users.GetAsync(x => x.UserId == request.UserId);
                 if (user == null)
                     return apiResponse.SetBadRequest("User not found");
 
+                // Tiến hành gán sau khi đã vượt qua các tầng kiểm tra an toàn
                 user.RoleId = request.RoleId;
 
                 if (request.Status == "Active")
