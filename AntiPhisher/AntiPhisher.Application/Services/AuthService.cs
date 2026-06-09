@@ -476,7 +476,7 @@ namespace AntiPhisher.Application.Services
         // PASSWORD HASH
         // =====================================================
 
-        private PasswordDTO CreatePasswordHash(
+        public PasswordDTO CreatePasswordHash(
             string password
         )
         {
