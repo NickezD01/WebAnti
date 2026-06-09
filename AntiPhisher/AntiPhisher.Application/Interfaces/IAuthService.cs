@@ -18,5 +18,8 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         Task<ApiResponse> ResetPasswordAsync(ResetPasswordRequest request);
 
+        // Đã đồng bộ kiểu trả về PasswordDTO theo cấu trúc thực tế của AuthService
+        Services.AuthService.PasswordDTO CreatePasswordHash(string password);
+
     }
 }
