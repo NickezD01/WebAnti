@@ -22,6 +22,12 @@ namespace AntiPhisher.Application.Validation
                 .NotEmpty().WithMessage("RoleId is required.")
                 .Must(roleId => roleId == 1 || roleId == 2 || roleId == 3)
                 .WithMessage("RoleId is invalid. Only allowed values are: 1 (Admin), 2 (Manager), 3 (User).");
+
+            // 3. Chỉ chấp nhận Status thuộc tập hợp hợp lệ
+            RuleFor(x => x.Status)
+                .NotEmpty().WithMessage("Status is required.")
+                .Must(s => s == "Active" || s == "Banned" || s == "Unverified")
+                .WithMessage("Status is invalid. Only allowed values are: Active, Banned, Unverified.");
         }
     }
 }

@@ -42,4 +42,10 @@
     <ProjectReference Include="..\AntiPhisher.Infrastructure\AntiPhisher.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="DataSeedFolder\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

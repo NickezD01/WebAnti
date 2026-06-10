@@ -20,8 +20,13 @@ namespace AntiPhisher.Infrastructure
     /// </summary>
     public static class DbInitializer
     {
-        // 🔥 ĐỊNH NGHĨA ĐƯỜNG DẪN GỐC CHỨA FILE JSON ĐÚNG THEO ĐỊA CHỈ BẠN CUNG CẤP
-        private static readonly string BaseSeedFolderPath = @"D:\WebAnti\AntiPhisher\AntiPhisher.API\DataSeedFolder";
+        // Đường dẫn tới file seed — tính từ AppContext.BaseDirectory (bin output) để portable qua mọi máy.
+        // lessons_seed.json: Infrastructure.csproj copy vào SeedData/
+        // batch_*.json:      API.csproj copy vào DataSeedFolder/
+        private static string LessonsSeedPath =>
+            Path.Combine(AppContext.BaseDirectory, "SeedData", "lessons_seed.json");
+        private static string ScenariosBatchFolder =>
+            Path.Combine(AppContext.BaseDirectory, "DataSeedFolder");
 
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
@@ -44,6 +49,9 @@ namespace AntiPhisher.Infrastructure
 
                 // 🔥 TIẾN HÀNH SEED 7 BATCH PHISHING SCENARIOS TỪ THƯ MỤC CỐ ĐỊNH
                 await SeedPhishingScenarios(context, logger);
+
+                await SeedCampaigns(context, logger);
+                await SeedCampaignScenarios(context, logger);
 
                 logger?.LogInformation("✅ Database seeding completed successfully.");
             }
@@ -237,8 +245,7 @@ namespace AntiPhisher.Infrastructure
         {
             if (await context.Phases.AnyAsync()) return;
 
-            // 🔥 ĐÃ CẬP NHẬT: Lấy file lessons_seed.json từ thư mục cố định
-            var seedPath = Path.Combine(BaseSeedFolderPath, "lessons_seed.json");
+            var seedPath = LessonsSeedPath;
 
             if (!File.Exists(seedPath))
             {
@@ -334,15 +341,8 @@ namespace AntiPhisher.Infrastructure
         // ─── 🔥 SEED PHISHING SCENARIOS (7 BATCH FILES) ─────────────────
         private static async Task SeedPhishingScenarios(AppDbContext context, ILogger? logger)
         {
-            // 🔥 ĐÃ CẬP NHẬT: Quét dữ liệu trực tiếp trong thư mục con "Scenarios" thuộc DataSeedFolder của bạn
-            // Nếu bạn để các file batch_*.json nằm ngay ngoài DataSeedFolder thì sửa đoạn dưới thành: BaseSeedFolderPath
-            string folderPath = Path.Combine(BaseSeedFolderPath, "Scenarios");
-
-            if (!Directory.Exists(folderPath))
-            {
-                // Dự phòng: Nếu bạn không tạo thư mục Scenarios mà vứt trực tiếp file batch vào DataSeedFolder
-                folderPath = BaseSeedFolderPath;
-            }
+            // batch_*.json nằm trực tiếp trong DataSeedFolder (không có subfolder Scenarios)
+            string folderPath = ScenariosBatchFolder;
 
             if (!Directory.Exists(folderPath))
             {
@@ -477,6 +477,126 @@ namespace AntiPhisher.Infrastructure
             [JsonPropertyName("visible_text")] public string VisibleText { get; set; }
             [JsonPropertyName("explanation")] public string Explanation { get; set; }
             [JsonPropertyName("severity")] public string Severity { get; set; }
+        }
+
+        // ─── CAMPAIGN SCENARIOS ──────────────────────────────────────
+        private static async Task SeedCampaignScenarios(AppDbContext context, ILogger? logger)
+        {
+            if (await context.CampaignScenarios.AnyAsync()) return;
+
+            var campaigns = await context.Campaigns
+                .OrderBy(c => c.CampaignId)
+                .ToListAsync();
+
+            if (!campaigns.Any()) return;
+
+            var scenarios = await context.Scenarios
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.ScenarioId)
+                .Take(campaigns.Count * 20)
+                .ToListAsync();
+
+            if (!scenarios.Any()) return;
+
+            var links = new List<CampaignScenario>();
+            for (int ci = 0; ci < campaigns.Count; ci++)
+            {
+                var slice = scenarios.Skip(ci * 20).Take(20).ToList();
+                for (int si = 0; si < slice.Count; si++)
+                {
+                    links.Add(new CampaignScenario
+                    {
+                        CampaignId  = campaigns[ci].CampaignId,
+                        ScenarioId  = slice[si].ScenarioId,
+                        OrderIndex  = si + 1
+                    });
+                }
+            }
+
+            await context.CampaignScenarios.AddRangeAsync(links);
+            await context.SaveChangesAsync();
+            logger?.LogInformation("🎯 Seeded {Count} campaign-scenario links ({Camps} campaigns × 20).",
+                links.Count, campaigns.Count);
+        }
+
+        // ─── CAMPAIGNS ───────────────────────────────────────────────
+        private static async Task SeedCampaigns(AppDbContext context, ILogger? logger)
+        {
+            if (await context.Campaigns.AnyAsync()) return;
+
+            var admin = await context.Users.FirstOrDefaultAsync(u => u.Email == "admin@gmail.com");
+            if (admin == null) return;
+
+            var now = DateTime.UtcNow;
+            var today = DateOnly.FromDateTime(now);
+
+            var campaigns = new List<Campaign>
+            {
+                new Campaign
+                {
+                    CreatedByUserId = admin.UserId,
+                    CompanyId       = null,
+                    CampaignName    = "Nhận diện Phishing cơ bản",
+                    Description     = "Campaign dành cho tất cả người dùng: nhận biết email phishing phổ biến, liên kết độc hại và kỹ thuật social engineering.",
+                    StartDate       = today,
+                    EndDate         = today.AddMonths(6),
+                    IsActive        = true,
+                    CreatedAt       = now,
+                    UpdatedAt       = now
+                },
+                new Campaign
+                {
+                    CreatedByUserId = admin.UserId,
+                    CompanyId       = null,
+                    CampaignName    = "Tấn công qua Email doanh nghiệp",
+                    Description     = "Phân tích các kịch bản tấn công BEC (Business Email Compromise) — giả mạo CEO, kế toán, đối tác.",
+                    StartDate       = today,
+                    EndDate         = today.AddMonths(6),
+                    IsActive        = true,
+                    CreatedAt       = now,
+                    UpdatedAt       = now
+                },
+                new Campaign
+                {
+                    CreatedByUserId = admin.UserId,
+                    CompanyId       = null,
+                    CampaignName    = "Spear Phishing & Kỹ thuật Social Engineering",
+                    Description     = "Nhận biết tấn công có chủ đích (spear phishing): nghiên cứu nạn nhân, tạo lòng tin giả, khai thác tâm lý.",
+                    StartDate       = today,
+                    EndDate         = today.AddMonths(6),
+                    IsActive        = true,
+                    CreatedAt       = now,
+                    UpdatedAt       = now
+                },
+                new Campaign
+                {
+                    CreatedByUserId = admin.UserId,
+                    CompanyId       = null,
+                    CampaignName    = "Liên kết & Tệp đính kèm độc hại",
+                    Description     = "Phân biệt URL giả mạo, domain lookalike, QR code độc hại và tệp đính kèm có chứa malware.",
+                    StartDate       = today,
+                    EndDate         = today.AddMonths(6),
+                    IsActive        = true,
+                    CreatedAt       = now,
+                    UpdatedAt       = now
+                },
+                new Campaign
+                {
+                    CreatedByUserId = admin.UserId,
+                    CompanyId       = null,
+                    CampaignName    = "Phản ứng & Báo cáo sự cố",
+                    Description     = "Hướng dẫn quy trình xử lý khi nhận email khả nghi: không click, báo cáo, cách ly thiết bị và thông báo đội IT.",
+                    StartDate       = today,
+                    EndDate         = today.AddMonths(6),
+                    IsActive        = true,
+                    CreatedAt       = now,
+                    UpdatedAt       = now
+                }
+            };
+
+            await context.Campaigns.AddRangeAsync(campaigns);
+            await context.SaveChangesAsync();
+            logger?.LogInformation("📣 Seeded {Count} default campaigns.", campaigns.Count);
         }
     }
 }

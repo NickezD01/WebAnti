@@ -61,6 +61,7 @@ namespace AntiPhisher.WebAPI.Controllers
         // 2. [ADMIN/USER] LẤY DANH SÁCH TẤT CẢ BÀI HỌC (Sắp xếp theo Phase -> Module -> Lesson)
         // GET: api/Lesson
         // =========================================================================
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllLessons()
         {
@@ -82,6 +83,7 @@ namespace AntiPhisher.WebAPI.Controllers
         // 3. [ADMIN/USER] LẤY CHI TIẾT MỘT BÀI HỌC THEO ID
         // GET: api/Lesson/{lessonId}
         // =========================================================================
+        [Authorize]
         [HttpGet("{lessonId:int}")]
         public async Task<IActionResult> GetLessonById(int lessonId)
         {
@@ -94,6 +96,23 @@ namespace AntiPhisher.WebAPI.Controllers
                     response.SetNotFound(message: $"Không tìm thấy bài học lý thuyết với ID {lessonId}");
                     return NotFound(response);
                 }
+
+                // B2 hard gate: Phase 2+ chỉ cho user đã unlock (Admin bypass)
+                if (lesson.PhaseNumber != 1)
+                {
+                    var claim = _claimService.GetUserClaim();
+                    if (claim.Role != "Admin")
+                    {
+                        var unlocked = await _lessonService.IsUserUnlockedAsync(claim.Id);
+                        if (!unlocked)
+                        {
+                            response.SetApiResponse(System.Net.HttpStatusCode.Forbidden, false,
+                                "Cần nâng cấp gói để xem nội dung này");
+                            return StatusCode(403, response);
+                        }
+                    }
+                }
+
                 response.SetOk(lesson);
                 return Ok(response);
             }
@@ -239,7 +258,83 @@ namespace AntiPhisher.WebAPI.Controllers
         }
 
         // =========================================================================
-        // 8. [USER] Lấy danh sách bài học được giao từ Campaign đang active
+        // 8. [ADMIN] CẬP NHẬT NỘI DUNG BÀI HỌC (tiêu đề, lý thuyết, hướng dẫn, ảnh)
+        // PUT: api/Lesson/{lessonId}
+        // =========================================================================
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{lessonId:int}")]
+        public async Task<IActionResult> UpdateLesson(int lessonId, [FromBody] UpdateLessonRequest request)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var result = await _lessonService.UpdateLessonAsync(lessonId, request);
+                response.SetOk(result);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        // =========================================================================
+        // 9. [ADMIN] LẤY QUIZ CỦA BÀI HỌC
+        // GET: api/Lesson/{lessonId}/quiz
+        // =========================================================================
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{lessonId:int}/quiz")]
+        public async Task<IActionResult> GetQuiz(int lessonId)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var quiz = await _lessonService.GetQuizByLessonIdAsync(lessonId);
+                response.SetOk(quiz);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        // =========================================================================
+        // 10. [ADMIN] LƯU (TẠO / CẬP NHẬT) QUIZ CHO BÀI HỌC
+        // PUT: api/Lesson/{lessonId}/quiz
+        // =========================================================================
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{lessonId:int}/quiz")]
+        public async Task<IActionResult> SaveQuiz(int lessonId, [FromBody] SaveQuizRequest request)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var quiz = await _lessonService.SaveQuizAsync(lessonId, request);
+                response.SetOk(quiz);
+                return Ok(response);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                response.SetNotFound(message: ex.Message);
+                return NotFound(response);
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        // =========================================================================
+        // 11. [USER] Lấy danh sách bài học được giao từ Campaign đang active
         // GET: api/Lesson/my-lessons
         // =========================================================================
         [Authorize]

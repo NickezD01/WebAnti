@@ -288,6 +288,138 @@ namespace AntiPhisher.Application.Services
         }
 
         // =====================================================================
+        // CHỨC NĂNG 4 — Manager xem học trình của 1 nhân viên cụ thể
+        // =====================================================================
+        public async Task<ApiResponse> GetEmployeeProgressAsync(int managerId, int employeeId)
+        {
+            ApiResponse apiResponse = new ApiResponse();
+            try
+            {
+                // Xác nhận manager và employee cùng công ty
+                var manager = await _unitOfWork.Users.GetAsync(x => x.UserId == managerId);
+                if (manager?.CompanyId == null)
+                    return apiResponse.SetBadRequest("Bạn chưa được gán vào công ty nào.");
+
+                var employee = await _unitOfWork.Users.GetAsync(x => x.UserId == employeeId);
+                if (employee == null)
+                    return apiResponse.SetNotFound("Không tìm thấy nhân viên.");
+                if (employee.CompanyId != manager.CompanyId)
+                    return apiResponse.SetBadRequest("Nhân viên này không thuộc công ty của bạn.");
+
+                // Tải toàn bộ Phase > Module > Lesson
+                var phases = await _unitOfWork.Phases.GetAllAsync(
+                    p => p.IsActive,
+                    include: q => q
+                        .Include(p => p.Modules.Where(m => m.IsActive))
+                        .ThenInclude(m => m.Lessons.Where(l => l.IsActive)));
+
+                // Tải tiến độ học bài của nhân viên
+                var lessonProgresses = await _unitOfWork.UserLessonProgresses
+                    .GetAllAsync(x => x.UserId == employeeId);
+                var progressDict = lessonProgresses?.ToDictionary(p => p.LessonId) ?? new Dictionary<int, UserLessonProgress>();
+
+                // Build phase items
+                var phaseItems = phases?
+                    .OrderBy(p => p.OrderIndex)
+                    .Select(p => new PhaseProgressItem
+                    {
+                        PhaseId = p.PhaseId,
+                        PhaseName = p.PhaseName,
+                        Modules = p.Modules
+                            .OrderBy(m => m.OrderIndex)
+                            .Select(m => new ModuleProgressItem
+                            {
+                                ModuleId = m.ModuleId,
+                                ModuleName = m.ModuleName,
+                                Lessons = m.Lessons
+                                    .OrderBy(l => l.OrderIndex)
+                                    .Select(l =>
+                                    {
+                                        progressDict.TryGetValue(l.LessonId, out var prog);
+                                        return new LessonProgressItem
+                                        {
+                                            LessonId = l.LessonId,
+                                            Title = l.Title,
+                                            IsCompleted = prog?.IsCompleted ?? false,
+                                            CompletedAt = prog?.CompletedAt
+                                        };
+                                    }).ToList()
+                            }).ToList(),
+                    }).ToList() ?? new List<PhaseProgressItem>();
+
+                // Tính TotalLessons / Completed cho mỗi phase
+                foreach (var ph in phaseItems)
+                {
+                    ph.TotalLessons = ph.Modules.Sum(m => m.Lessons.Count);
+                    ph.CompletedLessons = ph.Modules.Sum(m => m.Lessons.Count(l => l.IsCompleted));
+                }
+
+                int totalLessons = phaseItems.Sum(p => p.TotalLessons);
+                int totalCompleted = phaseItems.Sum(p => p.CompletedLessons);
+
+                // Tải chiến dịch được giao cho nhân viên (CampaignUserAssignment)
+                var assignments = await _unitOfWork.CampaignUserAssignments.GetAllAsync(
+                    a => a.UserId == employeeId,
+                    include: q => q.Include(a => a.Campaign).ThenInclude(c => c.CampaignScenarios));
+
+                var campaignItems = new List<CampaignProgressItem>();
+
+                if (assignments != null)
+                {
+                    foreach (var asgn in assignments)
+                    {
+                        var camp = asgn.Campaign;
+                        if (camp == null) continue;
+
+                        int totalScenarios = camp.CampaignScenarios?.Count ?? 0;
+
+                        // Lấy lịch sử làm bài cho campaign này
+                        var attempts = await _unitOfWork.UserAttempts.GetAllAsync(
+                            a => a.UserId == employeeId && a.CampaignId == camp.CampaignId);
+
+                        int attemptedScenarios = attempts?.Select(a => a.ScenarioId).Distinct().Count() ?? 0;
+                        int totalAttempts = attempts?.Count() ?? 0;
+                        double avgScore = totalAttempts > 0 ? attempts!.Average(a => a.Score) : 0;
+
+                        campaignItems.Add(new CampaignProgressItem
+                        {
+                            CampaignId = camp.CampaignId,
+                            CampaignName = camp.CampaignName,
+                            TotalScenarios = totalScenarios,
+                            AttemptedScenarios = attemptedScenarios,
+                            TotalAttempts = totalAttempts,
+                            AverageScore = Math.Round(avgScore, 1),
+                        });
+                    }
+                }
+
+                double globalAvgScore = campaignItems.Count > 0
+                    ? Math.Round(campaignItems.Average(c => c.AverageScore), 1)
+                    : 0;
+                int totalAttemptGlobal = campaignItems.Sum(c => c.TotalAttempts);
+
+                var result = new EmployeeProgressResponse
+                {
+                    UserId = employee.UserId,
+                    FullName = employee.FullName,
+                    Email = employee.Email,
+                    TotalLessons = totalLessons,
+                    TotalLessonsCompleted = totalCompleted,
+                    TotalAttempts = totalAttemptGlobal,
+                    AverageScore = globalAvgScore,
+                    Phases = phaseItems,
+                    Campaigns = campaignItems,
+                };
+
+                return apiResponse.SetOk(result);
+            }
+            catch (Exception ex)
+            {
+                return apiResponse.SetBadRequest($"Lỗi khi lấy học trình nhân viên: {ex.Message}");
+            }
+        }
+
+        // =====================================================================
         // CHỨC NĂNG 3 — Manager xem danh sách toàn bộ nhân viên trong CÔNG TY
         // =====================================================================
         public async Task<ApiResponse> GetEmployeesInCompanyAsync()

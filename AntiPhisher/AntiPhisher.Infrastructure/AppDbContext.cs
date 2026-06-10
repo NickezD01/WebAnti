@@ -58,6 +58,14 @@ namespace AntiPhisher.Infrastructure
         public DbSet<CampaignPrerequisite> CampaignPrerequisites { get; set; }
         public DbSet<UserLessonProgress> UserLessonProgresses { get; set; }
 
+        // --- LỜI MỜI THAM GIA CÔNG TY ---
+        public DbSet<CompanyInvitation> CompanyInvitations { get; set; }
+
+        // --- QUIZ BÀI HỌC ---
+        public DbSet<LessonQuiz>    LessonQuizzes  { get; set; }
+        public DbSet<QuizQuestion>  QuizQuestions  { get; set; }
+        public DbSet<QuizOption>    QuizOptions    { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

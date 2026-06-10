@@ -209,10 +209,18 @@ namespace AntiPhisher.Application.Services
                     campaignIds.Add(ta.CampaignId);
             }
 
+            // 3a. Luôn include campaign hệ thống (CompanyId=null) + campaign công ty của user
+            var currentUser = await _unitOfWork.Users.GetAsync(u => u.UserId == userId);
+            var openCampaigns = await _unitOfWork.Campaigns.GetAllAsync(
+                c => c.IsActive && (c.CompanyId == null ||
+                     (currentUser != null && currentUser.CompanyId != null && c.CompanyId == currentUser.CompanyId)));
+            foreach (var c in openCampaigns ?? Enumerable.Empty<Campaign>())
+                campaignIds.Add(c.CampaignId);
+
             if (!campaignIds.Any())
                 return Enumerable.Empty<MyCampaignResponse>();
 
-            // 3. Chỉ lấy campaign IsActive + trong ngày hiệu lực (không filter theo prerequisites)
+            // 3b. Chỉ lấy campaign IsActive + trong ngày hiệu lực (không filter theo prerequisites)
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var campaigns = await _unitOfWork.Campaigns.GetAllAsync(
                 x => campaignIds.Contains(x.CampaignId) && x.IsActive);

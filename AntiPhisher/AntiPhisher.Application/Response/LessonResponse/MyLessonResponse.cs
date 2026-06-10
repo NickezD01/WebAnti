@@ -17,5 +17,8 @@ namespace AntiPhisher.Application.Response.LessonResponse
         // Campaign nguồn giao bài học này
         public int CampaignId { get; set; }
         public string CampaignName { get; set; } = string.Empty;
+
+        // false = Phase 1 hoặc user unlocked; true = Phase 2+ và user chưa nâng cấp
+        public bool IsLocked { get; set; }
     }
 }

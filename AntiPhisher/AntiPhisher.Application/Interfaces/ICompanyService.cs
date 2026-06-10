@@ -12,6 +12,11 @@ namespace AntiPhisher.Application.Interfaces
     {
         // Endpoint lấy thông tin công ty của user đang đăng nhập hiện tại
         Task<ApiResponse> GetMyCompanyAsync();
-        Task<ApiResponse> AddEmployeeAsync(AddEmployeeDto dto);
+
+        /// <summary>Gửi lời mời email tới nhân viên (email mới hoặc đã có account).</summary>
+        Task<ApiResponse> InviteEmployeeAsync(InviteByEmailDto dto);
+
+        /// <summary>Nhân viên bấm link xác nhận trong email → thêm vào công ty.</summary>
+        Task<ApiResponse> AcceptInvitationAsync(string token);
     }
 }

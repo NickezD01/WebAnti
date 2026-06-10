@@ -2,6 +2,7 @@
 using AntiPhisher.Application.Response.LessonResponse;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace AntiPhisher.Application.Interfaces
 {
@@ -9,6 +10,7 @@ namespace AntiPhisher.Application.Interfaces
     {
         // Quản lý Bài học (Admin)
         Task<LessonResponse> CreateLessonAsync(CreateLessonRequest request);
+        Task<LessonResponse> UpdateLessonAsync(int lessonId, UpdateLessonRequest request);
         Task<IEnumerable<LessonResponse>> GetAllLessonsAsync();
         Task<LessonResponse?> GetLessonByIdAsync(int lessonId);
 
@@ -31,5 +33,12 @@ namespace AntiPhisher.Application.Interfaces
         // PHẦN 2: Luồng phân phối bài học cho User
         /// <summary>Trả về các bài học bắt buộc từ tất cả Campaign đang hoạt động mà User được gán vào.</summary>
         Task<IEnumerable<MyLessonResponse>> GetMyLessonsAsync(int userId);
+
+        /// <summary>TRUE nếu user thuộc công ty có subscription Active, hoặc cá nhân có sub Active.</summary>
+        Task<bool> IsUserUnlockedAsync(int userId);
+
+        // QUIZ
+        Task<QuizResponse?> GetQuizByLessonIdAsync(int lessonId);
+        Task<QuizResponse>  SaveQuizAsync(int lessonId, SaveQuizRequest request);
     }
 }
