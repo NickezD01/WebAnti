@@ -79,6 +79,18 @@ namespace AntiPhisher.API.Controllers
         }
 
         /// <summary>
+        /// User tự xem trạng thái gói dịch vụ của công ty mình.
+        /// GET: api/Subscription/my-plan
+        /// </summary>
+        [HttpGet("my-plan")]
+        public async Task<IActionResult> GetMyPlanStatus()
+        {
+            var userClaim = _claimService.GetUserClaim();
+            var response = await _subscriptionService.GetMyPlanStatusAsync(userClaim.Id);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
+
+        /// <summary>
         /// Hủy kích hoạt gói dịch vụ của công ty.
         /// POST: api/Subscription/{subscriptionId}/cancel
         /// </summary>

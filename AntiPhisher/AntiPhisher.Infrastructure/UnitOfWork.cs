@@ -71,6 +71,10 @@ namespace AntiPhisher.Infrastructure
         public ILessonRepository Lessons { get; }
         public ICampaignPrerequisiteRepository CampaignPrerequisites { get; }
         public IUserLessonProgressRepository UserLessonProgresses { get; }
+        public ICompanyInvitationRepository CompanyInvitations { get; }
+        public ILessonQuizRepository   LessonQuizzes  { get; }
+        public IQuizQuestionRepository QuizQuestions  { get; }
+        public IQuizOptionRepository   QuizOptions    { get; }
 
         // =========================
         // CONSTRUCTOR
@@ -121,6 +125,10 @@ namespace AntiPhisher.Infrastructure
             Lessons = new LessonRepository(context);
             CampaignPrerequisites = new CampaignPrerequisiteRepository(context);
             UserLessonProgresses = new UserLessonProgressRepository(context);
+            CompanyInvitations = new CompanyInvitationRepository(context);
+            LessonQuizzes = new LessonQuizRepository(context);
+            QuizQuestions = new QuizQuestionRepository(context);
+            QuizOptions   = new QuizOptionRepository(context);
         }
 
         // =========================

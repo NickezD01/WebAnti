@@ -22,5 +22,6 @@ namespace AntiPhisher.Application.Interfaces
         Task<ApiResponse> GetMyTeamMembersAsync(int managerId);
 
         Task<ApiResponse> GetEmployeesInCompanyAsync();
+        Task<ApiResponse> GetEmployeeProgressAsync(int managerId, int employeeId);
     }
 }

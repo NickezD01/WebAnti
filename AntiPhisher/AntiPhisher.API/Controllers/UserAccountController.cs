@@ -108,8 +108,20 @@ namespace AntiPhisher.API.Controllers
         [HttpGet("all-employees-in-company")]
         public async Task<IActionResult> GetAllEmployeesInCompany()
         {
-            // Controller không cần truyền ID, Service tự xử lý qua ClaimService
             var response = await _service.GetEmployeesInCompanyAsync();
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
+
+        /// <summary>
+        /// Manager xem học trình (bài học + chiến dịch) của 1 nhân viên.
+        /// GET /api/UserAccount/employee-progress/{employeeId}
+        /// </summary>
+        [Authorize(Roles = "Manager")]
+        [HttpGet("employee-progress/{employeeId:int}")]
+        public async Task<IActionResult> GetEmployeeProgress(int employeeId)
+        {
+            var claim = _claimService.GetUserClaim();
+            var response = await _service.GetEmployeeProgressAsync(claim.Id, employeeId);
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
     }

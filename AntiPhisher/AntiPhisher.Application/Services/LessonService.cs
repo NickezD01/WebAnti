@@ -77,6 +77,39 @@ namespace AntiPhisher.Application.Services
         }
 
         // =========================================================================
+        // 1b. QUẢN LÝ BÀI HỌC (ADMIN) - UPDATE LESSON
+        // =========================================================================
+        public async Task<LessonResponse> UpdateLessonAsync(int lessonId, UpdateLessonRequest request)
+        {
+            var l = await _unitOfWork.Lessons.GetAsync(x => x.LessonId == lessonId);
+            if (l == null) throw new KeyNotFoundException($"Không tìm thấy bài học ID {lessonId}");
+
+            if (request.Title != null)          l.Title           = request.Title.Trim();
+            if (request.Content != null)        l.TheoryContent   = request.Content;
+            if (request.SimulationGuide != null) l.SimulationGuide = request.SimulationGuide;
+            l.UpdatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.SaveChangeAsync();
+
+            var m = await _unitOfWork.Modules.GetAsync(x => x.ModuleId == l.ModuleId);
+            var p = m != null ? await _unitOfWork.Phases.GetAsync(x => x.PhaseId == m.PhaseId) : null;
+
+            return new LessonResponse
+            {
+                LessonId      = l.LessonId,
+                Title         = l.Title,
+                Content       = l.TheoryContent,
+                SimulationGuide = l.SimulationGuide,
+                PhaseNumber   = p?.OrderIndex ?? 0,
+                PhaseName     = p?.PhaseName,
+                ModuleNumber  = m?.OrderIndex ?? 0,
+                ModuleName    = m?.ModuleName,
+                LessonOrder   = (m?.OrderIndex ?? 0) + ((double)l.OrderIndex / 10),
+                EstimatedMinutes = 15,
+            };
+        }
+
+        // =========================================================================
         // 2. QUẢN LÝ BÀI HỌC (ADMIN) - GET ALL LESSONS
         // =========================================================================
         public async Task<IEnumerable<LessonResponse>> GetAllLessonsAsync()
@@ -92,12 +125,15 @@ namespace AntiPhisher.Application.Services
                          join p in phases on m.PhaseId equals p.PhaseId
                          select new LessonResponse
                          {
-                             LessonId = l.LessonId,
-                             Title = l.Title,
-                             Content = l.TheoryContent,
-                             PhaseNumber = p.OrderIndex,
-                             ModuleNumber = m.OrderIndex,
-                             LessonOrder = m.OrderIndex + ((double)l.OrderIndex / 10),
+                             LessonId        = l.LessonId,
+                             Title           = l.Title,
+                             Content         = l.TheoryContent,
+                             SimulationGuide = l.SimulationGuide,
+                             PhaseNumber     = p.OrderIndex,
+                             PhaseName       = p.PhaseName,
+                             ModuleNumber    = m.OrderIndex,
+                             ModuleName      = m.ModuleName,
+                             LessonOrder     = m.OrderIndex + ((double)l.OrderIndex / 10),
                              EstimatedMinutes = 15
                          };
 
@@ -280,102 +316,104 @@ namespace AntiPhisher.Application.Services
 
         public async Task<IEnumerable<MyLessonResponse>> GetMyLessonsAsync(int userId)
         {
-            // 1. Tìm tất cả Campaign trực tiếp assign cho User
-            var directAssignments = await _unitOfWork.CampaignUserAssignments.GetAllAsync(x => x.UserId == userId);
-            var directCampaignIds = directAssignments?.Select(a => a.CampaignId).ToHashSet() ?? new HashSet<int>();
+            var isUnlocked = await IsUserUnlockedAsync(userId);
 
-            // 2. Tìm Campaign gán qua Team
-            var teamMemberships = await _unitOfWork.TeamMembers.GetAllAsync(x => x.UserId == userId);
-            var userTeamIds = teamMemberships?.Select(tm => tm.TeamId).ToHashSet() ?? new HashSet<int>();
+            var phases  = await _unitOfWork.Phases.GetAllAsync(p => p.IsActive);
+            var modules = await _unitOfWork.Modules.GetAllAsync(m => m.IsActive);
+            var lessons = await _unitOfWork.Lessons.GetAllAsync(l => l.IsActive);
 
-            if (userTeamIds.Any())
-            {
-                var teamAssignments = await _unitOfWork.CampaignTeamAssignments.GetAllAsync(
-                    x => userTeamIds.Contains(x.TeamId));
-                foreach (var ta in teamAssignments ?? new List<CampaignTeamAssignment>())
-                    directCampaignIds.Add(ta.CampaignId);
-            }
-
-            if (!directCampaignIds.Any())
+            if (lessons == null || !lessons.Any())
                 return Enumerable.Empty<MyLessonResponse>();
 
-            // 3. Lọc chỉ lấy Campaign đang Active và trong thời gian hiệu lực
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
-            var activeCampaigns = await _unitOfWork.Campaigns.GetAllAsync(
-                x => directCampaignIds.Contains(x.CampaignId) && x.IsActive);
+            var phaseDict  = phases?.ToDictionary(p => p.PhaseId)   ?? new Dictionary<int, Phase>();
+            var moduleDict = modules?.ToDictionary(m => m.ModuleId)  ?? new Dictionary<int, Module>();
 
-            var validCampaigns = activeCampaigns?
-                .Where(c =>
-                    (c.StartDate == null || c.StartDate <= today) &&
-                    (c.EndDate == null || c.EndDate >= today))
-                .ToList() ?? new List<Campaign>();
+            var lessonIds = lessons.Select(l => l.LessonId).ToHashSet();
+            var progList  = await _unitOfWork.UserLessonProgresses.GetAllAsync(
+                p => p.UserId == userId && lessonIds.Contains(p.LessonId));
+            var progDict  = progList?.ToDictionary(p => p.LessonId) ?? new Dictionary<int, UserLessonProgress>();
 
-            if (!validCampaigns.Any())
-                return Enumerable.Empty<MyLessonResponse>();
-
-            var validCampaignIds = validCampaigns.Select(c => c.CampaignId).ToHashSet();
-
-            // 4. Lấy tất cả lesson bắt buộc từ các Campaign hợp lệ
-            var allPrereqs = await _unitOfWork.CampaignPrerequisites.GetAllAsync(
-                x => validCampaignIds.Contains(x.CampaignId));
-
-            if (allPrereqs == null || !allPrereqs.Any())
-                return Enumerable.Empty<MyLessonResponse>();
-
-            // 5. Lấy tiến độ của User
-            var requiredLessonIds = allPrereqs.Select(p => p.RequiredLessonId).Distinct().ToHashSet();
-            var userProgress = await _unitOfWork.UserLessonProgresses.GetAllAsync(
-                x => x.UserId == userId && requiredLessonIds.Contains(x.LessonId));
-            var progressDict = userProgress?.ToDictionary(p => p.LessonId) ?? new Dictionary<int, UserLessonProgress>();
-
-            // 6. Lấy thông tin chi tiết các Lesson
-            var allLessons = await _unitOfWork.Lessons.GetAllAsync(
-                x => requiredLessonIds.Contains(x.LessonId) && x.IsActive);
-            var modules = await _unitOfWork.Modules.GetAllAsync(null);
-            var phases = await _unitOfWork.Phases.GetAllAsync(null);
-
-            var moduleDict = modules?.ToDictionary(m => m.ModuleId) ?? new Dictionary<int, Module>();
-            var phaseDict = phases?.ToDictionary(p => p.PhaseId) ?? new Dictionary<int, Phase>();
-
-            // 7. Build response — mỗi lesson kèm trạng thái và campaign nguồn
             var result = new List<MyLessonResponse>();
-
-            foreach (var prereq in allPrereqs)
+            foreach (var lesson in lessons)
             {
-                var lesson = allLessons?.FirstOrDefault(l => l.LessonId == prereq.RequiredLessonId);
-                if (lesson == null) continue;
+                moduleDict.TryGetValue(lesson.ModuleId, out var mod);
+                int phaseNum  = mod != null && phaseDict.TryGetValue(mod.PhaseId, out var ph) ? ph.OrderIndex : 0;
+                int moduleNum = mod?.OrderIndex ?? 0;
 
-                // Tránh trùng lặp cùng lesson từ nhiều campaign: chỉ lấy lần đầu tiên
-                if (result.Any(r => r.LessonId == lesson.LessonId)) continue;
-
-                var campaign = validCampaigns.FirstOrDefault(c => c.CampaignId == prereq.CampaignId);
-
-                moduleDict.TryGetValue(lesson.ModuleId, out var module);
-                int phaseNum = module != null && phaseDict.TryGetValue(module.PhaseId, out var ph) ? ph.OrderIndex : 0;
-                int moduleNum = module?.OrderIndex ?? 0;
-
-                progressDict.TryGetValue(lesson.LessonId, out var progress);
-                string status = progress == null ? "NotStarted"
-                    : progress.IsCompleted ? "Completed"
-                    : "InProgress";
+                progDict.TryGetValue(lesson.LessonId, out var prog);
 
                 result.Add(new MyLessonResponse
                 {
-                    LessonId = lesson.LessonId,
-                    Title = lesson.Title,
-                    Content = lesson.TheoryContent,
-                    PhaseNumber = phaseNum,
-                    ModuleNumber = moduleNum,
-                    LessonOrder = moduleNum + ((double)lesson.OrderIndex / 10),
+                    LessonId         = lesson.LessonId,
+                    Title            = lesson.Title,
+                    Content          = lesson.TheoryContent,
+                    PhaseNumber      = phaseNum,
+                    ModuleNumber     = moduleNum,
+                    LessonOrder      = moduleNum + ((double)lesson.OrderIndex / 10),
                     EstimatedMinutes = 15,
-                    Status = status,
-                    CompletedAt = progress?.CompletedAt,
-                    CampaignId = prereq.CampaignId,
-                    CampaignName = campaign?.CampaignName ?? string.Empty
+                    Status           = prog == null ? "NotStarted" : prog.IsCompleted ? "Completed" : "InProgress",
+                    CompletedAt      = prog?.CompletedAt,
+                    CampaignId       = 0,
+                    CampaignName     = phaseNum == 1 ? "Học miễn phí" : string.Empty,
+                    IsLocked         = !isUnlocked && phaseNum != 1
                 });
             }
 
             return result.OrderBy(x => x.PhaseNumber).ThenBy(x => x.LessonOrder);
+        }
+
+        public async Task<bool> IsUserUnlockedAsync(int userId)
+        {
+            var user = await _unitOfWork.Users.GetAsync(u => u.UserId == userId);
+            if (user?.CompanyId == null) return false;
+
+            var sub = await _unitOfWork.Subscriptions.GetAsync(
+                s => s.CompanyId == user.CompanyId &&
+                     s.Status == SubscriptionStatus.Active &&
+                     s.EndDate > DateTime.UtcNow);
+            return sub != null;
+        }
+
+        private async Task<List<MyLessonResponse>> BuildPhase1LessonsAsync(int userId)
+        {
+            var phase1 = await _unitOfWork.Phases.GetAsync(p => p.OrderIndex == 1 && p.IsActive);
+            if (phase1 == null) return new List<MyLessonResponse>();
+
+            var mods = await _unitOfWork.Modules.GetAllAsync(m => m.PhaseId == phase1.PhaseId && m.IsActive);
+            var modIds = mods?.Select(m => m.ModuleId).ToHashSet() ?? new HashSet<int>();
+            if (!modIds.Any()) return new List<MyLessonResponse>();
+
+            var lessons = await _unitOfWork.Lessons.GetAllAsync(l => modIds.Contains(l.ModuleId) && l.IsActive);
+            var lessonIds = lessons?.Select(l => l.LessonId).ToHashSet() ?? new HashSet<int>();
+            if (!lessonIds.Any()) return new List<MyLessonResponse>();
+
+            var progList = await _unitOfWork.UserLessonProgresses.GetAllAsync(
+                p => p.UserId == userId && lessonIds.Contains(p.LessonId));
+            var progDict = progList?.ToDictionary(p => p.LessonId) ?? new Dictionary<int, UserLessonProgress>();
+            var modDict  = mods?.ToDictionary(m => m.ModuleId) ?? new Dictionary<int, Module>();
+
+            var output = new List<MyLessonResponse>();
+            foreach (var lesson in lessons ?? Enumerable.Empty<Lesson>())
+            {
+                modDict.TryGetValue(lesson.ModuleId, out var mod);
+                progDict.TryGetValue(lesson.LessonId, out var prog);
+                output.Add(new MyLessonResponse
+                {
+                    LessonId         = lesson.LessonId,
+                    Title            = lesson.Title,
+                    Content          = lesson.TheoryContent,
+                    PhaseNumber      = phase1.OrderIndex,
+                    ModuleNumber     = mod?.OrderIndex ?? 0,
+                    LessonOrder      = (mod?.OrderIndex ?? 0) + ((double)lesson.OrderIndex / 10),
+                    EstimatedMinutes = 15,
+                    Status           = prog == null ? "NotStarted" : prog.IsCompleted ? "Completed" : "InProgress",
+                    CompletedAt      = prog?.CompletedAt,
+                    CampaignId       = 0,
+                    CampaignName     = "Học miễn phí",
+                    IsLocked         = false
+                });
+            }
+            return output;
         }
 
         // =========================================================================
@@ -441,6 +479,119 @@ namespace AntiPhisher.Application.Services
                 await _unitOfWork.UserLessonProgresses.AddRangeAsync(newRecords);
                 await _unitOfWork.SaveChangeAsync();
             }
+        }
+
+        // =========================================================================
+        // QUIZ — lấy quiz của 1 bài học
+        // =========================================================================
+        public async Task<QuizResponse?> GetQuizByLessonIdAsync(int lessonId)
+        {
+            var quiz = await _unitOfWork.LessonQuizzes.GetAsync(q => q.LessonId == lessonId);
+            if (quiz == null) return null;
+
+            var questions = await _unitOfWork.QuizQuestions.GetAllAsync(q => q.QuizId == quiz.QuizId);
+            var questionIds = questions.Select(q => q.QuestionId).ToList();
+            var allOptions = await _unitOfWork.QuizOptions.GetAllAsync(o => questionIds.Contains(o.QuestionId));
+
+            return MapQuizResponse(quiz, questions, allOptions);
+        }
+
+        // =========================================================================
+        // QUIZ — lưu toàn bộ quiz (upsert: xóa cũ + tạo mới)
+        // =========================================================================
+        public async Task<QuizResponse> SaveQuizAsync(int lessonId, SaveQuizRequest request)
+        {
+            var lesson = await _unitOfWork.Lessons.GetAsync(l => l.LessonId == lessonId);
+            if (lesson == null) throw new KeyNotFoundException($"Không tìm thấy bài học ID {lessonId}");
+
+            // Xóa quiz cũ nếu có
+            var existingQuiz = await _unitOfWork.LessonQuizzes.GetAsync(q => q.LessonId == lessonId);
+            if (existingQuiz != null)
+            {
+                var oldQuestions = await _unitOfWork.QuizQuestions.GetAllAsync(q => q.QuizId == existingQuiz.QuizId);
+                var oldQIds = oldQuestions.Select(q => q.QuestionId).ToList();
+                var oldOptions = await _unitOfWork.QuizOptions.GetAllAsync(o => oldQIds.Contains(o.QuestionId));
+
+                foreach (var opt in oldOptions)  _unitOfWork.QuizOptions.Remove(opt);
+                foreach (var q in oldQuestions)  _unitOfWork.QuizQuestions.Remove(q);
+                _unitOfWork.LessonQuizzes.Remove(existingQuiz);
+                await _unitOfWork.SaveChangeAsync();
+            }
+
+            // Tạo quiz mới
+            var quiz = new LessonQuiz
+            {
+                LessonId  = lessonId,
+                Title     = request.Title?.Trim() ?? "Kiểm tra nhanh",
+                PassScore = request.PassScore,
+                IsActive  = request.IsActive
+            };
+            await _unitOfWork.LessonQuizzes.AddAsync(quiz);
+            await _unitOfWork.SaveChangeAsync();
+
+            // Tạo câu hỏi và đáp án
+            var newQuestions = new List<QuizQuestion>();
+            for (int qi = 0; qi < request.Questions.Count; qi++)
+            {
+                var qReq = request.Questions[qi];
+                var question = new QuizQuestion
+                {
+                    QuizId       = quiz.QuizId,
+                    QuestionText = qReq.QuestionText.Trim(),
+                    QuestionType = qReq.QuestionType,
+                    OrderIndex   = qReq.OrderIndex > 0 ? qReq.OrderIndex : qi + 1
+                };
+                await _unitOfWork.QuizQuestions.AddAsync(question);
+                await _unitOfWork.SaveChangeAsync();
+
+                for (int oi = 0; oi < qReq.Options.Count; oi++)
+                {
+                    var oReq = qReq.Options[oi];
+                    var option = new QuizOption
+                    {
+                        QuestionId = question.QuestionId,
+                        OptionText = oReq.OptionText.Trim(),
+                        IsCorrect  = oReq.IsCorrect,
+                        OrderIndex = oReq.OrderIndex > 0 ? oReq.OrderIndex : oi + 1
+                    };
+                    await _unitOfWork.QuizOptions.AddAsync(option);
+                }
+                await _unitOfWork.SaveChangeAsync();
+                newQuestions.Add(question);
+            }
+
+            var savedOptions = await _unitOfWork.QuizOptions.GetAllAsync(
+                o => newQuestions.Select(q => q.QuestionId).Contains(o.QuestionId));
+
+            return MapQuizResponse(quiz, newQuestions, savedOptions);
+        }
+
+        private static QuizResponse MapQuizResponse(LessonQuiz quiz, List<QuizQuestion> questions, List<QuizOption> options)
+        {
+            return new QuizResponse
+            {
+                QuizId    = quiz.QuizId,
+                LessonId  = quiz.LessonId,
+                Title     = quiz.Title,
+                PassScore = quiz.PassScore,
+                IsActive  = quiz.IsActive,
+                Questions = questions.OrderBy(q => q.OrderIndex).Select(q => new QuizQuestionResponse
+                {
+                    QuestionId   = q.QuestionId,
+                    QuestionText = q.QuestionText,
+                    QuestionType = q.QuestionType,
+                    OrderIndex   = q.OrderIndex,
+                    Options      = options.Where(o => o.QuestionId == q.QuestionId)
+                                          .OrderBy(o => o.OrderIndex)
+                                          .Select(o => new QuizOptionResponse
+                                          {
+                                              OptionId   = o.OptionId,
+                                              OptionText = o.OptionText,
+                                              IsCorrect  = o.IsCorrect,
+                                              OrderIndex = o.OrderIndex
+                                          }).ToList()
+                }).ToList()
+            };
         }
     }
 }

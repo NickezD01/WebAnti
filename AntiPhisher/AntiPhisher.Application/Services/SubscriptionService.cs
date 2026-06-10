@@ -463,6 +463,50 @@ namespace AntiPhisher.Application.Services
             }
         }
 
+        public async Task<ApiResponse> GetMyPlanStatusAsync(int userId)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.GetAsync(u => u.UserId == userId);
+                if (user?.CompanyId == null)
+                    return new ApiResponse().SetOk(new { hasPlan = false });
+
+                var subs = await _unitOfWork.Subscriptions.GetAllAsync(
+                    s => s.CompanyId == user.CompanyId,
+                    include: q => q.Include(s => s.SubscriptionPlans));
+
+                if (subs == null || !subs.Any())
+                    return new ApiResponse().SetOk(new { hasPlan = false });
+
+                // Ưu tiên Active trước, rồi đến gói gần hết hạn nhất
+                var active = subs
+                    .Where(s => s.Status == SubscriptionStatus.Active && s.EndDate > DateTime.UtcNow)
+                    .OrderByDescending(s => s.EndDate)
+                    .FirstOrDefault();
+
+                var latest = active ?? subs.OrderByDescending(s => s.EndDate).First();
+                var plan   = latest.SubscriptionPlans;
+                var days   = active != null ? (int)(active.EndDate - DateTime.UtcNow).TotalDays : 0;
+
+                return new ApiResponse().SetOk(new
+                {
+                    hasPlan      = active != null,
+                    planName     = plan?.Name,
+                    status       = latest.Status.ToString(),
+                    endDate      = latest.EndDate,
+                    daysRemaining = days,
+                    price        = plan?.Price,
+                    description  = plan?.Description,
+                    maxSlots     = plan?.MaxSlots,
+                    usedSlots    = latest.UsedSlots,
+                });
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse().SetBadRequest($"Lỗi lấy thông tin gói: {ex.Message}");
+            }
+        }
+
         private async Task<Subscription?> GetActiveSubscriptionByCompany(int companyId, int managerId)
         {
             var byCompany = await _unitOfWork.Subscriptions.GetAllAsync(

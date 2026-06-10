@@ -65,6 +65,10 @@ namespace AntiPhisher.Application
         ILessonRepository Lessons { get; }
         ICampaignPrerequisiteRepository CampaignPrerequisites { get; }
         IUserLessonProgressRepository UserLessonProgresses { get; }
+        ICompanyInvitationRepository CompanyInvitations { get; }
+        ILessonQuizRepository   LessonQuizzes  { get; }
+        IQuizQuestionRepository QuizQuestions  { get; }
+        IQuizOptionRepository   QuizOptions    { get; }
 
         // =========================
         // METHODS

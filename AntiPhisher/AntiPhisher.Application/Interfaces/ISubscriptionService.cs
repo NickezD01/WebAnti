@@ -36,5 +36,8 @@ namespace AntiPhisher.Application.Interfaces
 
         /// <summary>Xóa nhân viên ra khỏi công ty, giải phóng 1 slot.</summary>
         Task<ApiResponse> RemoveEmployeeAsync(int employeeUserId, int managerId);
+
+        /// <summary>User tự xem trạng thái gói của công ty mình (Active/Expired/null).</summary>
+        Task<ApiResponse> GetMyPlanStatusAsync(int userId);
     }
 }

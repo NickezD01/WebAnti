@@ -215,6 +215,16 @@ namespace AntiPhisher.Application.Services
                     return response;
                 }
 
+                // CHECK ACCOUNT ACTIVE
+                if (!user.IsActive)
+                {
+                    response.SetBadRequest(
+                        "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên."
+                    );
+
+                    return response;
+                }
+
                 // CHECK VERIFY EMAIL
                 if (!user.IsEmailVerified)
                 {

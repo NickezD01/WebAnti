@@ -20,6 +20,10 @@ namespace AntiPhisher.Domain.Models
 
         public bool IsActive { get; set; }
 
+        public string? Color { get; set; }   // hex e.g. "#6366F1"
+
+        public string? Icon { get; set; }    // lucide icon name e.g. "Shield"
+
         public virtual ICollection<Module> Modules { get; set; } = new List<Module>();
     }
 
