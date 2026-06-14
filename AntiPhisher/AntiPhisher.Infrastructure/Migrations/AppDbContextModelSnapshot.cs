@@ -491,6 +491,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("SepayTransactionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("SubscriptionId")
                         .HasColumnType("int");
 
