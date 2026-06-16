@@ -194,5 +194,23 @@ namespace AntiPhisher.Infrastructure
                 }
             }
         }
+
+        // =========================
+        // TRANSACTION
+        // =========================
+        public async Task ExecuteInTransactionAsync(Func<Task> work)
+        {
+            await using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await work();
+                await tx.CommitAsync();
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

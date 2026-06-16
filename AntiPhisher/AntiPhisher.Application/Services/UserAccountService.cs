@@ -77,12 +77,37 @@ namespace AntiPhisher.Application.Services
 
                 var userResponse = _mapper.Map<List<AccountResponse>>(items);
 
-                // Add synthetic mappings if they don't exist in DB for now
-                foreach (var user in userResponse)
+                // Batch load active subscriptions to populate ActivePlanName
+                var activeSubs = await _unitOfWork.Subscriptions.GetAllAsync(
+                    s => s.Status == SubscriptionStatus.Active);
+                var allPlans = await _unitOfWork.SubscriptionPlans.GetAllAsync(null);
+                var planDict = allPlans?.ToDictionary(p => p.Id, p => p.Name) ?? new Dictionary<int, string>();
+                // individual: AccountId → plan
+                var subByAccount = activeSubs?
+                    .Where(s => s.CompanyId == null)
+                    .GroupBy(s => s.AccountId)
+                    .ToDictionary(g => g.Key, g => g.First()) ?? new Dictionary<int, Subscription>();
+                // company: CompanyId → plan
+                var subByCompany = activeSubs?
+                    .Where(s => s.CompanyId != null)
+                    .GroupBy(s => s.CompanyId!.Value)
+                    .ToDictionary(g => g.Key, g => g.First()) ?? new Dictionary<int, Subscription>();
+
+                var userEntityDict = items.ToDictionary(u => u.UserId);
+
+                foreach (var ur in userResponse)
                 {
-                    // Synthetic fields that might not be mapped by EF Core
-                    user.SystemScore = 80;
-                    user.RiskLevel = "Low";
+                    ur.SystemScore = 80;
+                    ur.RiskLevel = "Low";
+
+                    Subscription? active = null;
+                    if (subByAccount.TryGetValue(ur.Id, out var indSub)) active = indSub;
+                    else if (userEntityDict.TryGetValue(ur.Id, out var entity) && entity.CompanyId != null
+                             && subByCompany.TryGetValue(entity.CompanyId.Value, out var compSub))
+                        active = compSub;
+
+                    if (active != null && planDict.TryGetValue(active.PlanId, out var pName))
+                        ur.ActivePlanName = pName;
                 }
 
                 return apiResponse.SetOk(new {

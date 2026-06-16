@@ -20,5 +20,10 @@ namespace AntiPhisher.Application.Interfaces
         /// Tiến độ hoàn thành theo từng Campaign: lesson % + attempt score + per-user breakdown.
         /// </summary>
         Task<ApiResponse> GetCampaignCompletionAsync(int managerId);
+
+        /// <summary>
+        /// Tổng quan toàn hệ thống dành cho Admin: doanh thu, giao dịch, người dùng, gói dịch vụ.
+        /// </summary>
+        Task<ApiResponse> GetAdminOverviewAsync();
     }
 }

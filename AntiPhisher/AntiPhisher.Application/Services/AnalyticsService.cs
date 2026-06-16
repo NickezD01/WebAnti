@@ -421,5 +421,138 @@ namespace AntiPhisher.Application.Services
                 return new ApiResponse().SetBadRequest($"Lỗi lấy campaign completion: {ex.Message}");
             }
         }
+
+        // ======================================================================
+        // ADMIN OVERVIEW
+        // ======================================================================
+        public async Task<ApiResponse> GetAdminOverviewAsync()
+        {
+            try
+            {
+                var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _vnTz);
+                var startOfMonth = new DateTime(now.Year, now.Month, 1);
+                var startOfLastMonth = startOfMonth.AddMonths(-1);
+
+                // ── Load raw data ──────────────────────────────────────────────
+                var allOrders = await _unitOfWork.Orders.GetAllAsync(null);
+                var allUsers  = await _unitOfWork.Users.GetAllAsync(null);
+                var allSubs   = await _unitOfWork.Subscriptions.GetAllAsync(null);
+                var allPlans  = await _unitOfWork.SubscriptionPlans.GetAllAsync(null);
+                var allCompanies = await _unitOfWork.Companies.GetAllAsync(null);
+
+                var planDict = allPlans?.ToDictionary(p => p.Id, p => p.Name) ?? new Dictionary<int, string>();
+                var userDict = allUsers?.ToDictionary(u => u.UserId, u => u.Email) ?? new Dictionary<int, string>();
+
+                // ── KPIs ───────────────────────────────────────────────────────
+                var paidOrders    = allOrders?.Where(o => o.Status == OrderStatus.Paid).ToList()   ?? new List<Order>();
+                var pendingOrders = allOrders?.Where(o => o.Status == OrderStatus.Pending).ToList() ?? new List<Order>();
+
+                long totalRevenue      = paidOrders.Sum(o => (long)(o.Price ?? 0));
+                long revenueThisMonth  = paidOrders.Where(o => o.PaidAt.HasValue
+                    && TimeZoneInfo.ConvertTimeFromUtc(o.PaidAt.Value, _vnTz) >= startOfMonth)
+                    .Sum(o => (long)(o.Price ?? 0));
+                long revenueLastMonth  = paidOrders.Where(o => o.PaidAt.HasValue
+                    && TimeZoneInfo.ConvertTimeFromUtc(o.PaidAt.Value, _vnTz) >= startOfLastMonth
+                    && TimeZoneInfo.ConvertTimeFromUtc(o.PaidAt.Value, _vnTz) < startOfMonth)
+                    .Sum(o => (long)(o.Price ?? 0));
+
+                int newUsersThisMonth = allUsers?.Count(u =>
+                    TimeZoneInfo.ConvertTimeFromUtc(u.CreatedAt, _vnTz) >= startOfMonth) ?? 0;
+
+                int activeSubscriptions = allSubs?.Count(s => s.Status == SubscriptionStatus.Active) ?? 0;
+
+                // ── Revenue by month (last 6 months) ──────────────────────────
+                var revenueByMonth = new List<MonthlyStatItem>();
+                for (int i = 5; i >= 0; i--)
+                {
+                    var monthStart = startOfMonth.AddMonths(-i);
+                    var monthEnd   = monthStart.AddMonths(1);
+                    var rev = paidOrders
+                        .Where(o => o.PaidAt.HasValue
+                            && TimeZoneInfo.ConvertTimeFromUtc(o.PaidAt.Value, _vnTz) >= monthStart
+                            && TimeZoneInfo.ConvertTimeFromUtc(o.PaidAt.Value, _vnTz) < monthEnd)
+                        .Sum(o => (long)(o.Price ?? 0));
+                    revenueByMonth.Add(new MonthlyStatItem
+                    {
+                        Month = $"Th.{monthStart.Month}",
+                        Value = rev
+                    });
+                }
+
+                // ── User growth by month (last 6 months) ──────────────────────
+                var userGrowthByMonth = new List<MonthlyStatItem>();
+                for (int i = 5; i >= 0; i--)
+                {
+                    var monthStart = startOfMonth.AddMonths(-i);
+                    var monthEnd   = monthStart.AddMonths(1);
+                    var cnt = allUsers?.Count(u =>
+                        TimeZoneInfo.ConvertTimeFromUtc(u.CreatedAt, _vnTz) >= monthStart
+                        && TimeZoneInfo.ConvertTimeFromUtc(u.CreatedAt, _vnTz) < monthEnd) ?? 0;
+                    userGrowthByMonth.Add(new MonthlyStatItem
+                    {
+                        Month = $"Th.{monthStart.Month}",
+                        Value = cnt
+                    });
+                }
+
+                // ── Plan breakdown (active subscriptions) ─────────────────────
+                var activeSubs = allSubs?.Where(s => s.Status == SubscriptionStatus.Active).ToList() ?? new List<Subscription>();
+                var planBreakdown = activeSubs
+                    .GroupBy(s => s.PlanId)
+                    .Select(g => new PlanBreakdownItem
+                    {
+                        PlanName = planDict.TryGetValue(g.Key, out var pn) ? pn : $"Gói #{g.Key}",
+                        Count    = g.Count(),
+                        Revenue  = paidOrders.Where(o => g.Select(s => s.Id).Contains(o.SubscriptionId))
+                                             .Sum(o => (long)(o.Price ?? 0))
+                    })
+                    .OrderByDescending(p => p.Revenue)
+                    .ToList();
+
+                // ── Recent orders (last 10 paid) ──────────────────────────────
+                var recentOrders = paidOrders
+                    .OrderByDescending(o => o.PaidAt)
+                    .Take(10)
+                    .Select(o =>
+                    {
+                        var sub = allSubs?.FirstOrDefault(s => s.Id == o.SubscriptionId);
+                        return new RecentOrderItem
+                        {
+                            OrderId   = o.Id,
+                            UserEmail = userDict.TryGetValue(o.AccountId, out var email) ? email : $"User #{o.AccountId}",
+                            PlanName  = sub != null && planDict.TryGetValue(sub.PlanId, out var pn) ? pn : "—",
+                            Amount    = (long)(o.Price ?? 0),
+                            Status    = o.Status.ToString(),
+                            CreatedAt = o.PaidAt ?? DateTime.UtcNow,
+                            PaidAt    = o.PaidAt
+                        };
+                    })
+                    .ToList();
+
+                var result = new AdminOverviewResponse
+                {
+                    TotalRevenue         = totalRevenue,
+                    RevenueThisMonth     = revenueThisMonth,
+                    RevenueLastMonth     = revenueLastMonth,
+                    TotalTransactions    = allOrders?.Count ?? 0,
+                    PaidTransactions     = paidOrders.Count,
+                    PendingTransactions  = pendingOrders.Count,
+                    TotalUsers           = allUsers?.Count ?? 0,
+                    NewUsersThisMonth    = newUsersThisMonth,
+                    ActiveSubscriptions  = activeSubscriptions,
+                    TotalCompanies       = allCompanies?.Count ?? 0,
+                    RevenueByMonth       = revenueByMonth,
+                    UserGrowthByMonth    = userGrowthByMonth,
+                    PlanBreakdown        = planBreakdown,
+                    RecentOrders         = recentOrders,
+                };
+
+                return new ApiResponse().SetOk(result);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse().SetBadRequest($"Lỗi lấy admin overview: {ex.Message}");
+            }
+        }
     }
 }

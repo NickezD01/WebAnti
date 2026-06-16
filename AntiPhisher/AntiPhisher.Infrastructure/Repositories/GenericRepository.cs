@@ -101,5 +101,8 @@ namespace AntiPhisher.Infrastructure.Repositories
         {
             _db.Remove(entity);
         }
+
+        public async Task<bool> AnyAsync(System.Linq.Expressions.Expression<Func<T, bool>> filter)
+            => await _db.AnyAsync(filter);
     }
 }

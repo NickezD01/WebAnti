@@ -21,5 +21,6 @@ namespace AntiPhisher.Application.Features
         Task<T> GetAsync(System.Linq.Expressions.Expression<Func<T, bool>> filter, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include);
         Task<List<T>> GetAllAsync(System.Linq.Expressions.Expression<Func<T, bool>>? filter,
                                                Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null, int pageIndex = 1, int pageSize = 25);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
     }
 }

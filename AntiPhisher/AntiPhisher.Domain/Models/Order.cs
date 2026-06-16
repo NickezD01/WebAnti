@@ -16,6 +16,9 @@ namespace AntiPhisher.Domain.Models
         public string Note { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Pending; // Pending, Paid, Canceled
         public bool IsDelete { get; set; }
+
+        public string? SepayTransactionId { get; set; }
+        public DateTime? PaidAt { get; set; }
         public User? UserAccount { get; set; }
         public Subscription Subscription { get; set; }
         //public SubscriptionPlan? SubscriptionPlans { get; set; }

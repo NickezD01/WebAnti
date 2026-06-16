@@ -365,13 +365,26 @@ namespace AntiPhisher.Application.Services
         public async Task<bool> IsUserUnlockedAsync(int userId)
         {
             var user = await _unitOfWork.Users.GetAsync(u => u.UserId == userId);
-            if (user?.CompanyId == null) return false;
+            if (user == null) return false;
 
-            var sub = await _unitOfWork.Subscriptions.GetAsync(
-                s => s.CompanyId == user.CompanyId &&
-                     s.Status == SubscriptionStatus.Active &&
-                     s.EndDate > DateTime.UtcNow);
-            return sub != null;
+            if (user.CompanyId == null)
+            {
+                // Individual B2C: subscription belongs to the user directly (CompanyId = null)
+                var sub = await _unitOfWork.Subscriptions.GetAsync(
+                    s => s.AccountId == userId && s.CompanyId == null &&
+                         s.Status == SubscriptionStatus.Active &&
+                         s.EndDate > DateTime.UtcNow);
+                return sub != null;
+            }
+            else
+            {
+                // Company B2B: subscription belongs to the company
+                var sub = await _unitOfWork.Subscriptions.GetAsync(
+                    s => s.CompanyId == user.CompanyId &&
+                         s.Status == SubscriptionStatus.Active &&
+                         s.EndDate > DateTime.UtcNow);
+                return sub != null;
+            }
         }
 
         private async Task<List<MyLessonResponse>> BuildPhase1LessonsAsync(int userId)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AntiPhisher.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitAll : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,7 +68,9 @@ namespace AntiPhisher.Infrastructure.Migrations
                     PhaseName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrderIndex = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -144,6 +146,34 @@ namespace AntiPhisher.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CompanyInvitations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CompanyId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    IsNewUser = table.Column<bool>(type: "bit", nullable: false),
+                    LinkedUserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AcceptedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyInvitations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompanyInvitations_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "CompanyId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -505,6 +535,28 @@ namespace AntiPhisher.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LessonQuizzes",
+                columns: table => new
+                {
+                    QuizId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LessonId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    PassScore = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LessonQuizzes", x => x.QuizId);
+                    table.ForeignKey(
+                        name: "FK_LessonQuizzes_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "LessonId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLessonProgresses",
                 columns: table => new
                 {
@@ -694,7 +746,10 @@ namespace AntiPhisher.Infrastructure.Migrations
                     SubscriptionId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false),
+                    SepayTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -775,6 +830,28 @@ namespace AntiPhisher.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "QuizQuestions",
+                columns: table => new
+                {
+                    QuestionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QuizId = table.Column<int>(type: "int", nullable: false),
+                    QuestionText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QuestionType = table.Column<int>(type: "int", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizQuestions", x => x.QuestionId);
+                    table.ForeignKey(
+                        name: "FK_QuizQuestions_LessonQuizzes_QuizId",
+                        column: x => x.QuizId,
+                        principalTable: "LessonQuizzes",
+                        principalColumn: "QuizId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AIFeedbacks",
                 columns: table => new
                 {
@@ -847,6 +924,28 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalColumn: "UserId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "QuizOptions",
+                columns: table => new
+                {
+                    OptionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QuestionId = table.Column<int>(type: "int", nullable: false),
+                    OptionText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCorrect = table.Column<bool>(type: "bit", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizOptions", x => x.OptionId);
+                    table.ForeignKey(
+                        name: "FK_QuizOptions_QuizQuestions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "QuizQuestions",
+                        principalColumn: "QuestionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AIFeedbacks_AttemptId",
                 table: "AIFeedbacks",
@@ -914,6 +1013,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyInvitations_CompanyId",
+                table: "CompanyInvitations",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DifficultyLevels_LevelName",
                 table: "DifficultyLevels",
                 column: "LevelName",
@@ -923,6 +1027,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "IX_EmailVerifications_UserId",
                 table: "EmailVerifications",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonQuizzes_LessonId",
+                table: "LessonQuizzes",
+                column: "LessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_ModuleId",
@@ -979,6 +1088,16 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "IX_Payments_UserId",
                 table: "Payments",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizOptions_QuestionId",
+                table: "QuizOptions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizQuestions_QuizId",
+                table: "QuizQuestions",
+                column: "QuizId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_Token",
@@ -1109,6 +1228,9 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "CampaignUserAssignments");
 
             migrationBuilder.DropTable(
+                name: "CompanyInvitations");
+
+            migrationBuilder.DropTable(
                 name: "EmailVerifications");
 
             migrationBuilder.DropTable(
@@ -1122,6 +1244,9 @@ namespace AntiPhisher.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "QuizOptions");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
@@ -1145,13 +1270,13 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
+                name: "QuizQuestions");
+
+            migrationBuilder.DropTable(
                 name: "PhishingTypes");
 
             migrationBuilder.DropTable(
                 name: "Teams");
-
-            migrationBuilder.DropTable(
-                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Campaigns");
@@ -1163,7 +1288,7 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "Subscriptions");
 
             migrationBuilder.DropTable(
-                name: "Modules");
+                name: "LessonQuizzes");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -1178,13 +1303,19 @@ namespace AntiPhisher.Infrastructure.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Phases");
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Companies");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Modules");
+
+            migrationBuilder.DropTable(
+                name: "Phases");
         }
     }
 }
