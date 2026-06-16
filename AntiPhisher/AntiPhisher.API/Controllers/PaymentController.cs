@@ -39,5 +39,7 @@ namespace AntiPhisher.API.Controllers
                 return Redirect(redirectUrl);
             }
         }
+
+
     }
 }

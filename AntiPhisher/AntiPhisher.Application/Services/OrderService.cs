@@ -2,11 +2,13 @@
 using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.Orders;
 using AntiPhisher.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace AntiPhisher.Application.Services
 {
@@ -14,11 +16,12 @@ namespace AntiPhisher.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClaimService _claimService;
-
-        public OrderService(IUnitOfWork unitOfWork, IClaimService claimService)
+        private readonly IConfiguration _config;
+        public OrderService(IUnitOfWork unitOfWork, IClaimService claimService, IConfiguration config)
         {
             _unitOfWork = unitOfWork;
             _claimService = claimService;
+            _config = config;
         }
 
         public async Task<ApiResponse> CreateOrderFromSubscription(int subscriptionId)
@@ -123,6 +126,18 @@ namespace AntiPhisher.Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             return response.SetOk("Order canceled successfully.");
+        }
+
+        public async Task<ApiResponse> GetPaymentQr(int orderId)
+        {
+            var order = await _unitOfWork.Orders.GetAsync(x => x.Id == orderId);
+            if (order == null) return new ApiResponse().SetNotFound("Không tìm thấy đơn hàng");
+            if (order.Status == OrderStatus.Paid) return new ApiResponse().SetBadRequest("Đơn hàng đã thanh toán");
+
+            var qrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
+                        $"?amount={(long)order.Price}&addInfo=ANTI{order.Id}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+
+            return new ApiResponse().SetOk(new { qrUrl, content = $"ANTI{order.Id}" });
         }
     }
 }

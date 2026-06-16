@@ -129,7 +129,13 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IQRService, QRService>();
+
 builder.Services.AddScoped<IVnPayService, VnPayService>();
+builder.Services.AddScoped<MoMoService>();
+builder.Services.AddScoped<IPaymentService, MoMoService>();
+
+
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 
