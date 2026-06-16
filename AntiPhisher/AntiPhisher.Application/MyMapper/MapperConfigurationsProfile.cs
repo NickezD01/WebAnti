@@ -181,10 +181,11 @@ namespace AntiPhisher.Application.MyMapper
             // SUBSCRIPTION MAPPINGS
             // =========================================================
             CreateMap<CreateSubscriptionRequest, Subscription>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => SubscriptionStatus.Active))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => SubscriptionStatus.PendingPayment))
                 .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => PaymentStatus.Pending))
                 .ForMember(dest => dest.UsedSlots, opt => opt.MapFrom(src => 0))
                 .ForMember(dest => dest.ModifiedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.StartDate, opt => opt.Ignore())
                 .ForMember(dest => dest.EndDate, opt => opt.Ignore());
 
             CreateMap<UpdateSubscriptionRequest, Subscription>()

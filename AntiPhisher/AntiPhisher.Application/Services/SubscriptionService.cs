@@ -58,10 +58,10 @@ namespace AntiPhisher.Application.Services
                 if (plan == null || !plan.IsActive)
                     return apiResponse.SetNotFound("Gói dịch vụ không tồn tại hoặc đã tạm dừng cung cấp.");
 
-                // 3. Kiểm tra xem Công ty này hiện tại đã có gói nào đang kích hoạt (Active & Paid) hay chưa
+                // 3. Kiểm tra xem Công ty này hiện tại đã có gói nào đang Active hoặc chờ thanh toán chưa
                 var existingActiveSub = await _unitOfWork.Subscriptions.GetAllAsync(
                     x => x.CompanyId == companyId
-                      && x.Status == SubscriptionStatus.Active
+                      && (x.Status == SubscriptionStatus.Active || x.Status == SubscriptionStatus.PendingPayment)
                       && x.EndDate > DateTime.UtcNow);
 
                 if (existingActiveSub != null && existingActiveSub.Any())
@@ -75,11 +75,9 @@ namespace AntiPhisher.Application.Services
                 subscription.AccountId = claim.Id; // Người thực hiện giao dịch đại diện
                 subscription.CompanyId = companyId; // Công ty sở hữu gói dịch vụ này
                 subscription.Price = plan.Price;
-                subscription.StartDate = request.StartDate;
-                subscription.EndDate = request.StartDate.AddMonths(plan.DurationMonth);
-                subscription.NextBillingDate = subscription.EndDate;
-                subscription.Status = SubscriptionStatus.Active;
-                subscription.PaymentStatus = PaymentStatus.Pending; // Chờ thanh toán hóa đơn
+                // StartDate/EndDate/NextBillingDate không set lúc tạo — sẽ set trong webhook khi Paid
+                subscription.Status = SubscriptionStatus.PendingPayment; // Chờ thanh toán mới kích hoạt
+                subscription.PaymentStatus = PaymentStatus.Pending;
                 subscription.UsedSlots = 0; // Reset số lượng nhân viên ban đầu của gói mới
 
                 await _unitOfWork.Subscriptions.AddAsync(subscription);
@@ -468,14 +466,26 @@ namespace AntiPhisher.Application.Services
             try
             {
                 var user = await _unitOfWork.Users.GetAsync(u => u.UserId == userId);
+
+                List<Subscription> subs;
                 if (user?.CompanyId == null)
-                    return new ApiResponse().SetOk(new { hasPlan = false });
+                {
+                    // User lẻ: tìm subscription cá nhân (không gắn company)
+                    subs = await _unitOfWork.Subscriptions.GetAllAsync(
+                        s => s.AccountId == userId && s.CompanyId == null,
+                        include: q => q.Include(s => s.SubscriptionPlans))
+                        ?? new List<Subscription>();
+                }
+                else
+                {
+                    // Company user: giữ nguyên hành vi cũ — tìm theo CompanyId
+                    subs = await _unitOfWork.Subscriptions.GetAllAsync(
+                        s => s.CompanyId == user.CompanyId,
+                        include: q => q.Include(s => s.SubscriptionPlans))
+                        ?? new List<Subscription>();
+                }
 
-                var subs = await _unitOfWork.Subscriptions.GetAllAsync(
-                    s => s.CompanyId == user.CompanyId,
-                    include: q => q.Include(s => s.SubscriptionPlans));
-
-                if (subs == null || !subs.Any())
+                if (!subs.Any())
                     return new ApiResponse().SetOk(new { hasPlan = false });
 
                 // Ưu tiên Active trước, rồi đến gói gần hết hạn nhất

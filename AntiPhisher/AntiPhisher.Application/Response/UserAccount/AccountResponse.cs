@@ -26,5 +26,6 @@ namespace AntiPhisher.Application.Response.UserAccount
         public string Status { get; set; } = string.Empty;
         public int SystemScore { get; set; }
         public string RiskLevel { get; set; } = string.Empty;
+        public string? ActivePlanName { get; set; }
     }
 }

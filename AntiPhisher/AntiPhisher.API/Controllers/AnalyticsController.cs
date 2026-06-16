@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AntiPhisher.API.Controllers
 {
-    [Authorize(Roles = "Manager")]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticsController : ControllerBase
@@ -23,6 +22,15 @@ namespace AntiPhisher.API.Controllers
         /// Gồm: avg risk score, detection rate, lesson completion, heatmap click nhầm (UTC+7).
         /// GET /api/Analytics/company-overview
         /// </summary>
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin-overview")]
+        public async Task<IActionResult> GetAdminOverview()
+        {
+            var result = await _analyticsService.GetAdminOverviewAsync();
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+
+        [Authorize(Roles = "Manager")]
         [HttpGet("company-overview")]
         public async Task<IActionResult> GetCompanyOverview()
         {
@@ -36,6 +44,7 @@ namespace AntiPhisher.API.Controllers
         /// Gồm: risk score, detection rate, số lần click/leak/report, tiến độ bài học.
         /// GET /api/Analytics/high-risk-employees
         /// </summary>
+        [Authorize(Roles = "Manager")]
         [HttpGet("high-risk-employees")]
         public async Task<IActionResult> GetHighRiskEmployees()
         {
@@ -48,6 +57,7 @@ namespace AntiPhisher.API.Controllers
         /// Tiến độ từng Campaign: lesson completion % + attempt score + per-user breakdown.
         /// GET /api/Analytics/campaign-completion
         /// </summary>
+        [Authorize(Roles = "Manager")]
         [HttpGet("campaign-completion")]
         public async Task<IActionResult> GetCampaignCompletion()
         {

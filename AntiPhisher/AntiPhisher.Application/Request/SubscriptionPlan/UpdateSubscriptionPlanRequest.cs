@@ -9,6 +9,8 @@ namespace AntiPhisher.Application.Request.SubscriptionPlan
         public string? Name { get; set; }
 
         public decimal? Price { get; set; }
+
+        [Range(1, 120, ErrorMessage = "Thời hạn gói phải từ 1 đến 120 tháng")]
         public int? DurationMonth { get; set; }
         public string? Description { get; set; }
         public string? Feature { get; set; }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AntiPhisher.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260610094152_AddPhaseColorIcon")]
-    partial class AddPhaseColorIcon
+    [Migration("20260616075705_InitAll")]
+    partial class InitAll
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -420,6 +420,35 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.ToTable("Lessons", (string)null);
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.LessonQuiz", b =>
+                {
+                    b.Property<int>("QuizId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuizId"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LessonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PassScore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("QuizId");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("LessonQuizzes", (string)null);
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.LoginHistory", b =>
                 {
                     b.Property<int>("LoginHistoryId")
@@ -539,8 +568,14 @@ namespace AntiPhisher.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SepayTransactionId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -700,6 +735,62 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.HasKey("PhishingTypeId");
 
                     b.ToTable("PhishingTypes");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.QuizOption", b =>
+                {
+                    b.Property<int>("OptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OptionId"));
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OptionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OptionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuizOptions", (string)null);
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.QuizQuestion", b =>
+                {
+                    b.Property<int>("QuestionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuestionType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("QuizId");
+
+                    b.ToTable("QuizQuestions", (string)null);
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.RefreshToken", b =>
@@ -1377,6 +1468,17 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.LessonQuiz", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.Lesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lesson");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.LoginHistory", b =>
                 {
                     b.HasOne("AntiPhisher.Domain.Models.User", "User")
@@ -1468,6 +1570,28 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("TransactionHistory");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.QuizOption", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.QuizQuestion", "Question")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.QuizQuestion", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.LessonQuiz", "Quiz")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.RefreshToken", b =>
@@ -1688,6 +1812,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("UserLessonProgresses");
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.LessonQuiz", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.Module", b =>
                 {
                     b.Navigation("Lessons");
@@ -1701,6 +1830,11 @@ namespace AntiPhisher.Infrastructure.Migrations
             modelBuilder.Entity("AntiPhisher.Domain.Models.Phase", b =>
                 {
                     b.Navigation("Modules");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.QuizQuestion", b =>
+                {
+                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.Role", b =>

@@ -146,33 +146,33 @@ namespace AntiPhisher.Infrastructure
             {
                 new SubscriptionPlan
                 {
-                    Name        = "Gói Cơ Bản",
-                    Price       = 990_000m,
+                    Name          = "Cá nhân",
+                    Price         = 39_000m,
                     DurationMonth = 1,
-                    MaxSlots    = 10,
-                    Description = "Phù hợp cho nhóm nhỏ dưới 10 nhân viên.",
-                    Feature     = "10 nhân viên, 50 kịch bản, Báo cáo cơ bản",
-                    IsActive    = true
+                    MaxSlots      = 1,
+                    Description   = "Dành riêng cho 1 cá nhân sử dụng.",
+                    Feature       = "1-2 chiến dịch phishing/tháng, Cảnh báo rủi ro email thời gian thực, Báo cáo điểm AI cá nhân hóa, Dashboard theo dõi tiến độ, Chỉ dành cho 1 người dùng",
+                    IsActive      = true
                 },
                 new SubscriptionPlan
                 {
-                    Name        = "Gói Chuyên Nghiệp",
-                    Price       = 2_490_000m,
+                    Name          = "Doanh nghiệp nhỏ",
+                    Price         = 79_000m,
                     DurationMonth = 1,
-                    MaxSlots    = 30,
-                    Description = "Phù hợp cho doanh nghiệp vừa 10-30 nhân viên.",
-                    Feature     = "30 nhân viên, 200 kịch bản, Báo cáo nâng cao, AI Feedback",
-                    IsActive    = true
+                    MaxSlots      = 50,
+                    Description   = "Dành cho SME nhạy cảm về chi phí.",
+                    Feature       = "2-3 chiến dịch phishing/tháng, Dashboard doanh nghiệp tùy chỉnh, Báo cáo điểm AI chi tiết, Cảnh báo rủi ro theo nhóm, Tối đa 50 nhân viên, Xuất báo cáo PDF hàng tháng, 1 tài khoản Manager riêng",
+                    IsActive      = true
                 },
                 new SubscriptionPlan
                 {
-                    Name        = "Gói Doanh Nghiệp Pro",
-                    Price       = 5_990_000m,
+                    Name          = "Enterprise",
+                    Price         = 99_000m,
                     DurationMonth = 1,
-                    MaxSlots    = 100,
-                    Description = "Giải pháp toàn diện cho doanh nghiệp lớn.",
-                    Feature     = "100 nhân viên, Không giới hạn kịch bản, Analytics chuyên sâu, Hỗ trợ ưu tiên",
-                    IsActive    = true
+                    MaxSlots      = 999,
+                    Description   = "Giải pháp toàn diện cho doanh nghiệp từ 20-150 nhân viên.",
+                    Feature       = "Chiến dịch phishing không giới hạn, AI scoring & phản hồi cá nhân hóa, Báo cáo rủi ro nâng cao theo bộ phận, Xuất báo cáo tuân thủ, Không giới hạn nhân viên, Tích hợp SSO & Active Directory, Hỗ trợ ưu tiên 24/7, 1 tài khoản Manager riêng",
+                    IsActive      = true
                 }
             };
 

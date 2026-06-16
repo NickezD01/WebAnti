@@ -482,3 +482,8 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local dev config overrides — chứa secret thật (App Password, API key...)
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json

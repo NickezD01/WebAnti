@@ -18,6 +18,7 @@ namespace AntiPhisher.Domain.Models
         public bool IsDelete { get; set; }
 
         public string? SepayTransactionId { get; set; }
+        public DateTime? PaidAt { get; set; }
         public User? UserAccount { get; set; }
         public Subscription Subscription { get; set; }
         //public SubscriptionPlan? SubscriptionPlans { get; set; }

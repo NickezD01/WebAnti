@@ -10,10 +10,14 @@ namespace AntiPhisher.API.Controllers
     public class PaymentController : ControllerBase
     {
         public IVnPayService _service;
-        public PaymentController(IVnPayService service)
+        private readonly IConfiguration _config;
+
+        public PaymentController(IVnPayService service, IConfiguration config)
         {
             _service = service;
+            _config = config;
         }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreatePaymentUrl(PaymentRequest model)
@@ -21,25 +25,16 @@ namespace AntiPhisher.API.Controllers
             var response = await _service.CreatePaymentUrl(model, HttpContext);
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
+
         [HttpGet("callback")]
         public async Task<IActionResult> PaymentCallback()
         {
             var response = await _service.PaymentExecute(Request.Query);
+            var feBase = _config["Frontend:BaseUrl"]!;
 
-            // Redirect the user directly to the front-end with status
-            if (response.IsSuccess)
-            {
-                // Extract the redirect URL from the response and pass it as a query parameter to the FE
-                var redirectUrl = "http://localhost:5173/paymentsuccess";
-                return Redirect(redirectUrl);
-            }
-            else
-            {
-                var redirectUrl = "http://localhost:5173/paymentfail";
-                return Redirect(redirectUrl);
-            }
+            return Redirect(response.IsSuccess
+                ? $"{feBase}/paymentsuccess"
+                : $"{feBase}/paymentfail");
         }
-
-
     }
 }

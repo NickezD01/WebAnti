@@ -76,5 +76,11 @@ namespace AntiPhisher.Application
         Task SaveChangeAsync();
         Task<T> ExecuteScalarAsync<T>(string sql);
         Task ExecuteRawSqlAsync(string sql);
+
+        /// <summary>
+        /// Chạy toàn bộ work() trong một DB transaction.
+        /// Nếu work() ném exception → tự động Rollback; thành công → Commit.
+        /// </summary>
+        Task ExecuteInTransactionAsync(Func<Task> work);
     }
 }
