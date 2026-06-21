@@ -2,17 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Sao chép file .sln và các file project từ thư mục hiện tại (đang là /)
+# SỬA CÁC DÒNG NÀY:
 COPY ["AntiPhisher.sln", "./"]
 COPY ["AntiPhisher.API/AntiPhisher.API.csproj", "AntiPhisher.API/"]
 COPY ["AntiPhisher.Application/AntiPhisher.Application.csproj", "AntiPhisher.Application/"]
 COPY ["AntiPhisher.Domain/AntiPhisher.Domain.csproj", "AntiPhisher.Domain/"]
 COPY ["AntiPhisher.Infrastructure/AntiPhisher.Infrastructure.csproj", "AntiPhisher.Infrastructure/"]
 
-# Restore các gói NuGet
 RUN dotnet restore "AntiPhisher.sln"
 
-# Copy toàn bộ source code vào
+# Copy toàn bộ source code
 COPY . .
 
 # Build project API
