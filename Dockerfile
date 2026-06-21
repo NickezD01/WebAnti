@@ -2,19 +2,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Chỉ định rõ đường dẫn từ ngoài vào trong
-COPY ["AntiPhisher/AntiPhisher.sln", "./"]
+# Copy file .sln và các file project từ thư mục "AntiPhisher" vào thư mục làm việc hiện tại của Docker (.)
+COPY ["AntiPhisher/AntiPhisher.sln", "."]
 COPY ["AntiPhisher/AntiPhisher.API/AntiPhisher.API.csproj", "AntiPhisher.API/"]
 COPY ["AntiPhisher/AntiPhisher.Application/AntiPhisher.Application.csproj", "AntiPhisher.Application/"]
 COPY ["AntiPhisher/AntiPhisher.Domain/AntiPhisher.Domain.csproj", "AntiPhisher.Domain/"]
 COPY ["AntiPhisher/AntiPhisher.Infrastructure/AntiPhisher.Infrastructure.csproj", "AntiPhisher.Infrastructure/"]
 
+# Restore sau khi đã copy file .sln
 RUN dotnet restore "AntiPhisher.sln"
 
-# Copy toàn bộ source code vào
+# Copy toàn bộ source code vào container
 COPY . .
 
-# Build project API
+# Build dự án API 
+# Lưu ý: Vì lúc này ta đã COPY toàn bộ code vào rồi, đường dẫn sẽ là từ gốc container
 RUN dotnet publish "AntiPhisher/AntiPhisher.API/AntiPhisher.API.csproj" -c Release -o /app/publish
 
 # Giai đoạn chạy
