@@ -260,7 +260,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    // Lấy từ biến môi trường đã tách
     var baseConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_BASE");
     var optionsConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_OPTIONS");
 
@@ -268,12 +267,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
     if (!string.IsNullOrEmpty(baseConn))
     {
-        // Ghép thủ công bằng code, không để Render can thiệp vào dấu ?
-        finalConnectionString = $"{baseConn}?{optionsConn}";
+        // Kiểm tra nếu options có dữ liệu thì mới thêm dấu ?
+        if (!string.IsNullOrEmpty(optionsConn))
+        {
+            finalConnectionString = $"{baseConn}?{optionsConn}";
+        }
+        else
+        {
+            finalConnectionString = baseConn;
+        }
     }
     else
     {
-        // Fallback về file cấu hình nếu chạy local
         finalConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     }
 
