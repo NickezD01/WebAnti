@@ -246,13 +246,25 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
 // ======================================================
 // DATABASE
 // ======================================================
+
+
+
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//{
+//    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//    options.UseSqlServer(connectionString);
+//    options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+//});
+
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString);
+    // Sử dụng UseNpgsql thay vì UseSqlServer
+    options.UseNpgsql(connectionString);
     options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
 });
-
 // ======================================================
 // JWT AUTHENTICATION
 // ======================================================
