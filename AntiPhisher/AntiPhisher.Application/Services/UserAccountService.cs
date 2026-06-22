@@ -95,10 +95,25 @@ namespace AntiPhisher.Application.Services
 
                 var userEntityDict = items.ToDictionary(u => u.UserId);
 
+                // Batch-load attempts cho tất cả users trong page (1 query duy nhất)
+                var userIds = items.Select(u => u.UserId).ToList();
+                var allAttempts = await _unitOfWork.UserAttempts.GetAllAsync(
+                    a => userIds.Contains(a.UserId));
+                var attemptsByUser = allAttempts?
+                    .GroupBy(a => a.UserId)
+                    .ToDictionary(g => g.Key, g => g.ToList())
+                    ?? new Dictionary<int, List<UserAttempt>>();
+
                 foreach (var ur in userResponse)
                 {
-                    ur.SystemScore = 80;
-                    ur.RiskLevel = "Low";
+                    if (attemptsByUser.TryGetValue(ur.Id, out var userAttempts) && userAttempts.Count > 0)
+                        ur.SystemScore = (int)Math.Round(userAttempts.Average(a => a.Score));
+                    else
+                        ur.SystemScore = 0;
+
+                    ur.RiskLevel = ur.SystemScore >= 75 ? "Low"
+                                 : ur.SystemScore >= 50 ? "Medium"
+                                 : "High";
 
                     Subscription? active = null;
                     if (subByAccount.TryGetValue(ur.Id, out var indSub)) active = indSub;
