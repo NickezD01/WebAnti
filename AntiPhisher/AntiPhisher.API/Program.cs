@@ -260,30 +260,16 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var baseConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_BASE");
-    var optionsConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_OPTIONS");
+    var connectionString =
+        Environment.GetEnvironmentVariable("CONNECTION_STRING_BASE")
+        ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
-    string finalConnectionString;
+    Console.WriteLine($"DB Connection: {connectionString}");
 
-    if (!string.IsNullOrEmpty(baseConn))
-    {
-        // Kiểm tra nếu options có dữ liệu thì mới thêm dấu ?
-        if (!string.IsNullOrEmpty(optionsConn))
-        {
-            finalConnectionString = $"{baseConn}?{optionsConn}";
-        }
-        else
-        {
-            finalConnectionString = baseConn;
-        }
-    }
-    else
-    {
-        finalConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    }
+    options.UseNpgsql(connectionString);
 
-    options.UseNpgsql(finalConnectionString);
-    options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
 });
 
 
