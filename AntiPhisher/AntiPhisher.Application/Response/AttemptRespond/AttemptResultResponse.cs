@@ -18,10 +18,12 @@ namespace AntiPhisher.Application.Response.AttemptRespond
         /// </summary>
         public string RiskLevel { get; set; } = "Low";
 
+        public bool IsAiLocked { get; set; } = false;
+
         // AI Feedback
-        public string FeedbackText { get; set; } = null!;
-        public string IndicatorsExplained { get; set; } = null!;
-        public string ImprovementTips { get; set; } = null!;
-        public string AIModel { get; set; } = null!;
+        public string? FeedbackText { get; set; }
+        public string? IndicatorsExplained { get; set; }
+        public string? ImprovementTips { get; set; }
+        public string? AIModel { get; set; }
     }
 }
