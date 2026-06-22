@@ -84,6 +84,7 @@ builder.Services
 // SWAGGER
 // ======================================================
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "AntiPhisher API", Version = "v1" });
@@ -122,8 +123,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
-// HttpClient cho ScenarioService (OpenAI)
-builder.Services.AddHttpClient<IScenarioService, ScenarioService>();
+// HttpClient cho ScenarioService (Openrouter)
+builder.Services.AddScoped<IScenarioService, ScenarioService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
@@ -132,7 +133,14 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+// Bind config "OpenRouter" trong appsettings.json vào OpenRouterOptions
+builder.Services.Configure<AntiPhisher.Infrastructure.OpenRouterOptions>(
+    builder.Configuration.GetSection("OpenRouter"));
 
+// HttpClient cho OpenRouterAnalysisService (đã thay Gemini)
+builder.Services.AddHttpClient
+    <AntiPhisher.Application.Interfaces.IOpenRouterAnalysisService,
+    AntiPhisher.Infrastructure.OpenRouterAnalysisService>();
 // Đăng ký dịch vụ Company Service
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 

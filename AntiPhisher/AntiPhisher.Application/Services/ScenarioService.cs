@@ -1,4 +1,11 @@
-﻿using AntiPhisher.Application.Interfaces;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.AttemptRequest;
 using AntiPhisher.Application.Request.ScenarioRequest;
 using AntiPhisher.Application.Response.AttemptRespond;
@@ -7,29 +14,23 @@ using AntiPhisher.Domain.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace AntiPhisher.Application.Services
 {
     public class ScenarioService : IScenarioService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly HttpClient _httpClient;
+        private readonly IOpenRouterAnalysisService _aiService;
         private readonly IMapper _mapper;
-        private readonly string _apiKey;
+        private readonly ILogger<ScenarioService> _logger;
 
-        public ScenarioService(IUnitOfWork unitOfWork, HttpClient httpClient, IConfiguration configuration, IMapper mapper)
+        public ScenarioService(IUnitOfWork unitOfWork, IOpenRouterAnalysisService aiService, IMapper mapper, ILogger<ScenarioService> logger)
         {
             _unitOfWork = unitOfWork;
-            _httpClient = httpClient;
+            _aiService = aiService;
             _mapper = mapper;
-            _apiKey = configuration["OpenAI:ApiKey"] ?? string.Empty;
+            _logger = logger;
         }
 
         // =========================================================
@@ -93,7 +94,7 @@ namespace AntiPhisher.Application.Services
                 await _unitOfWork.SaveChangeAsync();
 
                 // 6. Gọi AI với context hành vi phong phú hơn
-                var aiFeedback = await FetchAIFeedbackFromOpenAI(
+                var aiFeedback = await FetchAIFeedbackFromOpenRouter(
                     scenario, isCorrect,
                     request.IsClickedLink, request.IsCredentialLeaked, request.IsReported);
                 aiFeedback.AttemptId = attempt.AttemptId;
@@ -274,7 +275,7 @@ namespace AntiPhisher.Application.Services
         // =========================================================
         // HÀM PRIVATE GỌI OPENAI GPT-4O (GIỮ NGUYÊN GỐC)
         // =========================================================
-        private async Task<AIFeedback> FetchAIFeedbackFromOpenAI(
+        private async Task<AIFeedback> FetchAIFeedbackFromOpenRouter(
             Scenario scenario, bool isCorrect,
             bool isClickedLink, bool isCredentialLeaked, bool isReported)
         {
@@ -283,72 +284,40 @@ namespace AntiPhisher.Application.Services
                 FeedbackText = "Hệ thống phân tích AI đang bận, vui lòng kiểm tra lại phản hồi chi tiết trong lịch sử.",
                 IndicatorsExplained = "Không thể phân tích dấu hiệu.",
                 ImprovementTips = "Hãy cẩn trọng với các email yêu cầu hành động khẩn cấp.",
-                AIModel = "gpt-4o",
+                AIModel = "openrouter",
                 CreatedAt = DateTime.UtcNow
-            };
-
-            if (string.IsNullOrEmpty(_apiKey)) return fallbackFeedback;
-
-            string systemPrompt = "Bạn là chuyên gia phân tích bảo mật thông tin (Phishing Security Expert). " +
-                                  "Hãy đưa ra phản hồi bằng tiếng Việt dưới định dạng JSON Object chứa chính xác 3 key: " +
-                                  "\"feedbackText\" (nhận xét hành vi của user trong bài test này), " +
-                                  "\"indicatorsExplained\" (giải thích các dấu hiệu phishing/an toàn trong email), " +
-                                  "\"improvementTips\" (mẹo bảo mật cốt lõi để không bị lừa lần sau).";
-
-            // CHANGED: Prompt mới dùng 3 hành vi cụ thể thay vì "Safe"/"Phishing"
-            string behaviorDesc = $"- Đã bấm vào link giả mạo: {(isClickedLink ? "CÓ ⚠️" : "KHÔNG ✅")}\n" +
-                                  $"- Đã nhập thông tin đăng nhập/thẻ: {(isCredentialLeaked ? "CÓ 🚨" : "KHÔNG ✅")}\n" +
-                                  $"- Đã báo cáo email đáng ngờ: {(isReported ? "CÓ ✅" : "KHÔNG")}";
-
-            string userPrompt = $"[Thông tin Email Phishing]\n" +
-                               $"- Tiêu đề: {scenario.Subject}\n" +
-                               $"- Người gửi: {scenario.SenderEmail}\n" +
-                               $"- Nội dung HTML: {scenario.EmailBodyHtml}\n" +
-                               $"- Dấu hiệu lừa đảo gốc: {scenario.PhishingIndicators}\n\n" +
-                               $"[Hành vi của người dùng]\n" +
-                               behaviorDesc + "\n" +
-                               $"- Kết quả đánh giá: {(isCorrect ? "ĐÚNG ✅ — Đã nhận diện được tấn công" : "SAI ❌ — Bị mắc bẫy lừa đảo")}";
-
-            var requestBody = new
-            {
-                model = "gpt-4o",
-                response_format = new { type = "json_object" },
-                messages = new[]
-                {
-                    new { role = "system", content = systemPrompt },
-                    new { role = "user", content = userPrompt }
-                }
             };
 
             try
             {
-                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-                requestMessage.Headers.Add("Authorization", $"Bearer {_apiKey}");
-                requestMessage.Content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                var rawJson = await _aiService.AnalyzeScenarioAttemptAsync(
+                    scenario.Subject,
+                    scenario.SenderEmail,
+                    scenario.EmailBodyHtml,
+                    scenario.PhishingIndicators,
+                    scenario.IsPhishing,
+                    isClickedLink,
+                    isCredentialLeaked,
+                    isReported,
+                    isCorrect);
 
-                var response = await _httpClient.SendAsync(requestMessage);
-                if (!response.IsSuccessStatusCode) return fallbackFeedback;
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(responseString);
-
-                var contentJson = doc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
-                var tokensUsed = doc.RootElement.GetProperty("usage").GetProperty("total_tokens").GetInt32();
-
-                using var contentDoc = JsonDocument.Parse(contentJson ?? "{}");
+                using var contentDoc = JsonDocument.Parse(rawJson);
+                var root = contentDoc.RootElement;
 
                 return new AIFeedback
                 {
-                    FeedbackText = contentDoc.RootElement.GetProperty("feedbackText").GetString(),
-                    IndicatorsExplained = contentDoc.RootElement.GetProperty("indicatorsExplained").GetString(),
-                    ImprovementTips = contentDoc.RootElement.GetProperty("improvementTips").GetString(),
-                    AIModel = "gpt-4o",
-                    PromptTokensUsed = tokensUsed,
+                    FeedbackText = root.TryGetProperty("feedbackText", out var ft) ? ft.GetString() : fallbackFeedback.FeedbackText,
+                    IndicatorsExplained = root.TryGetProperty("indicatorsExplained", out var ie) ? ie.GetString() : fallbackFeedback.IndicatorsExplained,
+                    ImprovementTips = root.TryGetProperty("improvementTips", out var it) ? it.GetString() : fallbackFeedback.ImprovementTips,
+                    AIModel = "openrouter",
                     CreatedAt = DateTime.UtcNow
                 };
             }
-            catch
+            catch (Exception ex)
             {
+                // Bắt mọi lỗi: network timeout, JSON parse lỗi, AI trả sai schema...
+                // Không để lỗi AI làm crash luồng submit-attempt của học viên.
+                _logger.LogError(ex, "Lỗi khi lấy feedback AI cho ScenarioId={ScenarioId}", scenario.ScenarioId);
                 return fallbackFeedback;
             }
         }
