@@ -220,7 +220,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Cấu hình lắng nghe cổng (Quan trọng cho Render)
-//builder.WebHost.UseUrls($"http://*:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
+builder.WebHost.UseUrls($"http://*:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
 
 // ======================================================
 // CONFIGURATION
