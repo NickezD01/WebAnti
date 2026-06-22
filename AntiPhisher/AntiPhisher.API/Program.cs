@@ -260,11 +260,28 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    // Sử dụng UseNpgsql thay vì UseSqlServer
-    options.UseNpgsql(connectionString);
+    // Lấy từ biến môi trường đã tách
+    var baseConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_BASE");
+    var optionsConn = Environment.GetEnvironmentVariable("CONNECTION_STRING_OPTIONS");
+
+    string finalConnectionString;
+
+    if (!string.IsNullOrEmpty(baseConn))
+    {
+        // Ghép thủ công bằng code, không để Render can thiệp vào dấu ?
+        finalConnectionString = $"{baseConn}?{optionsConn}";
+    }
+    else
+    {
+        // Fallback về file cấu hình nếu chạy local
+        finalConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    }
+
+    options.UseNpgsql(finalConnectionString);
     options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
 });
+
+
 // ======================================================
 // JWT AUTHENTICATION
 // ======================================================
