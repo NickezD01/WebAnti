@@ -1,0 +1,582 @@
+{
+  "batch_id": "09",
+  "batch_name": "Phase 3 — HR Scams",
+  "phase": 3,
+  "lesson": "3.1",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P3-HR-001",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Authority + Fear",
+      "attack_type": "HR Impersonation",
+      "learning_objective": "Nhận diện email giả HR yêu cầu cập nhật thông tin ngân hàng trước kỳ lương",
+      "email": {
+        "sender_name": "Phòng Nhân sự — Vinamilk",
+        "sender_email": "hr.payroll@vinamilk-hrportal.com",
+        "recipient_email": "nguyen.thi.thu.hien@vinamilk.com.vn",
+        "subject": "Cập nhật tài khoản ngân hàng nhận lương — Trước 05/06/2026",
+        "body": "Kính gửi chị Nguyễn Thị Thu Hiền,\n\nPhòng Nhân sự thông báo: hệ thống lương Vinamilk đang nâng cấp sang nhà cung cấp dịch vụ mới. Để đảm bảo lương tháng 6 được chuyển đúng hạn ngày 15/06, tất cả nhân viên cần xác nhận hoặc cập nhật thông tin tài khoản ngân hàng trước ngày 05/06/2026.\n\nVui lòng điền thông tin qua mẫu trực tuyến bên dưới.\n\nNhân viên chưa cập nhật đúng hạn có thể nhận lương trễ hoặc phải nhận tiền mặt tại quỹ.",
+        "cta_text": "Cập nhật tài khoản lương",
+        "cta_link": "http://vinamilk-hrportal.com/payroll-update"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr.payroll@vinamilk-hrportal.com",
+          "explanation": "HR Vinamilk dùng @vinamilk.com.vn — 'vinamilk-hrportal.com' là domain bên ngoài giả mạo, thêm '-hrportal' để trông như cổng HR riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "financial_data_request",
+          "visible_text": "xác nhận hoặc cập nhật thông tin tài khoản ngân hàng",
+          "explanation": "HR thật không yêu cầu cập nhật tài khoản ngân hàng qua link email — thông tin tài khoản được cập nhật trực tiếp tại phòng HR hoặc qua hệ thống nội bộ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "nhận lương trễ hoặc phải nhận tiền mặt",
+          "explanation": "Đe dọa trễ lương tạo áp lực tài chính trực tiếp — người dùng thường không muốn trễ lương và làm theo ngay.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["vinamilk-hrportal.com", "tài khoản ngân hàng", "nhận lương trễ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả HR để lấy thông tin tài khoản ngân hàng!",
+        "summary": "Email giả HR dùng lo lắng về lương — một trong những áp lực tài chính trực tiếp nhất với nhân viên. Domain không phải nội bộ công ty là dấu hiệu rõ nhất.",
+        "learning_point": "HR không yêu cầu cập nhật tài khoản ngân hàng qua link email. Mọi thay đổi thông tin lương cần được làm trực tiếp tại phòng HR.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "HR Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-002",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Fear",
+      "attack_type": "HR Impersonation",
+      "learning_objective": "Nhận diện email giả HR cảnh báo vi phạm kỷ luật để tạo hoảng loạn",
+      "email": {
+        "sender_name": "Bộ phận Nhân sự — Masan Consumer",
+        "sender_email": "disciplinary@masan-hrdept.com",
+        "recipient_email": "tran.van.long.phuc@masan.com.vn",
+        "subject": "Thông báo vi phạm nội quy — Yêu cầu giải trình trong 48 giờ",
+        "body": "Kính gửi anh Trần Văn Long Phúc,\n\nPhòng Nhân sự ghi nhận anh có hành vi vi phạm Điều 15.2 Nội quy lao động công ty ngày 03/06/2026.\n\nAnh được yêu cầu hoàn thành bản giải trình trực tuyến trong vòng 48 giờ. Nếu không phản hồi đúng hạn, Hội đồng kỷ luật sẽ tiến hành xử lý theo quy định mà không cần ý kiến của anh.\n\nBản giải trình cần khai báo đầy đủ thông tin cá nhân và lý do.",
+        "cta_text": "Nộp bản giải trình",
+        "cta_link": "http://masan-hrdept.com/disciplinary-form"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "disciplinary@masan-hrdept.com",
+          "explanation": "'masan-hrdept.com' là domain giả — HR Masan dùng @masan.com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "Hội đồng kỷ luật sẽ tiến hành xử lý mà không cần ý kiến của anh",
+          "explanation": "Đe dọa bị kỷ luật mà không được bào chữa tạo nỗi sợ mất việc — người dùng thường làm theo ngay để 'tự bảo vệ'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "personal_data_request",
+          "visible_text": "khai báo đầy đủ thông tin cá nhân",
+          "explanation": "Biểu mẫu 'giải trình' thật ra là form thu thập thông tin cá nhân và có thể thông tin đăng nhập.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["masan-hrdept.com", "Hội đồng kỷ luật", "thông tin cá nhân"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả HR cảnh báo vi phạm kỷ luật — chiêu Fear mạnh!",
+        "summary": "Sợ mất việc là một trong những nỗi sợ lớn nhất — email giả HR khai thác điều này để dụ người dùng điền form thông tin.",
+        "learning_point": "Thông báo kỷ luật thật luôn đến từ email nội bộ công ty và thường kèm cuộc họp trực tiếp — không qua link nộp form online. Liên hệ HR trực tiếp để xác minh.",
+        "psychology_display": "Fear",
+        "attack_type_display": "HR Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-003",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Authority + Curiosity",
+      "attack_type": "HR Impersonation",
+      "learning_objective": "Nhận diện giả HR gửi link khảo sát nội bộ giả để lấy thông tin đăng nhập",
+      "email": {
+        "sender_name": "Phòng HR — FPT Corporation",
+        "sender_email": "hr-survey@fpt-employee-portal.net",
+        "recipient_email": "le.minh.quan@fpt.com.vn",
+        "subject": "Khảo sát mức độ hài lòng nhân viên Q2/2026 — Bắt buộc hoàn thành",
+        "body": "Kính gửi anh Lê Minh Quân,\n\nFPT Corporation triển khai khảo sát hài lòng nhân viên định kỳ Q2/2026 (bắt buộc theo chính sách quản trị nhân sự). Kết quả khảo sát ảnh hưởng đến kế hoạch phúc lợi năm 2027.\n\nThời gian hoàn thành: 10 phút\nHạn chót: 08/06/2026\n\nAnh đăng nhập bằng tài khoản FPT để khảo sát được cá nhân hóa.",
+        "cta_text": "Bắt đầu khảo sát",
+        "cta_link": "https://fpt-employee-portal.net/survey-q2-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr-survey@fpt-employee-portal.net",
+          "explanation": "FPT dùng @fpt.com.vn — 'fpt-employee-portal.net' là domain bên ngoài giả mạo, dùng .net thay .com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "đăng nhập bằng tài khoản FPT",
+          "explanation": "Yêu cầu đăng nhập tài khoản nội bộ FPT vào website bên ngoài — nếu làm theo sẽ mất thông tin đăng nhập công ty.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "authority_pressure",
+          "visible_text": "bắt buộc theo chính sách quản trị nhân sự",
+          "explanation": "'Bắt buộc theo chính sách' tạo cảm giác không thể từ chối — nhưng khảo sát thật của FPT được thực hiện qua hệ thống nội bộ.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["fpt-employee-portal.net", "đăng nhập bằng tài khoản FPT", "bắt buộc"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả khảo sát HR để lấy thông tin đăng nhập!",
+        "summary": "Yêu cầu đăng nhập tài khoản công ty vào website bên ngoài domain công ty — đây là dấu hiệu rõ nhất của phishing.",
+        "learning_point": "Hệ thống khảo sát nội bộ thật chạy trên domain công ty hoặc nền tảng có liên kết SSO đã thiết lập trước. Không đăng nhập tài khoản công ty vào bất kỳ website nào không phải domain công ty.",
+        "psychology_display": "Authority",
+        "attack_type_display": "HR Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-004",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "HR Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email HR hợp lệ thông báo chính sách phúc lợi mới — không yêu cầu hành động đáng ngờ",
+      "email": {
+        "sender_name": "Phòng Nhân sự — Techcombank",
+        "sender_email": "hr@techcombank.com.vn",
+        "recipient_email": "pham.van.hung@techcombank.com.vn",
+        "subject": "Thông báo: Chính sách nghỉ phép mới hiệu lực từ 01/07/2026",
+        "body": "Kính gửi anh Phạm Văn Hưng,\n\nPhòng Nhân sự thông báo chính sách nghỉ phép năm mới của Techcombank sẽ có hiệu lực từ 01/07/2026:\n\n• Tăng phép năm từ 12 lên 15 ngày\n• Thêm 2 ngày phép cá nhân (personal leave)\n• Phép chưa dùng được chuyển tối đa 5 ngày sang năm sau\n\nChính sách đầy đủ được đăng tại Intranet: intranet.techcombank.com.vn/hr-policies\n\nMọi thắc mắc liên hệ phòng HR: hr@techcombank.com.vn | 024 3944 6368 (ext. 1234)\n\nTrân trọng,\nPhòng Nhân sự Techcombank",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email HR về chính sách mới với link Intranet — có thể trông như thông báo giả",
+        "why_legitimate": "Domain @techcombank.com.vn chính thức. Link Intranet trỏ về intranet.techcombank.com.vn — subdomain nội bộ. Không yêu cầu đăng nhập hay cung cấp thông tin. Không có deadline áp lực. Có số điện thoại nội bộ xác minh."
+      },
+      "feedback": {
+        "title": "Đây là email HR hợp lệ!",
+        "summary": "Thông báo chính sách từ @techcombank.com.vn với link Intranet nội bộ, không có yêu cầu hành động đáng ngờ hay deadline áp lực.",
+        "learning_point": "Email HR hợp lệ thường: thông báo thông tin (không yêu cầu hành động ngay), link trỏ về intranet/domain công ty, và có số điện thoại nội bộ xác minh.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-005",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Authority + Urgency",
+      "attack_type": "HR Impersonation",
+      "learning_objective": "Nhận diện email giả HR yêu cầu ký hợp đồng điện tử giả — thay đổi điều khoản lao động",
+      "email": {
+        "sender_name": "Phòng Nhân sự — Samsung Vietnam",
+        "sender_email": "contracts@samsung-vn-hrservice.com",
+        "recipient_email": "kim.thi.lan.huong@samsung.com.vn",
+        "subject": "PHỤ LỤC HỢP ĐỒNG LAO ĐỘNG 2026 — Ký xác nhận trước 10/06",
+        "body": "Kính gửi chị Kim Thị Lan Hương,\n\nSamsung Vietnam thực hiện cập nhật phụ lục hợp đồng lao động định kỳ cho năm 2026 theo Nghị định 145/2020/NĐ-CP.\n\nPhụ lục bao gồm cập nhật về: chế độ phúc lợi, điều khoản bảo mật thông tin và điều kiện làm việc linh hoạt.\n\nChị cần ký điện tử và nộp trước ngày 10/06/2026. Hợp đồng chưa ký đúng hạn có thể ảnh hưởng đến tình trạng hợp đồng lao động.",
+        "cta_text": "Xem và ký hợp đồng",
+        "cta_link": "https://samsung-vn-hrservice.com/contract-sign-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "contracts@samsung-vn-hrservice.com",
+          "explanation": "Samsung Vietnam dùng @samsung.com.vn — 'samsung-vn-hrservice.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "legal_document_phishing",
+          "visible_text": "ký điện tử và nộp trước ngày 10/06/2026",
+          "explanation": "Phụ lục hợp đồng lao động thật được ký qua hệ thống HR nội bộ của công ty — không qua link từ domain bên ngoài.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "ảnh hưởng đến tình trạng hợp đồng lao động",
+          "explanation": "Đe dọa ảnh hưởng hợp đồng lao động (có thể hiểu là mất việc) là áp lực tâm lý rất mạnh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["samsung-vn-hrservice.com", "ký điện tử", "tình trạng hợp đồng"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả HR yêu cầu ký hợp đồng qua link ngoài!",
+        "summary": "Kẻ tấn công lợi dụng lo lắng về hợp đồng lao động — một vấn đề pháp lý quan trọng với mọi nhân viên. Ký điện tử thật luôn qua hệ thống nội bộ.",
+        "learning_point": "Hợp đồng và phụ lục lao động ký qua hệ thống HR nội bộ hoặc DocuSign/SignNow được IT phê duyệt trước. Nhận link ký hợp đồng từ domain bên ngoài: xác nhận với HR trực tiếp.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "HR Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-006",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Curiosity + Authority",
+      "attack_type": "Benefits Scam",
+      "learning_objective": "Nhận diện email giả HR thông báo phúc lợi bổ sung để dụ cung cấp thông tin cá nhân",
+      "email": {
+        "sender_name": "Phòng C&B — Tập đoàn Vingroup",
+        "sender_email": "benefits@vingroup-cb-portal.com",
+        "recipient_email": "tran.thi.phuong.linh@vingroup.net",
+        "subject": "Thông báo: Gói bảo hiểm sức khỏe mới 2026 — Đăng ký trước 15/06",
+        "body": "Kính gửi chị Trần Thị Phương Linh,\n\nVingroup triển khai gói bảo hiểm sức khỏe cao cấp mới từ tháng 7/2026 (hợp tác với Prudential). Gói bảo hiểm bao gồm:\n\n• Khám bệnh không giới hạn tại hệ thống Vinmec\n• Bảo hiểm nha khoa và thị lực\n• Bảo hiểm tai nạn 24/7 — mức độ bảo hiểm tăng 200%\n\nĐể đăng ký, chị điền đầy đủ thông tin cá nhân và thông tin gia đình (nếu đăng ký gói gia đình).\n\nHạn đăng ký: 15/06/2026.",
+        "cta_text": "Đăng ký gói bảo hiểm",
+        "cta_link": "https://vingroup-cb-portal.com/benefits-enrollment-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "benefits@vingroup-cb-portal.com",
+          "explanation": "Vingroup dùng @vingroup.net — 'vingroup-cb-portal.com' là domain bên ngoài. Phòng C&B Vingroup không dùng domain riêng biệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "personal_data_harvesting",
+          "visible_text": "điền đầy đủ thông tin cá nhân và thông tin gia đình",
+          "explanation": "Thu thập thông tin cá nhân + gia đình qua form bên ngoài domain công ty — đây là data harvesting.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "too_good_to_be_true",
+          "visible_text": "mức độ bảo hiểm tăng 200%",
+          "explanation": "Phúc lợi quá hấp dẫn kết hợp deadline đăng ký tạo FOMO — người dùng sợ mất cơ hội và đăng ký ngay.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["vingroup-cb-portal.com", "thông tin cá nhân và gia đình", "tăng 200%"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả phòng C&B để thu thập dữ liệu cá nhân!",
+        "summary": "Thông báo phúc lợi hấp dẫn là mồi nhử để thu thập thông tin cá nhân toàn diện — từ thông tin nhân viên đến thông tin gia đình.",
+        "learning_point": "Đăng ký bảo hiểm/phúc lợi công ty luôn qua hệ thống HR nội bộ. Nhận thông báo phúc lợi qua email domain lạ: xác nhận với phòng C&B qua email nội bộ.",
+        "psychology_display": "Curiosity + FOMO",
+        "attack_type_display": "Data Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-007",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Authority",
+      "attack_type": "Tax Document Scam",
+      "learning_objective": "Nhận diện giả HR gửi link tải chứng từ thuế TNCN giả để lấy thông tin đăng nhập",
+      "email": {
+        "sender_name": "Kế toán Lương — Novaland Group",
+        "sender_email": "payroll.tax@novaland-hrfinance.com",
+        "recipient_email": "vo.thi.kim.yen@novaland.com.vn",
+        "subject": "Chứng từ khấu trừ thuế TNCN 2025 — Tải về ngay (hạn nộp hoàn thuế 30/06)",
+        "body": "Kính gửi chị Võ Thị Kim Yến,\n\nPhòng kế toán lương Novaland Group gửi chứng từ khấu trừ thuế thu nhập cá nhân năm 2025 để chị dùng cho việc quyết toán/hoàn thuế trước hạn 30/06/2026.\n\nChị cần đăng nhập bằng tài khoản email công ty để tải chứng từ bảo mật.\n\nLưu ý: hạn nộp quyết toán thuế cá nhân là 30/06 — trễ hạn có thể bị phạt hành chính.",
+        "cta_text": "Tải chứng từ thuế",
+        "cta_link": "https://novaland-hrfinance.com/tax-document-2025"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "payroll.tax@novaland-hrfinance.com",
+          "explanation": "Novaland dùng @novaland.com.vn — 'novaland-hrfinance.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "đăng nhập bằng tài khoản email công ty",
+          "explanation": "Yêu cầu đăng nhập tài khoản công ty vào domain ngoài là credential harvesting — thông tin đăng nhập sẽ bị đánh cắp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "hạn nộp quyết toán thuế cá nhân là 30/06",
+          "explanation": "Hạn nộp thuế thật (30/06) được dùng như áp lực thuyết phục — kẻ tấn công nghiên cứu lịch thuế để tăng tính xác thực.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["novaland-hrfinance.com", "đăng nhập tài khoản email công ty", "hạn 30/06"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả kế toán lương để lấy thông tin đăng nhập công ty!",
+        "summary": "Lợi dụng hạn nộp thuế thật (30/06) để tạo áp lực thật. Nhưng yêu cầu đăng nhập tài khoản công ty vào domain bên ngoài là dấu hiệu phishing rõ ràng.",
+        "learning_point": "Chứng từ thuế TNCN từ công ty được gửi qua hệ thống HR nội bộ hoặc email trực tiếp — không yêu cầu đăng nhập vào portal bên ngoài.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-008",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "HR Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email HR hợp lệ gửi file đính kèm quyết định lương",
+      "email": {
+        "sender_name": "Phòng Nhân sự — Hòa Phát Group",
+        "sender_email": "hr@hoaphat.com.vn",
+        "recipient_email": "nguyen.thi.ngoc.bich@hoaphat.com.vn",
+        "subject": "Quyết định điều chỉnh lương — Hiệu lực 01/07/2026",
+        "body": "Kính gửi chị Nguyễn Thị Ngọc Bích,\n\nPhòng Nhân sự gửi đính kèm Quyết định điều chỉnh lương của chị, có hiệu lực từ 01/07/2026.\n\nFile đính kèm: QD_DieuChinhLuong_NguyenThiNgocBich_07_2026.pdf\n\nChị vui lòng ký nháy bản cứng và nộp lại phòng Nhân sự (P.302) trước ngày 20/06/2026.\n\nMọi thắc mắc liên hệ:\nChị Phạm Thu Hà — Chuyên viên C&B\nEmail: pham.thu.ha@hoaphat.com.vn | ĐT: 024 3974 xxxx (ext. 2345)\n\nTrân trọng,\nPhòng Nhân sự — Hòa Phát Group",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email HR về lương với file đính kèm — nhạy cảm, người dùng có thể lo ngại",
+        "why_legitimate": "Domain @hoaphat.com.vn chính thức. File đính kèm là .pdf (không phải .exe hay .html). Có tên người nhận cụ thể. Yêu cầu ký bản cứng nộp trực tiếp (không qua link). Có thông tin liên hệ nội bộ xác minh."
+      },
+      "feedback": {
+        "title": "Đây là email HR hợp lệ!",
+        "summary": "Quyết định lương từ @hoaphat.com.vn với file PDF và yêu cầu nộp bản cứng — tất cả đều hợp lệ.",
+        "learning_point": "Email HR hợp lệ về lương: từ domain nội bộ, file PDF (không phải file lạ), yêu cầu thực hiện qua quy trình trực tiếp (không chỉ qua link), có thông tin liên hệ nội bộ xác minh.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-009",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Authority + Trust",
+      "attack_type": "HR Spear Phishing",
+      "learning_objective": "Nhận diện HR spear phishing với thông tin nội bộ thật — email được cá nhân hóa cao độ",
+      "email": {
+        "sender_name": "Nguyễn Thị Hồng Nhung — HRBP",
+        "sender_email": "nguyen.thi.hong.nhung@pvgasgroup.vn",
+        "recipient_email": "le.van.truong@pvgas.com.vn",
+        "subject": "Anh Trường — Cập nhật quy trình Performance Review tháng 6",
+        "body": "Anh Trường ơi,\n\nEm Nhung — HRBP của nhóm Technical Operations gửi anh quy trình Performance Review mới áp dụng từ Q3/2026.\n\nBan lãnh đạo yêu cầu tất cả Team Lead hoàn thành self-assessment và đánh giá nhóm trước khi họp ngày 18/06. Anh vào hệ thống HR mới (vừa migrate từ SAP sang Workday) để điền.\n\nHệ thống mới cần reset mật khẩu lần đầu đăng nhập — anh dùng email công ty và mật khẩu hiện tại để xác thực ban đầu.",
+        "cta_text": "Truy cập Workday HR",
+        "cta_link": "https://pvgas-workday-hr.com/first-login"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "nguyen.thi.hong.nhung@pvgasgroup.vn",
+          "explanation": "PV Gas dùng @pvgas.com.vn — 'pvgasgroup.vn' là domain gần giống nhưng khác. Typosquatting tinh vi: 'pvgasgroup.vn' thay vì 'pvgas.com.vn'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "dùng email công ty và mật khẩu hiện tại để xác thực ban đầu",
+          "explanation": "Hệ thống HR mới (Workday hay bất kỳ hệ thống nào) không yêu cầu dùng mật khẩu hiện tại để 'xác thực ban đầu' — đây là cách lấy mật khẩu hiện tại của bạn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fake_system_migration",
+          "visible_text": "vừa migrate từ SAP sang Workday",
+          "explanation": "Migration hệ thống SAP → Workday là lý do nghe có vẻ kỹ thuật và hợp lý — kẻ tấn công dùng để giải thích tại sao cần đăng nhập vào URL mới.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["pvgasgroup.vn", "mật khẩu hiện tại để xác thực", "migrate SAP sang Workday"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "HR Spear Phishing cực kỳ tinh vi!",
+        "summary": "Email dùng: tên HRBP thật, đề cập đúng tên nhóm, lý do kỹ thuật nghe có vẻ hợp lý (SAP → Workday). Nhưng domain khác (@pvgasgroup.vn thay vì @pvgas.com.vn) và yêu cầu mật khẩu hiện tại.",
+        "learning_point": "Hệ thống HR mới KHÔNG BAO GIỜ yêu cầu mật khẩu cũ để 'xác thực'. Migration hệ thống được IT thông báo chính thức qua nhiều kênh. Gặp tình huống này: liên hệ IT/HR qua kênh nội bộ đã biết.",
+        "psychology_display": "Authority + Trust",
+        "attack_type_display": "Spear Phishing"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-010",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Fear + Authority",
+      "attack_type": "Termination Scam",
+      "learning_objective": "Nhận diện giả HR thông báo chấm dứt hợp đồng để dụ nhân viên cung cấp thông tin tài khoản nhận trợ cấp",
+      "email": {
+        "sender_name": "Ủy ban Kỷ luật — Nestlé Vietnam",
+        "sender_email": "disciplinary.committee@nestle-vn-hr.com",
+        "recipient_email": "bui.thi.lan.phuong@nestle.com.vn",
+        "subject": "THÔNG BÁO CHẤM DỨT HỢP ĐỒNG — Mã nhân viên NV00-4521",
+        "body": "Kính gửi nhân viên Bùi Thị Lan Phương (Mã NV: NV00-4521),\n\nỦy ban Kỷ luật Nestlé Vietnam quyết định chấm dứt hợp đồng lao động của bạn kể từ ngày 15/06/2026 do vi phạm Điều 17.4 Nội quy lao động.\n\nTheo quy định, bạn có quyền nhận trợ cấp thôi việc và các khoản thanh toán cuối cùng. Để nhận các khoản này, vui lòng cung cấp thông tin tài khoản ngân hàng và ký xác nhận qua cổng HR trước khi bàn giao.\n\nThời hạn: 07/06/2026 — 2 ngày làm việc từ thông báo này.",
+        "cta_text": "Cung cấp tài khoản nhận trợ cấp",
+        "cta_link": "https://nestle-vn-hr.com/severance-payment"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "disciplinary.committee@nestle-vn-hr.com",
+          "explanation": "Nestlé Vietnam dùng @nestle.com.vn — 'nestle-vn-hr.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "extreme_fear_tactic",
+          "visible_text": "chấm dứt hợp đồng lao động kể từ ngày 15/06/2026",
+          "explanation": "Thông báo chấm dứt hợp đồng đột ngột là nỗi sợ lớn nhất của nhiều nhân viên — tạo cú sốc tâm lý khiến người dùng hành động ngay không kiểm tra.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "financial_data_request",
+          "visible_text": "cung cấp thông tin tài khoản ngân hàng",
+          "explanation": "Trong trạng thái hoảng loạn về mất việc, người dùng dễ dàng cung cấp thông tin ngân hàng với lý do 'nhận trợ cấp'.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["nestle-vn-hr.com", "chấm dứt hợp đồng", "tài khoản nhận trợ cấp"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả thông báo sa thải để lấy thông tin ngân hàng!",
+        "summary": "Thông báo sa thải đột ngột tạo cú sốc tâm lý tối đa — sau đó 'cứu vớt' bằng lời hứa trợ cấp nếu cung cấp thông tin ngân hàng. Đây là kỹ thuật tâm lý 2 bước rất tinh vi.",
+        "learning_point": "Thông báo chấm dứt hợp đồng thật luôn diễn ra trực tiếp có văn bản công ty, không qua email đơn thuần. Nhận email dạng này: liên hệ HR và quản lý trực tiếp qua kênh đã biết.",
+        "psychology_display": "Fear + Authority",
+        "attack_type_display": "Termination Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-HR-011",
+      "batch": "09",
+      "phase": 3,
+      "lesson": "3.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "HR Scams",
+      "psychology": "Trust + Authority",
+      "attack_type": "Vendor Impersonation via HR",
+      "learning_objective": "Nhận diện giả nhà cung cấp HR (Workday/SAP) để thu thập thông tin đăng nhập hệ thống",
+      "email": {
+        "sender_name": "Workday Support — Vietnam",
+        "sender_email": "support.vn@workday-apac-support.com",
+        "recipient_email": "dao.thi.mai.anh@petrovietnam.com.vn",
+        "subject": "Workday: Tài khoản của bạn cần xác minh sau maintenance đêm 04/06",
+        "body": "Kính gửi Đào Thị Mai Anh,\n\nWorkday đã hoàn thành maintenance hệ thống đêm 04/06/2026. Để đảm bảo tài khoản hoạt động bình thường sau maintenance, người dùng cần xác minh phiên đăng nhập một lần.\n\nXác minh chỉ mất 30 giây. Sau xác minh, tài khoản Workday của bạn sẽ hoạt động đầy đủ với các tính năng mới.\n\nBộ phận IT PetroVietnam đã phối hợp với Workday để triển khai quy trình này.",
+        "cta_text": "Xác minh tài khoản Workday",
+        "cta_link": "https://workday-apac-support.com/vn-verify"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "support.vn@workday-apac-support.com",
+          "explanation": "Workday gửi email từ @workday.com — 'workday-apac-support.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_maintenance_pretext",
+          "visible_text": "cần xác minh phiên đăng nhập một lần sau maintenance",
+          "explanation": "Maintenance hệ thống không bao giờ yêu cầu người dùng 'xác minh tài khoản' qua link email — đây là pretext phổ biến để giải thích tại sao cần đăng nhập lại.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "false_it_endorsement",
+          "visible_text": "Bộ phận IT PetroVietnam đã phối hợp với Workday",
+          "explanation": "Đề cập đến IT nội bộ như đã xác nhận tạo niềm tin giả — nhưng email không đến từ IT công ty.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["workday-apac-support.com", "sau maintenance", "IT PetroVietnam đã phối hợp"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả nhà cung cấp phần mềm HR sau maintenance!",
+        "summary": "Kẻ tấn công theo dõi lịch maintenance hệ thống và gửi email đúng thời điểm — làm tăng tính xác thực. Nhưng Workday không gửi email xác minh từ domain ngoài workday.com.",
+        "learning_point": "Nhà cung cấp phần mềm (Workday, SAP, Oracle) không yêu cầu xác minh tài khoản qua email sau maintenance. Thông báo maintenance hợp lệ đến từ IT nội bộ qua kênh đã biết.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "Vendor Impersonation"
+      }
+    }
+  ]
+}

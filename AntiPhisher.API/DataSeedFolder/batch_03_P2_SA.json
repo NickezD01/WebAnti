@@ -1,0 +1,395 @@
+[
+  {
+    "simulation_id": "P2-SA-001",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Fear",
+    "attack_type": "Banking Scam",
+    "learning_objective": "Nhận diện fake domain — domain giả mạo thêm từ khóa vào tên ngân hàng thật",
+    "email": {
+      "sender_name": "ACB Bank Security",
+      "sender_email": "security@acb-bank-alert.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Tài khoản ACB bị đăng nhập lạ — Xác minh ngay",
+      "body": "Kính gửi Quý Khách hàng,\n\nHệ thống phát hiện đăng nhập bất thường vào tài khoản ACB của bạn từ thiết bị mới tại Đà Nẵng lúc 11:47 hôm nay.\n\nNếu không phải bạn thực hiện, hãy bảo vệ tài khoản ngay bằng cách xác minh danh tính. Quyền truy cập sẽ bị thu hồi nếu không xác minh trong 1 giờ.",
+      "cta_text": "Xác minh tài khoản ngay",
+      "cta_link": "http://acb-bank-alert.com/verify"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "security@acb-bank-alert.com",
+        "explanation": "'acb-bank-alert.com' là domain giả — ACB thật dùng @acb.com.vn. Thêm '-bank-alert' vào sau tên ngân hàng là kỹ thuật fake domain phổ biến nhất.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "urgency_language",
+        "visible_text": "trong 1 giờ",
+        "explanation": "Deadline 1 giờ tạo áp lực để bạn không kịp kiểm tra bằng cách mở app ACB thật.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "fear_tactic",
+        "visible_text": "Quyền truy cập sẽ bị thu hồi",
+        "explanation": "Đe dọa mất quyền truy cập tài khoản là chiến thuật Fear — kết hợp với deadline ngắn để tạo áp lực kép.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["acb-bank-alert.com", "trong 1 giờ", "Đà Nẵng lúc 11:47"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing!",
+      "summary": "Domain 'acb-bank-alert.com' thêm '-bank-alert' vào sau tên ngân hàng — kỹ thuật phổ biến nhất để tạo domain trông quen thuộc. ACB thật chỉ dùng @acb.com.vn.",
+      "learning_point": "Quy tắc đơn giản: domain ngân hàng thật luôn kết thúc bằng .com.vn hoặc .vn — bất kỳ domain nào thêm từ khóa như '-alert', '-secure', '-notify' đều là giả mạo.",
+      "psychology_display": "Fear + Urgency",
+      "attack_type_display": "Banking Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-002",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Authority",
+    "attack_type": "Cloud Service Phishing",
+    "learning_objective": "Nhận diện typosquatting — domain giả thay thế ký tự để đánh lừa mắt đọc nhanh",
+    "email": {
+      "sender_name": "Microsoft Account Team",
+      "sender_email": "account@micros0ft-account.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Mật khẩu Microsoft 365 sắp hết hạn — Đặt lại ngay",
+      "body": "Kính gửi người dùng,\n\nMật khẩu tài khoản Microsoft 365 của bạn sẽ hết hạn sau 48 giờ theo chính sách bảo mật của tổ chức.\n\nVui lòng đặt lại mật khẩu ngay để tiếp tục truy cập email, Teams và OneDrive. Tài khoản không cập nhật sẽ bị tạm khóa.",
+      "cta_text": "Đặt lại mật khẩu",
+      "cta_link": "https://micros0ft-account.com/reset"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "account@micros0ft-account.com",
+        "explanation": "'micros0ft' dùng số 0 thay chữ o — đây là typosquatting. Email Microsoft thật đến từ @microsoft.com hoặc @accountprotection.microsoft.com.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "generic_greeting",
+        "visible_text": "Kính gửi người dùng",
+        "explanation": "Microsoft biết tên và địa chỉ email của bạn — email thật từ Microsoft luôn dùng tên đầy đủ, không dùng 'người dùng' chung chung.",
+        "severity": "medium"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "sau 48 giờ",
+        "explanation": "Deadline 48 giờ tạo áp lực phải hành động trong ngày — kết hợp với đe dọa mất quyền truy cập Teams và OneDrive.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["micros0ft-account.com", "Kính gửi người dùng", "sau 48 giờ"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing!",
+      "summary": "Typosquatting: 'micros0ft' dùng số 0 thay chữ o — rất khó phát hiện khi đọc nhanh. Đây là kỹ thuật phổ biến thứ hai sau fake domain.",
+      "learning_point": "Khi kiểm tra domain sender: đọc chậm từng ký tự, đặc biệt chú ý các ký tự dễ bị thay thế: o↔0, l↔1, rn↔m. Domain Microsoft thật chỉ là microsoft.com — không có thêm gì.",
+      "psychology_display": "Authority + Urgency",
+      "attack_type_display": "Cloud Service Phishing"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-003",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Authority",
+    "attack_type": "Email Spoofing",
+    "learning_objective": "Nhận diện Email Spoofing — tên hiển thị hợp lệ nhưng địa chỉ email thật hoàn toàn khác",
+    "email": {
+      "sender_name": "Phòng Kế Toán — ABC Technology",
+      "sender_email": "ketoan@abctech-finance.net",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Yêu cầu xác nhận thông tin thanh toán nhà cung cấp",
+      "body": "Chào Lan,\n\nPhòng kế toán cần xác nhận thông tin tài khoản ngân hàng của nhà cung cấp Công ty ABC Supplies trước khi xử lý thanh toán đợt tháng 6.\n\nVui lòng truy cập hệ thống kế toán nội bộ để xác nhận thông tin và phê duyệt lệnh thanh toán 45.000.000đ.",
+      "cta_text": "Xác nhận thanh toán",
+      "cta_link": "http://abctech-finance.net/approve-payment"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "ketoan@abctech-finance.net",
+        "explanation": "Tên hiển thị 'Phòng Kế Toán — ABC Technology' trông hợp lệ nhưng email thật là @abctech-finance.net — không phải @abctech.com.vn. Đây là Email Spoofing điển hình.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "payment_request",
+        "visible_text": "phê duyệt lệnh thanh toán 45.000.000đ",
+        "explanation": "Yêu cầu phê duyệt thanh toán lớn qua link email ngoài hệ thống nội bộ — quy trình phê duyệt tài chính thật không hoạt động qua link email.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "suspicious_link",
+        "visible_text": "abctech-finance.net/approve-payment",
+        "explanation": "Link dẫn đến domain bên ngoài 'abctech-finance.net' thay vì hệ thống nội bộ thật của công ty.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["abctech-finance.net", "45.000.000đ", "Phòng Kế Toán — ABC Technology"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là Email Spoofing!",
+      "summary": "Tên hiển thị 'Phòng Kế Toán — ABC Technology' hoàn toàn có thể giả mạo — địa chỉ email thật mới quan trọng. Luôn click vào tên người gửi để xem địa chỉ đầy đủ.",
+      "learning_point": "Quy tắc vàng: không tin vào tên hiển thị (display name) — luôn kiểm tra địa chỉ email đầy đủ sau @. Email nội bộ thật phải đến từ @abctech.com.vn, không từ domain bên ngoài.",
+      "psychology_display": "Authority",
+      "attack_type_display": "Email Spoofing / Vendor Fraud"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-004",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Curiosity",
+    "attack_type": "Delivery Scam",
+    "learning_objective": "Nhận diện domain giả mạo thương hiệu lớn bằng cách thêm tên quốc gia vào domain",
+    "email": {
+      "sender_name": "DHL Express Vietnam",
+      "sender_email": "tracking@dhl-vietnam-express.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Kiện hàng DHL đang chờ xác nhận địa chỉ giao",
+      "body": "Kính gửi Quý Khách,\n\nKiện hàng quốc tế mã DHL-VN-2026-884421 đã đến kho trung chuyển Hà Nội và đang chờ xác nhận địa chỉ giao hàng cuối.\n\nVui lòng xác nhận địa chỉ trong vòng 24 giờ. Sau thời hạn kiện hàng sẽ được hoàn trả người gửi.",
+      "cta_text": "Xác nhận địa chỉ giao hàng",
+      "cta_link": "http://dhl-vietnam-express.com/confirm-address"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "tracking@dhl-vietnam-express.com",
+        "explanation": "'dhl-vietnam-express.com' là domain giả — DHL thật dùng @dhl.com hoặc @dhl.com.vn. Thêm '-vietnam-express' vào là kỹ thuật fake domain phổ biến với thương hiệu quốc tế.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "urgency_language",
+        "visible_text": "trong vòng 24 giờ",
+        "explanation": "Deadline 24 giờ với nguy cơ mất kiện hàng tạo Urgency — khiến người dùng click link mà không kiểm tra mã vận đơn trên website DHL thật.",
+        "severity": "high"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": [],
+    "highlight_keywords": ["dhl-vietnam-express.com", "trong vòng 24 giờ", "DHL-VN-2026-884421"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing!",
+      "summary": "Domain 'dhl-vietnam-express.com' giả mạo DHL bằng cách thêm '-vietnam-express'. Thương hiệu quốc tế không tạo domain riêng cho từng quốc gia theo kiểu này.",
+      "learning_point": "Khi nhận thông báo giao hàng: tra mã vận đơn trực tiếp trên website chính thức (dhl.com) — không click link trong email. DHL thật chỉ dùng @dhl.com hoặc @dhl.com.vn.",
+      "psychology_display": "Curiosity + Urgency",
+      "attack_type_display": "Delivery Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-005",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "medium",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Authority + Urgency",
+    "attack_type": "HR Scam",
+    "learning_objective": "Nhận diện subdomain giả mạo — kẻ tấn công dùng tên thật của tổ chức làm subdomain để đánh lừa",
+    "email": {
+      "sender_name": "Bảo hiểm Xã hội Việt Nam",
+      "sender_email": "thongbao@bhxh.gov-vn-portal.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Cập nhật thông tin BHXH bắt buộc — Hạn 30/06/2026",
+      "body": "Kính gửi Nguyễn Thị Lan,\n\nTheo quy định mới của Bộ Lao động, tất cả người lao động phải cập nhật thông tin BHXH trực tuyến trước 30/06/2026 để đảm bảo quyền lợi bảo hiểm y tế và hưu trí không bị gián đoạn.\n\nHệ thống ghi nhận tài khoản của bạn chưa hoàn tất cập nhật. Vui lòng đăng nhập và xác minh thông tin cá nhân, ngân hàng nhận lương hưu.",
+      "cta_text": "Cập nhật thông tin BHXH",
+      "cta_link": "https://bhxh.gov-vn-portal.com/update-info"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "thongbao@bhxh.gov-vn-portal.com",
+        "explanation": "Đây là kỹ thuật subdomain tinh vi: 'bhxh' trông như subdomain hợp lệ nhưng domain thật là 'gov-vn-portal.com' — không phải baohiemxahoi.gov.vn của cơ quan BHXH Việt Nam.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "credential_request",
+        "visible_text": "xác minh thông tin cá nhân, ngân hàng nhận lương hưu",
+        "explanation": "BHXH không yêu cầu cập nhật thông tin ngân hàng qua link email — đây là mục tiêu thật của email: lấy thông tin tài khoản ngân hàng.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "authority_impersonation",
+        "visible_text": "Bộ Lao động",
+        "explanation": "Tham chiếu 'Bộ Lao động' và quy định pháp lý tạo Authority — người dùng sợ mất quyền lợi BHXH nếu không tuân thủ.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["bhxh.gov-vn-portal.com", "ngân hàng nhận lương hưu", "trước 30/06/2026"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing dùng subdomain giả!",
+      "summary": "Kỹ thuật tinh vi: 'bhxh.gov-vn-portal.com' trông như domain chính phủ nhưng thực ra domain thật là 'gov-vn-portal.com'. Cơ quan BHXH thật dùng baohiemxahoi.gov.vn.",
+      "learning_point": "Cách đọc domain đúng: phần quan trọng nhất là phần NGAY TRƯỚC .com/.vn/.gov.vn — 'bhxh.gov-vn-portal.com' có domain gốc là 'gov-vn-portal.com', không phải 'gov.vn'.",
+      "psychology_display": "Authority + Urgency",
+      "attack_type_display": "Government Impersonation"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-006",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "medium",
+    "email_type": "malicious",
+    "category": "Suspicious Sender Address",
+    "psychology": "Authority",
+    "attack_type": "BEC",
+    "learning_objective": "Nhận diện typosquatting tinh vi trong BEC — domain chỉ khác một ký tự so với domain công ty thật",
+    "email": {
+      "sender_name": "Nguyễn Hoàng Nam — CFO",
+      "sender_email": "nguyen.hoang.nam@abctech.com.vn.finance-dept.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Chuyển khoản thanh toán hợp đồng Q2 — Gấp",
+      "body": "Lan,\n\nAnh cần em xử lý thanh toán hợp đồng tư vấn Q2 cho đối tác. Số tiền 72.000.000đ cần chuyển trước cuối ngày hôm nay vì đối tác yêu cầu thanh toán trước khi ký hợp đồng chính thức.\n\nThông tin tài khoản:\nCTY TNHH Tư Vấn Đông Nam Á\nSố TK: 1234567890 — BIDV CN Hoàn Kiếm\n\nAnh đang họp, liên hệ lại qua email nếu cần.",
+      "cta_text": "",
+      "cta_link": ""
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_sender_domain",
+        "visible_text": "nguyen.hoang.nam@abctech.com.vn.finance-dept.com",
+        "explanation": "Domain thật là 'abctech.com.vn.finance-dept.com' — 'abctech.com.vn' xuất hiện như subdomain nhưng domain gốc là 'finance-dept.com'. Kỹ thuật này rất tinh vi và dễ bị bỏ qua khi đọc nhanh.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "payment_request",
+        "visible_text": "72.000.000đ",
+        "explanation": "Yêu cầu chuyển tiền lớn qua email từ CFO với lý do 'thanh toán trước khi ký hợp đồng' — đây là Red Flag BEC kinh điển.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "trước cuối ngày hôm nay",
+        "explanation": "Deadline cuối ngày kết hợp 'anh đang họp' ngăn nạn nhân xác minh trực tiếp — chiến thuật cô lập trong BEC.",
+        "severity": "high"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2", "rf3"],
+    "missable_flags": [],
+    "highlight_keywords": ["abctech.com.vn.finance-dept.com", "72.000.000đ", "trước cuối ngày hôm nay"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là BEC với subdomain giả cực tinh vi!",
+      "summary": "Domain 'abctech.com.vn.finance-dept.com' dùng domain công ty thật làm subdomain của domain giả — kỹ thuật nguy hiểm nhất trong BEC vì rất khó phát hiện khi đọc nhanh.",
+      "learning_point": "Luôn đọc domain từ PHẢI sang TRÁI: phần sau dấu @ → 'abctech.com.vn.finance-dept.com' → đọc ngược: .com → finance-dept → .com.vn → abctech. Domain thật là 'finance-dept.com' — không phải abctech.com.vn.",
+      "psychology_display": "Authority + Urgency",
+      "attack_type_display": "BEC / CFO Fraud"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-007",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "hard",
+    "email_type": "legitimate",
+    "category": "Suspicious Sender Address",
+    "psychology": "N/A",
+    "attack_type": "N/A",
+    "learning_objective": "Phân biệt subdomain hợp lệ với domain giả — không phải mọi subdomain đều là phishing",
+    "email": {
+      "sender_name": "Google Workspace",
+      "sender_email": "workspace-noreply@google.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Thông báo: Dung lượng Google Drive gần đầy",
+      "body": "Kính gửi Nguyễn Thị Lan,\n\nDung lượng Google Drive của tài khoản nguyen.thi.lan@abctech.com.vn đã sử dụng 13,8 GB / 15 GB (92%).\n\nKhi Drive đầy, bạn sẽ không thể nhận email mới hoặc tạo file trong Google Docs, Sheets và Slides.\n\nĐể quản lý dung lượng, truy cập drive.google.com/settings/storage hoặc liên hệ quản trị viên Google Workspace của tổ chức để nâng cấp gói lưu trữ.\n\nGoogle Workspace Team"
+    },
+    "red_flags": [],
+    "correct_flags": [],
+    "missable_flags": [],
+    "highlight_keywords": [],
+    "correct_answer": "legitimate",
+    "suspicious_element": {
+      "element": "Email từ @google.com thông báo dung lượng sắp đầy kèm link drive.google.com — người dùng mới có thể nghi ngờ đây là phishing dạng 'nâng cấp dung lượng giả'",
+      "why_legitimate": "Domain @google.com là chính thức của Google. Link 'drive.google.com/settings/storage' là subdomain hợp lệ của google.com. Email có địa chỉ người nhận cụ thể và số dung lượng chính xác (13.8/15 GB). Không có CTA button đáng ngờ — chỉ hướng dẫn vào settings hoặc liên hệ admin. Email thông báo dung lượng hợp lệ không yêu cầu mật khẩu hay thông tin thanh toán."
+    },
+    "feedback": {
+      "title": "Đây là email hợp lệ từ Google!",
+      "summary": "Email từ @google.com với thông tin dung lượng cụ thể và link drive.google.com — đây là email thông báo thật. Phân biệt với phishing: không có CTA button đáng ngờ, không yêu cầu đăng nhập qua link email, không yêu cầu thanh toán.",
+      "learning_point": "drive.google.com là subdomain hợp lệ của google.com — an toàn. Phân biệt với 'google-drive.com' hay 'googledrive-storage.net' (domain giả). Cách kiểm tra: phần domain gốc (trước .com) phải là 'google'.",
+      "psychology_display": "N/A — Email hợp lệ",
+      "attack_type_display": "N/A — Email hợp lệ"
+    }
+  },
+  {
+    "simulation_id": "P2-SA-008",
+    "batch": "03",
+    "phase": 2,
+    "lesson": "2.1",
+    "difficulty": "hard",
+    "email_type": "legitimate",
+    "category": "Suspicious Sender Address",
+    "psychology": "N/A",
+    "attack_type": "N/A",
+    "learning_objective": "Nhận biết email marketing hợp lệ từ nền tảng thứ ba gửi thay cho thương hiệu — không phải phishing dù domain không phải của thương hiệu",
+    "email": {
+      "sender_name": "Shopee Việt Nam",
+      "sender_email": "no-reply@mail.shopee.vn",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Đơn hàng #SPX778821 đã giao thành công",
+      "body": "Xin chào Nguyễn Thị Lan,\n\nĐơn hàng #SPX778821 đã được giao thành công vào lúc 14:35 ngày 17/06/2026.\n\nNếu bạn chưa nhận được hàng, vui lòng liên hệ shop hoặc Shopee qua:\n- App Shopee → Đơn hàng của tôi → #SPX778821 → Liên hệ hỗ trợ\n- Hotline: 19001221\n\nVui lòng xác nhận đã nhận hàng trong app để shop nhận được thanh toán.\n\nCảm ơn bạn đã mua sắm tại Shopee!"
+    },
+    "red_flags": [],
+    "correct_flags": [],
+    "missable_flags": [],
+    "highlight_keywords": [],
+    "correct_answer": "legitimate",
+    "suspicious_element": {
+      "element": "Email từ @mail.shopee.vn thay vì @shopee.vn — người dùng mới có thể lo ngại vì domain có thêm 'mail.' và trông khác với domain chính thức",
+      "why_legitimate": "'mail.shopee.vn' là subdomain email marketing chính thức của Shopee — nhiều nền tảng thương mại điện tử dùng subdomain 'mail.' hoặc 'email.' để gửi thông báo tự động. Tên người nhận cụ thể, mã đơn hàng thật #SPX778821, hotline 19001221 xác minh được. Không có link đáng ngờ — hướng dẫn dùng app và hotline. Email xác nhận giao hàng không yêu cầu bất kỳ hành động tài chính nào."
+    },
+    "feedback": {
+      "title": "Đây là email hợp lệ từ Shopee!",
+      "summary": "'mail.shopee.vn' là subdomain email chính thức của Shopee — không phải giả mạo. Nhiều nền tảng lớn dùng subdomain 'mail.' để gửi thông báo tự động. Tín hiệu xác thực: tên thật, mã đơn hàng cụ thể, hotline xác minh được, không yêu cầu đăng nhập hay thanh toán.",
+      "learning_point": "Phân biệt 'mail.shopee.vn' (subdomain hợp lệ — an toàn) với 'shopee-mail.com' hay 'mail-shopee.net' (domain giả — nguy hiểm). Quy tắc: 'shopee.vn' phải xuất hiện ở CUỐI domain trước phần đường dẫn.",
+      "psychology_display": "N/A — Email hợp lệ",
+      "attack_type_display": "N/A — Email hợp lệ"
+    }
+  }
+]

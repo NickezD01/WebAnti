@@ -1,0 +1,582 @@
+{
+  "batch_id": "13",
+  "batch_name": "Phase 3 — Recruitment Scams",
+  "phase": 3,
+  "lesson": "3.5",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P3-RS-001",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Curiosity + Greed",
+      "attack_type": "Fake Job Offer",
+      "learning_objective": "Nhận diện email tuyển dụng giả lương cao bất thường từ công ty nước ngoài không rõ nguồn gốc",
+      "email": {
+        "sender_name": "HR Department — Pacific Global Corp",
+        "sender_email": "hr@pacific-global-corp.net",
+        "recipient_email": "nguyen.thi.lan.anh@gmail.com",
+        "subject": "Offer: Remote Marketing Manager — $3,500/tháng — Làm việc tại nhà",
+        "body": "Kính gửi Nguyễn Thị Lan Anh,\n\nChúng tôi đã xem profile LinkedIn của bạn và nhận thấy bạn phù hợp với vị trí Remote Marketing Manager tại Pacific Global Corp (Singapore).\n\nMức lương: $3,500 USD/tháng (làm việc tại nhà hoàn toàn)\nYêu cầu: Có laptop, kết nối internet, thành thạo tiếng Anh\nKhông cần kinh nghiệm chuyên ngành\n\nĐể ứng tuyển, gửi CV và CCCD của bạn trong vòng 48 giờ.\n\nChúng tôi sẽ liên hệ phỏng vấn qua Telegram.",
+        "cta_text": "Ứng tuyển ngay",
+        "cta_link": "http://pacific-global-corp.net/apply"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "too_good_to_be_true",
+          "visible_text": "$3,500/tháng — Không cần kinh nghiệm chuyên ngành",
+          "explanation": "Lương $3,500 USD không cần kinh nghiệm là bất khả thi — đây là mồi nhử FOMO và lòng tham.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "personal_document_request",
+          "visible_text": "gửi CV và CCCD của bạn",
+          "explanation": "Yêu cầu CCCD ngay trong bước ứng tuyển đầu tiên — không công ty tuyển dụng hợp pháp nào yêu cầu CCCD trước khi phỏng vấn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unofficial_channel",
+          "visible_text": "phỏng vấn qua Telegram",
+          "explanation": "Phỏng vấn qua Telegram thay vì Zoom/Teams/Google Meet — đây là kênh không thể xác minh danh tính người phỏng vấn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["$3,500 không cần kinh nghiệm", "gửi CCCD", "Telegram"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Lừa tuyển dụng lương cao — đánh cắp CCCD!",
+        "summary": "Lương phi thực tế không cần kinh nghiệm + yêu cầu CCCD ngay = lừa đảo thu thập giấy tờ tùy thân để mở tài khoản ngân hàng hoặc làm giả hồ sơ.",
+        "learning_point": "CCCD chỉ cung cấp sau khi được offer và ký hợp đồng tại công ty thật. Phỏng vấn qua Telegram và lương không thực tế là hai dấu hiệu lừa tuyển dụng rõ nhất.",
+        "psychology_display": "Curiosity + Greed",
+        "attack_type_display": "Fake Job Offer"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-002",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Headhunter Impersonation",
+      "learning_objective": "Nhận diện email giả headhunter từ công ty HR uy tín dụ ứng viên cung cấp thông tin cá nhân",
+      "email": {
+        "sender_name": "Talent Acquisition — ManpowerGroup Vietnam",
+        "sender_email": "talent@manpowergroup-vn.net",
+        "recipient_email": "tran.duc.huy@vinfast.com.vn",
+        "subject": "Cơ hội: Senior Mechanical Engineer — Automotive (Confidential) — Lương 45–55tr",
+        "body": "Kính gửi anh Trần Đức Huy,\n\nTôi là Tuyển dụng cấp cao từ ManpowerGroup Vietnam. Chúng tôi đang tìm kiếm Senior Mechanical Engineer cho khách hàng trong ngành ô tô (thông tin bảo mật).\n\nMức lương: 45,000,000 – 55,000,000 VNĐ/tháng\nGói phúc lợi: Bảo hiểm cao cấp, xe công ty, cổ phần\n\nĐể đánh giá sự phù hợp, anh vui lòng điền thông tin chi tiết (bao gồm mức lương hiện tại và kỳ vọng) vào form trước 09/06/2026.",
+        "cta_text": "Điền thông tin ứng viên",
+        "cta_link": "https://manpowergroup-vn.net/candidate-profile"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "talent@manpowergroup-vn.net",
+          "explanation": "ManpowerGroup Vietnam dùng @manpower.com.vn hoặc @manpowergroup.com — 'manpowergroup-vn.net' là domain giả mạo dùng .net.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "salary_data_harvesting",
+          "visible_text": "mức lương hiện tại và kỳ vọng",
+          "explanation": "Thu thập thông tin lương hiện tại là data harvesting — thông tin này có thể bán cho đối thủ cạnh tranh hoặc dùng trong các scam khác.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước 09/06/2026",
+          "explanation": "Deadline ngắn cho quyết định nghề nghiệp quan trọng — headhunter thật cho ứng viên thời gian cân nhắc hợp lý.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["manpowergroup-vn.net", "mức lương hiện tại", "trước 09/06"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả headhunter để lấy thông tin lương và dữ liệu cá nhân!",
+        "summary": "Thông tin lương hiện tại là dữ liệu nhạy cảm — có thể bị dùng để negotiate lại lương thấp hơn, bán cho đối thủ, hoặc dùng trong các scam tiếp theo.",
+        "learning_point": "Headhunter thật từ công ty uy tín dùng domain chính thức. Không cung cấp lương hiện tại qua form online — chỉ thảo luận trực tiếp trong phỏng vấn sau khi xác minh danh tính headhunter.",
+        "psychology_display": "Authority + Curiosity",
+        "attack_type_display": "Salary Data Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-003",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Greed + Urgency",
+      "attack_type": "Part-time Job Scam",
+      "learning_objective": "Nhận diện lừa đảo việc làm thêm online — mô hình 'nhiệm vụ nhỏ, hoa hồng lớn' dẫn đến mất tiền",
+      "email": {
+        "sender_name": "Task Team — SocialBoost Vietnam",
+        "sender_email": "jobs@socialboost-vn.com",
+        "recipient_email": "pham.thi.ngoc.mai@yahoo.com.vn",
+        "subject": "Việc làm thêm: Like & Review sản phẩm — Thu nhập 300.000–500.000đ/ngày",
+        "body": "Chào Phạm Thị Ngọc Mai,\n\nSocialBoost Vietnam tuyển cộng tác viên thực hiện nhiệm vụ online đơn giản:\n• Like, share, review sản phẩm trên các sàn TMĐT\n• Chỉ cần 2–3 giờ/ngày, làm tại nhà\n• Thu nhập: 300.000 – 500.000đ/ngày\n• Hoa hồng được cộng tích lũy, rút về ngân hàng hàng ngày\n\nBắt đầu ngay hôm nay — chỉ cần đặt cọc bảo lãnh 500.000đ để kích hoạt tài khoản làm việc (hoàn trả sau 30 ngày).\n\nTham gia nhóm Telegram để nhận nhiệm vụ đầu tiên.",
+        "cta_text": "Tham gia ngay",
+        "cta_link": "http://socialboost-vn.com/register"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "upfront_payment_required",
+          "visible_text": "đặt cọc bảo lãnh 500.000đ",
+          "explanation": "Không công việc hợp pháp nào yêu cầu người lao động đặt cọc để 'kích hoạt tài khoản'. Đây là bẫy: sau khi đặt cọc, sẽ có yêu cầu nộp thêm với lý do khác nhau.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "too_good_to_be_true",
+          "visible_text": "300.000 – 500.000đ/ngày chỉ 2–3 giờ",
+          "explanation": "Thu nhập 300-500k/ngày chỉ cần like/review là phi thực tế — đây là mồi nhử để người dùng đặt cọc và tiếp tục nộp tiền.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unofficial_channel",
+          "visible_text": "nhóm Telegram",
+          "explanation": "Mọi giao dịch thông qua Telegram ẩn danh — không có cơ sở pháp lý để khiếu nại khi bị lừa.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["đặt cọc 500.000đ", "300.000–500.000đ/ngày", "Telegram"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Lừa đảo việc làm thêm — bẫy đặt cọc rồi mất tiền!",
+        "summary": "Mô hình 'nhiệm vụ nhỏ hoa hồng lớn + đặt cọc ban đầu' là lừa đảo kinh điển tại VN 2024-2026. Sau khi đặt cọc đầu, sẽ có yêu cầu nộp thêm liên tục với lý do 'tăng hạn mức'.",
+        "learning_point": "Không công việc hợp pháp nào yêu cầu nộp tiền để được làm việc. Thu nhập bất thường cao không cần kỹ năng = lừa đảo.",
+        "psychology_display": "Greed + Urgency",
+        "attack_type_display": "Task Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-004",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Recruitment Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email tuyển dụng hợp lệ từ nhà tuyển dụng thật qua LinkedIn Recruiter",
+      "email": {
+        "sender_name": "Lê Thị Hồng Nhung — Talent Acquisition",
+        "sender_email": "le.thi.hong.nhung@nestle.com",
+        "recipient_email": "nguyen.hoang.vu@gmail.com",
+        "subject": "Cơ hội tại Nestlé Vietnam: Senior Brand Manager — Mì & Gia Vị",
+        "body": "Kính gửi anh Nguyễn Hoàng Vũ,\n\nTôi là Nhung từ đội Talent Acquisition Nestlé Vietnam. Qua LinkedIn, tôi nhận thấy profile của anh rất phù hợp với vị trí Senior Brand Manager tại bộ phận Mì & Gia Vị của chúng tôi.\n\nNếu anh quan tâm muốn tìm hiểu thêm về vị trí này, tôi rất vui được sắp xếp cuộc trao đổi 30 phút qua Microsoft Teams.\n\nAnh có thể xem thêm thông tin vị trí tại: careers.nestle.com/vn (search: Senior Brand Manager)\n\nChúc anh ngày tốt lành,\nLê Thị Hồng Nhung\nTalent Acquisition Specialist — Nestlé Vietnam\nle.thi.hong.nhung@nestle.com | 028 3799 xxxx",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email tuyển dụng không được yêu cầu từ công ty FMCG lớn — có thể nghi ngờ",
+        "why_legitimate": "Domain @nestle.com là domain chính thức toàn cầu. Không yêu cầu thông tin cá nhân hay CCCD. Không yêu cầu đặt cọc. Phỏng vấn qua Teams (kênh chính thức). Link về careers.nestle.com/vn để xác minh độc lập. Có số điện thoại."
+      },
+      "feedback": {
+        "title": "Đây là email tuyển dụng hợp lệ từ Nestlé!",
+        "summary": "Email từ @nestle.com chính thức, không yêu cầu thông tin ngay, có kênh xác minh độc lập (careers website) và phỏng vấn qua Teams.",
+        "learning_point": "Email tuyển dụng hợp lệ: domain công ty chính thức, không yêu cầu CCCD/đặt cọc sớm, link về careers website xác minh được, phỏng vấn qua kênh chính thức.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-005",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Authority + Fear",
+      "attack_type": "Fake Job Application Confirmation",
+      "learning_objective": "Nhận diện email xác nhận ứng tuyển giả gửi đến người không ứng tuyển — lừa nhập thông tin để 'xác nhận'",
+      "email": {
+        "sender_name": "Nhân sự — Samsung Electronics Vietnam",
+        "sender_email": "hr.recruit@samsung-vn-hiring.com",
+        "recipient_email": "bui.thi.phuong.thao@gmail.com",
+        "subject": "Xác nhận đơn ứng tuyển — Kỹ sư Điện tử Senior — Samsung Vietnam",
+        "body": "Kính gửi ứng viên Bùi Thị Phương Thảo,\n\nChúng tôi đã nhận được đơn ứng tuyển vị trí Kỹ sư Điện tử Senior của bạn gửi qua VietnamWorks ngày 03/06/2026.\n\nBước tiếp theo: Vui lòng hoàn thành hồ sơ ứng viên trực tuyến để tiến vào vòng đánh giá kỹ thuật. Hồ sơ cần bổ sung:\n• Bằng cấp và chứng chỉ (scan)\n• CCCD mặt trước và sau\n• Thông tin tài khoản ngân hàng (để xử lý thù lao phỏng vấn)\n\nHạn nộp: 09/06/2026.",
+        "cta_text": "Hoàn thành hồ sơ",
+        "cta_link": "https://samsung-vn-hiring.com/candidate-profile"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr.recruit@samsung-vn-hiring.com",
+          "explanation": "Samsung Vietnam tuyển dụng qua @samsung.com — 'samsung-vn-hiring.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "banking_info_in_application",
+          "visible_text": "thông tin tài khoản ngân hàng (để xử lý thù lao phỏng vấn)",
+          "explanation": "Không công ty nào yêu cầu tài khoản ngân hàng trong hồ sơ ứng tuyển — 'thù lao phỏng vấn' là cớ giả để lấy thông tin ngân hàng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "unsolicited_confirmation",
+          "visible_text": "đơn ứng tuyển ... gửi qua VietnamWorks ngày 03/06",
+          "explanation": "Nếu người nhận không ứng tuyển vị trí này — đây là xác nhận giả. Người nhận có thể bị nhầm và điền thông tin vì lo mình đã quên đã ứng tuyển.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["samsung-vn-hiring.com", "tài khoản ngân hàng", "CCCD mặt trước và sau"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Xác nhận ứng tuyển giả để lấy CCCD và tài khoản ngân hàng!",
+        "summary": "Kể cả người không ứng tuyển cũng có thể bị lừa vì nghĩ 'có thể mình đã ứng tuyển mà không nhớ'. Yêu cầu tài khoản ngân hàng trong hồ sơ ứng tuyển là Red Flag tuyệt đối.",
+        "learning_point": "Không công ty nào yêu cầu tài khoản ngân hàng hay CCCD trong hồ sơ ứng tuyển ban đầu. Nhận email xác nhận ứng tuyển không rõ: kiểm tra trực tiếp trong tài khoản VietnamWorks/LinkedIn của bạn.",
+        "psychology_display": "Authority + Confusion",
+        "attack_type_display": "Fake Application Confirmation"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-006",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Fear + Authority",
+      "attack_type": "Background Check Phishing",
+      "learning_objective": "Nhận diện email kiểm tra lý lịch giả yêu cầu đăng nhập tài khoản mạng xã hội",
+      "email": {
+        "sender_name": "Sterling Volunteer Check — Vietnam",
+        "sender_email": "bgcheck@sterling-bgcheck-vn.com",
+        "recipient_email": "vo.thi.cam.ly@gmail.com",
+        "subject": "Yêu cầu kiểm tra lý lịch — Vị trí Finance Manager tại Unilever Vietnam",
+        "body": "Kính gửi Võ Thị Cẩm Ly,\n\nUnilever Vietnam đã yêu cầu Sterling tiến hành kiểm tra lý lịch (background check) cho ứng viên của họ. Để hoàn thành quy trình, bạn cần xác nhận danh tính qua một số kênh:\n\n1. Xác minh LinkedIn: đăng nhập và cấp quyền xem lịch sử công việc\n2. Xác minh Facebook: đăng nhập để xác nhận thông tin cá nhân\n3. Upload CCCD mặt trước/sau\n\nThông tin bảo mật tuyệt đối theo chuẩn ISO 27001.",
+        "cta_text": "Bắt đầu xác minh",
+        "cta_link": "https://sterling-bgcheck-vn.com/verify-now"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "bgcheck@sterling-bgcheck-vn.com",
+          "explanation": "Sterling Volunteers (công ty background check thật) dùng @sterlingbackcheck.com — 'sterling-bgcheck-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "social_media_login_request",
+          "visible_text": "đăng nhập LinkedIn ... đăng nhập Facebook",
+          "explanation": "Không có quy trình background check hợp pháp nào yêu cầu đăng nhập tài khoản mạng xã hội của ứng viên — đây là credential harvesting toàn diện.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "false_security_claim",
+          "visible_text": "theo chuẩn ISO 27001",
+          "explanation": "Dẫn chứng chứng chỉ bảo mật để tạo niềm tin giả — không thể xác minh ngay lập tức.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["sterling-bgcheck-vn.com", "đăng nhập LinkedIn/Facebook", "ISO 27001"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả background check để lấy thông tin đăng nhập mạng xã hội!",
+        "summary": "Background check hợp pháp xác minh bằng reference check (gọi điện sếp cũ) và kiểm tra hồ sơ công khai — không bao giờ yêu cầu đăng nhập tài khoản cá nhân.",
+        "learning_point": "Công ty tuyển dụng không yêu cầu đăng nhập tài khoản mạng xã hội của ứng viên. Background check thật được thực hiện qua quy trình có văn bản đồng ý riêng.",
+        "psychology_display": "Authority + Trust",
+        "attack_type_display": "Background Check Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-007",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Greed + Urgency",
+      "attack_type": "Advance Fee Recruitment Scam",
+      "learning_objective": "Nhận diện lừa đảo visa/chi phí tuyển dụng nước ngoài — yêu cầu nộp tiền trước để được nhận việc",
+      "email": {
+        "sender_name": "HR — Golden Gate International (Dubai)",
+        "sender_email": "hr@goldengateintl-dubai.com",
+        "recipient_email": "le.van.binh.an@hotmail.com",
+        "subject": "JOB OFFER: Hospitality Manager — Dubai — AED 15,000/tháng + Visa được tài trợ",
+        "body": "Dear Lê Văn Bình An,\n\nWe are pleased to offer you the position of Hospitality Manager at Golden Gate International Hotel, Dubai.\n\nSalary: AED 15,000/month (~105.000.000 VNĐ)\nBenefits: Accommodation, flights, medical\nVisa: Company-sponsored work visa\n\nTo proceed, please transfer the documentation and visa processing fee:\nFee: $350 USD\nAccount: Western Union to HR Manager (details attached)\n\nPlease transfer within 48 hours to secure your position. After payment, your visa paperwork will begin immediately.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "advance_fee",
+          "visible_text": "$350 USD visa processing fee — Western Union",
+          "explanation": "Yêu cầu nộp phí visa/giấy tờ trước khi nhận việc là Advance Fee Scam kinh điển — công ty hợp pháp tài trợ visa KHÔNG thu phí từ ứng viên.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "western_union_payment",
+          "visible_text": "Western Union to HR Manager",
+          "explanation": "Western Union không thể hoàn tiền và không truy vết người nhận — kênh thanh toán ưa thích của lừa đảo quốc tế.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "too_good_to_be_true",
+          "visible_text": "AED 15,000/tháng + Accommodation + Flights",
+          "explanation": "Gói lương và phúc lợi quá hấp dẫn (105 triệu/tháng + nhà + vé máy bay) tạo FOMO mạnh — người dùng sợ mất cơ hội nếu không nộp tiền ngay.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["$350 USD", "Western Union", "48 giờ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Advance Fee Scam tuyển dụng nước ngoài!",
+        "summary": "Lừa đảo tuyển dụng nước ngoài thu phí visa/giấy tờ trước là một trong những scam phổ biến nhất với người lao động Việt Nam muốn đi làm nước ngoài.",
+        "learning_point": "Công ty hợp pháp tài trợ visa KHÔNG thu phí từ ứng viên. Thanh toán qua Western Union/MoneyGram = lừa đảo. Kiểm tra công ty qua Đại sứ quán nước sở tại.",
+        "psychology_display": "Greed + FOMO",
+        "attack_type_display": "Advance Fee Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-008",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Recruitment Scams",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email từ chối ứng tuyển hợp lệ từ nhà tuyển dụng thật — không có yêu cầu thêm",
+      "email": {
+        "sender_name": "Talent Acquisition — Masan Group",
+        "sender_email": "talent@masan.com.vn",
+        "recipient_email": "nguyen.thi.bao.chau@gmail.com",
+        "subject": "Cảm ơn bạn đã ứng tuyển tại Masan Group",
+        "body": "Kính gửi Nguyễn Thị Bảo Châu,\n\nCảm ơn bạn đã quan tâm và ứng tuyển vị trí Marketing Executive tại Masan Group.\n\nSau khi xem xét hồ sơ của bạn, chúng tôi nhận thấy bạn có nền tảng tốt. Tuy nhiên, vị trí này đã được lấp đầy bởi ứng viên phù hợp hơn với yêu cầu cụ thể của dự án hiện tại.\n\nChúng tôi sẽ lưu hồ sơ của bạn trong 12 tháng để xem xét cho các cơ hội phù hợp trong tương lai.\n\nTrân trọng,\nĐội Talent Acquisition — Masan Group\ncareers.masan.com.vn",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email từ công ty lớn về ứng tuyển — có thể lo email giả",
+        "why_legitimate": "Domain @masan.com.vn chính thức. Không yêu cầu bất kỳ hành động nào. Không có link đáng ngờ. Nội dung là từ chối — không phải yêu cầu thông tin hay tiền. Chỉ thông báo thuần túy."
+      },
+      "feedback": {
+        "title": "Đây là email từ chối tuyển dụng hợp lệ!",
+        "summary": "Email từ chối từ @masan.com.vn, không yêu cầu hành động, không có link lạ — hoàn toàn hợp lệ.",
+        "learning_point": "Email từ chối hợp lệ: không yêu cầu thêm thông tin hay tiền, không có link đáng ngờ, chỉ thông báo quyết định.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-009",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Trust + Authority",
+      "attack_type": "Fake Internship with Data Harvesting",
+      "learning_objective": "Nhận diện lừa đảo tuyển dụng nhắm sinh viên — giả chương trình thực tập danh tiếng để lấy thông tin cá nhân toàn diện",
+      "email": {
+        "sender_name": "Internship Program — Deloitte Vietnam",
+        "sender_email": "internship@deloitte-vietnam-grad.com",
+        "recipient_email": "tran.minh.khang.2002@student.hust.edu.vn",
+        "subject": "Chúc mừng! Bạn được chọn vào vòng 2 Chương trình Thực tập Deloitte RISE 2026",
+        "body": "Kính gửi Trần Minh Khang,\n\nHội đồng tuyển chọn Deloitte Vietnam RISE Internship Program 2026 xin thông báo: bạn được chọn vào vòng 2 (top 15% trong 2.300 ứng viên).\n\nĐể hoàn thiện hồ sơ vòng 2, chúng tôi cần bổ sung thêm:\n• CCCD mặt trước và sau (bản scan rõ nét)\n• Hộ chiếu (nếu có)\n• Sổ hộ khẩu hoặc KT3\n• Tài khoản ngân hàng (để xử lý thù lao thực tập 5.000.000đ/tháng)\n• Thư giới thiệu từ giảng viên\n\nHạn nộp: 08/06/2026 — vòng 2 phỏng vấn ngày 12/06.",
+        "cta_text": "Nộp hồ sơ vòng 2",
+        "cta_link": "https://deloitte-vietnam-grad.com/round2-submission"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "internship@deloitte-vietnam-grad.com",
+          "explanation": "Deloitte Vietnam dùng @deloitte.com — 'deloitte-vietnam-grad.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "comprehensive_document_harvesting",
+          "visible_text": "CCCD + Hộ chiếu + Sổ hộ khẩu + Tài khoản ngân hàng",
+          "explanation": "Yêu cầu toàn bộ giấy tờ tùy thân (CCCD, hộ chiếu, hộ khẩu) + tài khoản ngân hàng chỉ để ứng tuyển thực tập — đây là thu thập dữ liệu cá nhân toàn diện để bán hoặc dùng cho fraud.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "vanity_bait",
+          "visible_text": "top 15% trong 2.300 ứng viên",
+          "explanation": "Thông tin 'top 15%' tạo cảm giác được chọn đặc biệt — sinh viên tự hào và ít cảnh giác hơn khi nghe mình được chọn trong số đông.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["deloitte-vietnam-grad.com", "CCCD + Hộ chiếu + Hộ khẩu", "top 15%"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Deloitte để lấy toàn bộ giấy tờ tùy thân của sinh viên!",
+        "summary": "Sinh viên là mục tiêu dễ bị nhắm vì: háo hức với thực tập danh tiếng, ít kinh nghiệm nhận biết lừa đảo, và chưa biết quy trình tuyển dụng chuẩn.",
+        "learning_point": "Deloitte và Big 4 KHÔNG yêu cầu CCCD, hộ chiếu, hộ khẩu trong vòng ứng tuyển. Kiểm tra chương trình thực tập thật tại careers.deloitte.com. Hộ chiếu/hộ khẩu chỉ cần khi ký hợp đồng chính thức.",
+        "psychology_display": "Trust + Vanity",
+        "attack_type_display": "Internship Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-010",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Trust + Greed",
+      "attack_type": "Money Mule Recruitment",
+      "learning_objective": "Nhận diện lừa tuyển dụng 'tài chính' để biến ứng viên thành money mule (người rửa tiền không biết)",
+      "email": {
+        "sender_name": "Finance Operations — RemitPay Global",
+        "sender_email": "recruit@remitpay-global.net",
+        "recipient_email": "phuong.nguyen.1998@gmail.com",
+        "subject": "Tuyển: Finance Operation Agent — Làm tại nhà — 15.000.000đ/tháng + Hoa hồng",
+        "body": "Kính gửi Phương Nguyễn,\n\nRemitPay Global tuyển Finance Operation Agent hỗ trợ xử lý giao dịch tài chính quốc tế cho khách hàng tại Việt Nam.\n\nMô tả công việc:\n• Nhận tiền chuyển khoản từ khách hàng vào tài khoản cá nhân của bạn\n• Chuyển lại cho chúng tôi qua crypto hoặc Western Union (giữ lại 8-10% hoa hồng)\n• Làm 2-3 giờ/ngày, hoàn toàn tại nhà\n\nYêu cầu: Có tài khoản ngân hàng Việt Nam, smartphone\n\nGiao dịch đầu tiên thường là 20-50 triệu VND. Thu nhập tháng đầu dự kiến 15-20 triệu.",
+        "cta_text": "Ứng tuyển ngay",
+        "cta_link": "http://remitpay-global.net/apply"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "money_mule_indicators",
+          "visible_text": "Nhận tiền vào tài khoản cá nhân ... chuyển lại qua crypto/Western Union",
+          "explanation": "Đây là mô tả Money Mule 100% — nhận tiền (từ nạn nhân lừa đảo khác) rồi chuyển đi. Người làm việc này có thể bị truy cứu hình sự về rửa tiền dù không biết.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "high_commission_no_skill",
+          "visible_text": "giữ lại 8-10% hoa hồng",
+          "explanation": "Hoa hồng 8-10% cho việc chuyển tiền không cần kỹ năng là bất khả thi trong ngành tài chính hợp pháp — đây là payment để che giấu nguồn gốc tiền bất hợp pháp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "crypto_transfer_request",
+          "visible_text": "chuyển lại qua crypto hoặc Western Union",
+          "explanation": "Crypto và Western Union không thể hoàn tiền và khó truy vết — kênh ưa thích để rửa tiền.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["nhận tiền vào TK cá nhân", "chuyển qua crypto/Western Union", "8-10% hoa hồng"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Money Mule Scam — bạn có thể bị truy cứu hình sự!",
+        "summary": "Money Mule là người (thường không biết) nhận và chuyển tiền lừa đảo cho kẻ tấn công. Tại Việt Nam, người làm Money Mule có thể bị truy cứu về tội rửa tiền (Điều 324 BLHS) dù nghĩ đây là 'việc làm bình thường'.",
+        "learning_point": "Không công việc hợp pháp nào trả bạn để nhận tiền người khác vào TK cá nhân rồi chuyển đi. Đây là Money Mule — bạn đang tiếp tay rửa tiền lừa đảo và có thể bị bắt.",
+        "psychology_display": "Greed + Naivety",
+        "attack_type_display": "Money Mule Recruitment"
+      }
+    },
+    {
+      "simulation_id": "P3-RS-011",
+      "batch": "13",
+      "phase": 3,
+      "lesson": "3.5",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Recruitment Scams",
+      "psychology": "Authority + Fear",
+      "attack_type": "Pig Butchering Recruitment Setup",
+      "learning_objective": "Nhận diện bước đầu của Pig Butchering scam qua chiêu tuyển dụng — xây dựng mối quan hệ trước khi lừa đầu tư",
+      "email": {
+        "sender_name": "Jenny Nguyen — Relationship Manager",
+        "sender_email": "jenny.nguyen@asiaprime-capital.com",
+        "recipient_email": "dao.van.quang.minh@gmail.com",
+        "subject": "Cơ hội tuyển dụng: Financial Advisor tại AsiaPrime Capital (Remote) — Thu nhập không giới hạn",
+        "body": "Kính gửi anh Đào Văn Quang Minh,\n\nTôi là Jenny, Relationship Manager tại AsiaPrime Capital — công ty quản lý tài sản với văn phòng tại Singapore và Hong Kong.\n\nChúng tôi đang mở rộng mạng lưới tư vấn tài chính tại Việt Nam. Vị trí không yêu cầu kinh nghiệm — chúng tôi sẽ đào tạo từ đầu về đầu tư crypto và forex.\n\nThu nhập: Hoa hồng 15-20% trên lợi nhuận của khách hàng — không giới hạn.\n\nAnh có muốn tìm hiểu thêm không? Chúng ta có thể chat qua WhatsApp để tôi giải thích chi tiết hơn.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "pig_butchering_setup",
+          "visible_text": "đào tạo về đầu tư crypto và forex ... chat qua WhatsApp",
+          "explanation": "Tuyển dụng liên quan đến crypto/forex + muốn chuyển sang WhatsApp riêng là bước đầu của Pig Butchering (giết lợn) — xây dựng quan hệ riêng tư trước khi dụ đầu tư vào sàn giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unrealistic_commission",
+          "visible_text": "hoa hồng 15-20% trên lợi nhuận — không giới hạn",
+          "explanation": "Hoa hồng 15-20% trên lợi nhuận khách hàng không tồn tại trong ngành tài chính hợp pháp — đây là mồi nhử để người dùng tham gia và sau đó đầu tư vào sàn giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "offshore_unregulated",
+          "visible_text": "Singapore và Hong Kong",
+          "explanation": "Công ty offshore (Singapore, HK) không đăng ký tại Việt Nam và không chịu quản lý UBCKNN — không thể khiếu nại khi xảy ra tranh chấp.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["crypto và forex", "WhatsApp", "15-20% hoa hồng không giới hạn"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Pig Butchering — lừa đảo đầu tư bắt đầu từ tuyển dụng!",
+        "summary": "Pig Butchering là lừa đảo dài hơi: bắt đầu bằng 'tuyển dụng' hoặc 'tình cờ kết bạn', xây dựng niềm tin qua WhatsApp/Telegram, rồi giới thiệu sàn đầu tư giả. Nạn nhân thường mất toàn bộ tiết kiệm.",
+        "learning_point": "Cơ hội tuyển dụng liên quan đến crypto/forex + muốn chat riêng qua WhatsApp = Pig Butchering setup. Không chuyển sang kênh cá nhân với người tuyển dụng lạ qua email.",
+        "psychology_display": "Greed + Trust-building",
+        "attack_type_display": "Pig Butchering Setup"
+      }
+    }
+  ]
+}

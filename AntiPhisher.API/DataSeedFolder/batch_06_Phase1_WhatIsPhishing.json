@@ -1,0 +1,1698 @@
+{
+  "batch_id": "06",
+  "batch_name": "Phase 1 — What is Phishing?",
+  "phase": 1,
+  "lesson": "1.1",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P1-WP-001",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Urgency",
+      "attack_type": "Banking Scam",
+      "learning_objective": "Nhận diện email phishing ngân hàng cơ bản — domain giả và deadline gấp",
+      "email": {
+        "sender_name": "Agribank Thông Báo",
+        "sender_email": "alert@agribank-online-vn.com",
+        "recipient_email": "pham.van.duc@greenfood.com.vn",
+        "subject": "Tài khoản bị tạm khóa — Mở khóa ngay trong 2 giờ",
+        "body": "Kính gửi Quý Khách hàng,\n\nTài khoản Agribank của bạn đã bị tạm khóa do phát hiện hoạt động đăng nhập bất thường từ thiết bị lạ.\n\nVui lòng xác minh danh tính trong vòng 2 giờ để mở khóa tài khoản. Sau thời hạn trên, tài khoản sẽ bị đình chỉ và bạn cần đến chi nhánh để xử lý.\n\nNhấp vào nút bên dưới để xác minh ngay.",
+        "cta_text": "Xác minh ngay",
+        "cta_link": "http://agribank-online-vn.com/unlock"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@agribank-online-vn.com",
+          "explanation": "Domain 'agribank-online-vn.com' là giả. Agribank thật dùng @agribank.com.vn — không có domain '-online-vn.com' riêng biệt.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "trong vòng 2 giờ",
+          "explanation": "Deadline 2 giờ là chiến thuật Urgency — ngân hàng thật không khóa tài khoản chỉ sau 2 giờ qua email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "bị đình chỉ",
+          "explanation": "Đe dọa đình chỉ tài khoản tạo áp lực tâm lý để người dùng hành động nhanh mà không kiểm tra.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["tạm khóa", "trong vòng 2 giờ", "agribank-online-vn.com"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả danh Agribank dùng domain '-online-vn.com' và deadline 2 giờ — đây là cấu trúc phishing ngân hàng cơ bản nhất.",
+        "learning_point": "Phishing là email giả mạo tổ chức uy tín để đánh cắp thông tin. Dấu hiệu đầu tiên cần kiểm tra: domain người gửi có đúng không?",
+        "psychology_display": "Urgency",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-002",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Fear",
+      "attack_type": "Account Takeover",
+      "learning_objective": "Nhận diện phishing giả mạo dịch vụ email — dấu hiệu domain không khớp",
+      "email": {
+        "sender_name": "Gmail Security",
+        "sender_email": "no-reply@gmail-security-center.net",
+        "recipient_email": "le.thi.hoa@vietlogistics.vn",
+        "subject": "Cảnh báo: Ai đó đăng nhập tài khoản Gmail của bạn",
+        "body": "Xin chào Le Thi Hoa,\n\nChúng tôi phát hiện đăng nhập vào tài khoản Gmail của bạn từ địa điểm lạ:\n\nThiết bị: Windows PC\nVị trí: Hà Nội, Việt Nam\nThời gian: 07:14 hôm nay\n\nNếu đây không phải bạn, tài khoản của bạn có thể đã bị xâm phạm. Bảo mật tài khoản ngay lập tức.",
+        "cta_text": "Bảo mật tài khoản",
+        "cta_link": "http://gmail-security-center.net/secure"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "no-reply@gmail-security-center.net",
+          "explanation": "Google không gửi email từ 'gmail-security-center.net'. Email bảo mật Google thật đến từ @google.com hoặc @accounts.google.com.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "tài khoản của bạn có thể đã bị xâm phạm",
+          "explanation": "Thông báo 'bị xâm phạm' gây hoảng loạn để người dùng click link ngay mà không kiểm tra.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_link",
+          "visible_text": "http://gmail-security-center.net/secure",
+          "explanation": "Link dùng HTTP (không HTTPS) và domain không phải google.com.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["gmail-security-center.net", "đã bị xâm phạm", "Bảo mật ngay"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả Google gửi từ domain 'gmail-security-center.net' — không liên quan đến Google. Kẻ tấn công muốn bạn nhập mật khẩu vào trang giả.",
+        "learning_point": "Phishing thường giả mạo dịch vụ bạn đang dùng hàng ngày. Luôn kiểm tra domain người gửi — không chỉ tên hiển thị.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Account Takeover"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-003",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Curiosity",
+      "attack_type": "Prize Scam",
+      "learning_objective": "Nhận diện phishing dạng quà thưởng — chiêu lừa phổ biến nhất với người dùng mới",
+      "email": {
+        "sender_name": "Lazada Vietnam Rewards",
+        "sender_email": "rewards@lazada-vn-prize.com",
+        "recipient_email": "tran.quoc.bao@sunhouse.com.vn",
+        "subject": "Chúc mừng! Bạn trúng voucher 2.000.000đ từ Lazada",
+        "body": "Xin chào,\n\nChúc mừng bạn là khách hàng may mắn thứ 10.000 của Lazada Vietnam tháng 6/2026!\n\nPhần thưởng của bạn: Voucher mua sắm 2.000.000đ\nHạn nhận thưởng: 24 giờ kể từ email này\n\nNhấp vào đây để nhận voucher. Bạn cần đăng nhập tài khoản Lazada để xác nhận.",
+        "cta_text": "Nhận voucher ngay",
+        "cta_link": "http://lazada-vn-prize.com/claim-voucher"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "rewards@lazada-vn-prize.com",
+          "explanation": "'lazada-vn-prize.com' là domain giả. Lazada Việt Nam dùng @lazada.vn — không có domain '-prize.com' riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "too_good_to_be_true",
+          "visible_text": "voucher 2.000.000đ",
+          "explanation": "Phần thưởng lớn không rõ lý do trúng thưởng là dấu hiệu lừa đảo kinh điển.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "24 giờ kể từ email này",
+          "explanation": "Deadline 24 giờ tạo FOMO — sợ mất cơ hội nếu không hành động ngay.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["lazada-vn-prize.com", "voucher 2.000.000đ", "24 giờ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả Lazada dùng Curiosity (voucher hấp dẫn) + Urgency (24 giờ) để dụ bạn đăng nhập vào trang giả và đánh cắp mật khẩu.",
+        "learning_point": "Phần thưởng bất ngờ không rõ lý do = dấu hiệu phishing. Kiểm tra trực tiếp trong app Lazada — nếu không thấy thông báo tương tự, email là giả.",
+        "psychology_display": "Curiosity + Urgency",
+        "attack_type_display": "Prize Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-004",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Phishing Basics",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email thông báo hợp lệ từ dịch vụ thật — không phải mọi email có link đều là phishing",
+      "email": {
+        "sender_name": "Grab Vietnam",
+        "sender_email": "no-reply@grab.com",
+        "recipient_email": "nguyen.minh.tu@abctech.com.vn",
+        "subject": "Hóa đơn chuyến đi của bạn — 45.000đ",
+        "body": "Xin chào Nguyễn Minh Tú,\n\nCảm ơn bạn đã sử dụng GrabCar hôm nay.\n\nChuyến đi: Quận 1 → Sân bay Tân Sơn Nhất\nTài xế: Nguyễn Văn A (⭐ 4.9)\nThời gian: 08:32 – 09:15, 05/06/2026\nTổng cước: 45.000đ\nThanh toán: Momo ****7823\n\nXem chi tiết chuyến đi hoặc liên hệ hỗ trợ tại app Grab.\n\nEmail này được gửi tự động, vui lòng không trả lời.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email từ dịch vụ app có thông tin giao dịch — người mới có thể nghi ngờ",
+        "why_legitimate": "Domain @grab.com chính thức. Có tên người nhận cụ thể. Thông tin chuyến đi khớp thực tế. Không yêu cầu click link hay cung cấp thông tin. Không có CTA đáng ngờ."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ!",
+        "summary": "Email xác nhận chuyến Grab từ domain @grab.com chính thức, có đầy đủ thông tin chuyến đi, không có link đáng ngờ hay yêu cầu hành động.",
+        "learning_point": "Không phải mọi email từ app/dịch vụ đều là phishing. Email hợp lệ thường: dùng tên bạn, có thông tin cụ thể khớp thực tế, không có CTA áp lực.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-005",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority",
+      "attack_type": "Government Impersonation",
+      "learning_objective": "Nhận diện phishing giả danh cơ quan nhà nước — domain .gov.vn bị giả mạo tinh vi",
+      "email": {
+        "sender_name": "Bộ Công an — Cục An ninh mạng",
+        "sender_email": "canhbao@bocongan-anninh.net",
+        "recipient_email": "vo.thi.mai@hoabinh-edu.vn",
+        "subject": "Cảnh báo: Tài khoản mạng xã hội của bạn liên quan điều tra",
+        "body": "Kính gửi Công dân Võ Thị Mai,\n\nCục An ninh mạng và Phòng, Chống Tội phạm Sử dụng Công nghệ cao (A05) — Bộ Công an đang điều tra một số tài khoản mạng xã hội liên quan đến hoạt động phát tán thông tin sai lệch.\n\nTài khoản Facebook/Zalo đăng ký với số điện thoại của bạn có trong danh sách cần xác minh. Vui lòng hoàn thành khai báo trực tuyến trong 48 giờ để tránh bị triệu tập trực tiếp.\n\nTruy cập cổng khai báo để hoàn thành thủ tục.",
+        "cta_text": "Khai báo trực tuyến",
+        "cta_link": "http://bocongan-anninh.net/khai-bao"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "canhbao@bocongan-anninh.net",
+          "explanation": "Bộ Công an dùng domain @mps.gov.vn — 'bocongan-anninh.net' là domain tư nhân giả mạo, dùng .net thay vì .gov.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "A05 — Bộ Công an",
+          "explanation": "Giả mạo cơ quan điều tra để tạo nỗi sợ pháp lý — người dùng thường hoảng và làm theo ngay khi nghe đến 'công an điều tra'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "tránh bị triệu tập trực tiếp",
+          "explanation": "Đe dọa 'triệu tập' là Fear tột độ — thiết kế để người dùng không dám đặt câu hỏi mà làm ngay.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["A05 — Bộ Công an", "bocongan-anninh.net", "triệu tập trực tiếp"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing nguy hiểm!",
+        "summary": "Giả danh Bộ Công an là chiêu lừa đảo tinh vi nhất — khai thác Authority + Fear tối đa. Dấu hiệu rõ: domain .net thay vì .gov.vn.",
+        "learning_point": "Cơ quan nhà nước Việt Nam chỉ dùng domain .gov.vn. Công an không điều tra qua link email. Nhận email dạng này: gọi hotline 113 hoặc vào trực tiếp trụ sở để xác minh.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Government Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-006",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Banking Scam",
+      "learning_objective": "Nhận diện email giả ngân hàng với domain typosquatting — chênh lệch tinh vi khó phát hiện",
+      "email": {
+        "sender_name": "BIDV Internet Banking",
+        "sender_email": "security@bidv-internetbanking.com",
+        "recipient_email": "hoang.van.long@vinaconex.com.vn",
+        "subject": "Phát hiện giao dịch đáng ngờ 32.000.000đ — Xác nhận ngay",
+        "body": "Kính gửi Hoàng Văn Long,\n\nHệ thống BIDV Smart Banking ghi nhận giao dịch chuyển tiền 32.000.000đ lúc 22:47 tối qua đến tài khoản tại ngân hàng nước ngoài.\n\nNếu đây không phải bạn, hãy xác nhận và đóng băng tài khoản ngay lập tức để ngăn thiệt hại thêm.\n\nGiao dịch sẽ được xử lý hoàn toàn sau 30 phút nếu không có phản hồi.",
+        "cta_text": "Đóng băng tài khoản ngay",
+        "cta_link": "http://bidv-internetbanking.com/freeze-account"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@bidv-internetbanking.com",
+          "explanation": "BIDV dùng @bidv.com.vn — 'bidv-internetbanking.com' là domain riêng giả mạo, thêm '-internetbanking' để trông có vẻ chính thống.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "32.000.000đ lúc 22:47 tối qua",
+          "explanation": "Số tiền lớn vào ban đêm tạo nỗi sợ mạnh — người dùng hoảng loạn và click link mà không kiểm tra app thật.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "sau 30 phút nếu không có phản hồi",
+          "explanation": "Deadline 30 phút cực ngắn — thiết kế để người dùng không còn thời gian gọi tổng đài hay mở app kiểm tra.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["bidv-internetbanking.com", "32.000.000đ", "30 phút"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Domain 'bidv-internetbanking.com' trông có vẻ liên quan đến BIDV nhưng hoàn toàn là tên miền giả. Kết hợp số tiền lớn + deadline 30 phút tạo áp lực tối đa.",
+        "learning_point": "Khi nhận thông báo giao dịch đáng ngờ: mở app BIDV Smart Banking kiểm tra lịch sử. Nếu không thấy giao dịch đó — email là giả.",
+        "psychology_display": "Urgency + Fear",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-007",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Curiosity + Authority",
+      "attack_type": "Credential Harvesting",
+      "learning_objective": "Nhận diện phishing giả mạo Microsoft đánh vào tài khoản công việc",
+      "email": {
+        "sender_name": "Microsoft Account Team",
+        "sender_email": "account-alert@microsoft-account-vn.com",
+        "recipient_email": "dinh.thi.lan@pharma-viet.com",
+        "subject": "Xác nhận đăng nhập bất thường vào Microsoft 365 của bạn",
+        "body": "Kính gửi Đinh Thị Lan,\n\nMicrosoft phát hiện đăng nhập vào tài khoản Microsoft 365 của tổ chức bạn từ địa điểm chưa từng sử dụng:\n\nThiết bị: Android — Samsung\nIP: 103.72.xxx.xxx (Malaysia)\nThời gian: 11:03 hôm nay\n\nNếu không phải bạn, tài khoản tổ chức của bạn có nguy cơ bị xâm phạm dữ liệu. Xem lại hoạt động đăng nhập và bảo mật tài khoản.",
+        "cta_text": "Xem lại hoạt động",
+        "cta_link": "http://microsoft-account-vn.com/activity-review"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "account-alert@microsoft-account-vn.com",
+          "explanation": "Microsoft gửi email bảo mật từ @microsoft.com hoặc @accountprotection.microsoft.com — không có domain 'microsoft-account-vn.com'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "Malaysia",
+          "explanation": "Đăng nhập từ nước ngoài (Malaysia) tạo cảm giác tài khoản đang bị tấn công thật — rất thuyết phục với người dùng công ty.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_link",
+          "visible_text": "http://microsoft-account-vn.com/activity-review",
+          "explanation": "Domain không phải microsoft.com và dùng HTTP thay HTTPS.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["microsoft-account-vn.com", "Malaysia", "tài khoản tổ chức"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email giả Microsoft nhắm vào tài khoản công việc — nguy hiểm hơn email cá nhân vì có thể ảnh hưởng toàn bộ tổ chức.",
+        "learning_point": "Để kiểm tra hoạt động đăng nhập Microsoft 365: vào mysignins.microsoft.com — gõ tay, không click link email.",
+        "psychology_display": "Curiosity + Fear",
+        "attack_type_display": "Credential Harvesting"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-008",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "Phishing Basics",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email xác nhận đặt hàng hợp lệ — có link nhưng không đáng ngờ",
+      "email": {
+        "sender_name": "Tiki",
+        "sender_email": "order-confirm@tiki.vn",
+        "recipient_email": "bui.quang.hieu@meditech.com.vn",
+        "subject": "Xác nhận đơn hàng #TK2026060512345 — Dự kiến giao 07/06",
+        "body": "Xin chào Bùi Quang Hiếu,\n\nĐơn hàng của bạn đã được xác nhận và đang được xử lý.\n\nMã đơn: #TK2026060512345\nSản phẩm: Logitech MX Master 3S (1 chiếc)\nGiá: 1.890.000đ\nĐịa chỉ giao: 45 Lý Tự Trọng, Q.1, TP.HCM\nDự kiến giao hàng: 07/06/2026\n\nBạn có thể theo dõi đơn hàng tại app Tiki.\nNếu cần hỗ trợ: hotline 1800 6035 (miễn phí).\n\nCảm ơn bạn đã mua sắm tại Tiki!",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email xác nhận đơn hàng có thông tin chi tiết — người mới có thể nghi ngờ nếu không nhớ đặt hàng",
+        "why_legitimate": "Domain @tiki.vn chính thức. Có tên người nhận và mã đơn hàng cụ thể. Không yêu cầu click link hay nhập thông tin. Hotline 1800 6035 có thể xác minh. Không có deadline hay áp lực."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ!",
+        "summary": "Email xác nhận đơn Tiki từ @tiki.vn chính thức, có đầy đủ thông tin đơn hàng và không có yêu cầu hành động đáng ngờ.",
+        "learning_point": "Email hợp lệ từ sàn TMĐT luôn: dùng tên bạn, có mã đơn hàng cụ thể, không yêu cầu đăng nhập qua link, hướng dẫn dùng app/hotline.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-009",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Spear Phishing",
+      "learning_objective": "Nhận diện spear phishing — email được cá nhân hóa với tên thật và thông tin công ty, khó nhận biết hơn phishing đại trà",
+      "email": {
+        "sender_name": "Phòng Tài chính — Tập đoàn Masan",
+        "sender_email": "finance.alert@masan-group-finance.com",
+        "recipient_email": "nguyen.thi.thu@masan.com.vn",
+        "subject": "Nguyễn Thị Thu — Xác nhận thông tin tài khoản lương tháng 6",
+        "body": "Kính gửi chị Nguyễn Thị Thu,\n\nPhòng Tài chính Masan Group thực hiện cập nhật hệ thống thanh toán lương định kỳ tháng 6/2026. Chúng tôi cần chị xác nhận lại thông tin tài khoản ngân hàng để đảm bảo lương được chuyển đúng hạn ngày 15/06.\n\nVui lòng xác nhận hoặc cập nhật thông tin tài khoản qua cổng HR trước ngày 10/06/2026.\n\nNếu thông tin không được xác nhận, lương tháng 6 sẽ bị tạm giữ chờ xử lý thủ công.",
+        "cta_text": "Xác nhận tài khoản lương",
+        "cta_link": "http://masan-group-finance.com/payroll-confirm"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "finance.alert@masan-group-finance.com",
+          "explanation": "'masan-group-finance.com' là domain ngoài — email nội bộ Masan thật đến từ @masan.com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "xác nhận lại thông tin tài khoản ngân hàng",
+          "explanation": "Phòng Tài chính nội bộ không yêu cầu xác nhận thông tin ngân hàng qua link email — đây là credential/financial harvesting.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "lương tháng 6 sẽ bị tạm giữ",
+          "explanation": "Đe dọa trễ lương tạo áp lực tài chính trực tiếp — rất hiệu quả với nhân viên.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["masan-group-finance.com", "xác nhận tài khoản ngân hàng", "lương tháng 6 bị tạm giữ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là spear phishing nhắm vào nhân viên!",
+        "summary": "Email này khó hơn phishing đại trà vì: dùng tên thật, đề cập lương cụ thể, và lý do nghe hợp lý. Nhưng domain người gửi không phải nội bộ công ty.",
+        "learning_point": "Spear phishing là phishing được cá nhân hóa — nguy hiểm hơn vì trông thật hơn. Quy tắc không thay đổi: email nội bộ phải từ domain công ty. Gọi thẳng phòng Tài chính để xác nhận.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Spear Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-010",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority",
+      "attack_type": "Clone Phishing",
+      "learning_objective": "Nhận diện clone phishing — email sao chép y chang email hợp lệ cũ, chỉ thay link",
+      "email": {
+        "sender_name": "DocuSign",
+        "sender_email": "dse@docusign-esignature.net",
+        "recipient_email": "phuong.thi.nga@cienco4.com.vn",
+        "subject": "Reminder: Hợp đồng dịch vụ Q3/2026 cần ký điện tử — Hạn chót hôm nay",
+        "body": "Kính gửi Phương Thị Nga,\n\nĐây là nhắc nhở cuối cùng: Tài liệu 'Hợp đồng dịch vụ IT Q3/2026' cần chữ ký điện tử của bạn trước 17:00 hôm nay.\n\nNgười gửi: Nguyễn Hữu Thắng — Giám đốc IT\nTài liệu: Service Agreement Q3-2026.pdf\nHết hạn: 05/06/2026 17:00\n\nVui lòng xem xét và ký tài liệu.",
+        "cta_text": "Xem và ký tài liệu",
+        "cta_link": "http://docusign-esignature.net/sign/q3-contract"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "dse@docusign-esignature.net",
+          "explanation": "DocuSign thật gửi từ @docusign.com hoặc @docusign.net — 'docusign-esignature.net' là domain giả, thêm '-esignature' để đánh lừa.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "Reminder: ... Hạn chót hôm nay",
+          "explanation": "Nhắc nhở 'cuối cùng' tạo áp lực — người dùng quen nhận DocuSign reminder nên ít cảnh giác hơn với email dạng này.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_link",
+          "visible_text": "http://docusign-esignature.net/sign/q3-contract",
+          "explanation": "Link dùng HTTP và domain giả — DocuSign thật dùng HTTPS và app.docusign.com.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["docusign-esignature.net", "Hạn chót hôm nay", "Reminder cuối cùng"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là clone phishing giả DocuSign!",
+        "summary": "Clone phishing sao chép format email DocuSign thật — rất khó phân biệt nếu bạn đang thật sự chờ ký hợp đồng. Điểm duy nhất lộ: domain người gửi.",
+        "learning_point": "DocuSign và các dịch vụ ký điện tử bị giả mạo rất nhiều. Luôn kiểm tra domain người gửi và truy cập thẳng app.docusign.com để xem tài liệu thật.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Clone Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-011",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Trust + Authority",
+      "attack_type": "Multi-stage Phishing",
+      "learning_objective": "Nhận diện phishing nhiều bước — email đầu không có link, chỉ tạo niềm tin; link xuất hiện ở email sau",
+      "email": {
+        "sender_name": "Vũ Thanh Tùng — KPMG Vietnam",
+        "sender_email": "vu.thanh.tung@kpmg-advisory-vn.com",
+        "recipient_email": "tran.ngoc.anh@hcm-realty.com.vn",
+        "subject": "Giới thiệu: Báo cáo khảo sát thị trường bất động sản Q2/2026",
+        "body": "Kính gửi chị Trần Ngọc Anh,\n\nTôi là Vũ Thanh Tùng, chuyên viên tư vấn tại KPMG Vietnam. Chúng tôi vừa hoàn thành báo cáo khảo sát thị trường BĐS TP.HCM Q2/2026 — dữ liệu từ 450 giao dịch thực tế.\n\nBáo cáo bao gồm:\n• Biến động giá 12 quận trọng điểm\n• Phân tích thanh khoản phân khúc trung cao\n• Dự báo Q3/2026\n\nChị có muốn nhận bản PDF báo cáo đầy đủ không? Tôi sẽ gửi link tải trong email tiếp theo sau khi chị xác nhận.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "vu.thanh.tung@kpmg-advisory-vn.com",
+          "explanation": "KPMG Vietnam dùng @kpmg.com.vn — 'kpmg-advisory-vn.com' là domain giả mạo, thêm '-advisory-vn' để trông như nhánh tư vấn riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unsolicited_contact",
+          "visible_text": "Giới thiệu:",
+          "explanation": "Email lạnh từ người không quen biết chủ động liên hệ và hứa gửi link sau — đây là bước đầu của multi-stage phishing.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "bait_content",
+          "visible_text": "link tải trong email tiếp theo",
+          "explanation": "Email này không có link độc hại — nhưng 'email tiếp theo' mới chứa link thật. Bước 1 chỉ để xây dựng niềm tin.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["kpmg-advisory-vn.com", "email tiếp theo", "link tải"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là bước đầu của multi-stage phishing!",
+        "summary": "Email này không có link độc hại — mục tiêu là tạo niềm tin và khiến bạn mong chờ email tiếp theo (có link độc hại). Kẻ tấn công hiểu rằng bạn ít cảnh giác hơn với email từ 'người đã liên hệ trước'.",
+        "learning_point": "Không phải phishing nào cũng có link ngay. Email lạnh từ người không quen, giới thiệu tài liệu giá trị và hứa gửi link sau — là dấu hiệu multi-stage phishing.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "Multi-stage Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-012",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Fear",
+      "attack_type": "Utility Bill Scam",
+      "learning_objective": "Nhận diện phishing giả công ty điện/nước đe dọa cắt dịch vụ",
+      "email": {
+        "sender_name": "EVN TP.HCM — Thông báo",
+        "sender_email": "thongbao@evnhcmc-payment.com",
+        "recipient_email": "le.thi.bich.van@gmail.com",
+        "subject": "KHẨN: Hóa đơn điện chưa thanh toán — Nguy cơ cắt điện 07/06",
+        "body": "Kính gửi Khách hàng,\n\nTài khoản điện mã KH-0823456 tại địa chỉ của bạn có hóa đơn tháng 5/2026 chưa thanh toán: 1.234.000đ.\n\nNếu không thanh toán trước 17:00 ngày 07/06/2026, EVN sẽ tiến hành cắt điện theo quy định.\n\nThanh toán ngay qua cổng điện tử để tránh gián đoạn.",
+        "cta_text": "Thanh toán hóa đơn điện",
+        "cta_link": "http://evnhcmc-payment.com/pay-bill"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@evnhcmc-payment.com",
+          "explanation": "EVN TP.HCM dùng @evnhcmc.com.vn — 'evnhcmc-payment.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "cắt điện 07/06",
+          "explanation": "Đe dọa cắt điện cùng ngày tạo áp lực phải hành động ngay không kiểm tra.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "generic_greeting",
+          "visible_text": "Kính gửi Khách hàng",
+          "explanation": "EVN biết tên bạn — thông báo thật luôn có tên đầy đủ và mã khách hàng chính xác.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "evnhcmc-payment.com",
+        "cắt điện 07/06",
+        "Kính gửi Khách hàng"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả EVN đe dọa cắt điện!",
+        "summary": "Domain 'evnhcmc-payment.com' không phải EVN thật. EVN gửi thông báo qua @evnhcmc.com.vn và app EVNHCMC.",
+        "learning_point": "Kiểm tra hóa đơn điện qua app EVNHCMC hoặc cskh.evnhcmc.com.vn — không qua link email. EVN thật gọi điện trực tiếp trước khi cắt điện.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Utility Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-013",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Curiosity",
+      "attack_type": "Package Delivery Scam",
+      "learning_objective": "Nhận diện phishing giả dịch vụ bưu kiện thông báo kiện hàng bị giữ",
+      "email": {
+        "sender_name": "Vietnam Post — Thông báo bưu kiện",
+        "sender_email": "notify@vnpost-tracking-vn.com",
+        "recipient_email": "hoang.duc.thinh@gmail.com",
+        "subject": "Kiện hàng chờ nhận: Mã VN123456789VN — Xác nhận địa chỉ giao",
+        "body": "Kính gửi Hoàng Đức Thịnh,\n\nBưu kiện mã VN123456789VN đang chờ xác nhận địa chỉ giao. Bưu kiện sẽ bị trả lại người gửi nếu không có xác nhận trong 48 giờ.\n\nPhí giữ kiện: 25.000đ/ngày sau thời hạn.\n\nXác nhận địa chỉ và thanh toán phí giao lần 2 nếu cần.",
+        "cta_text": "Xác nhận địa chỉ giao hàng",
+        "cta_link": "http://vnpost-tracking-vn.com/confirm-address"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notify@vnpost-tracking-vn.com",
+          "explanation": "Vietnam Post dùng @vnpost.vn — 'vnpost-tracking-vn.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_request",
+          "visible_text": "phí giữ kiện 25.000đ/ngày",
+          "explanation": "Yêu cầu thanh toán phí nhỏ qua link email — thường dùng để lấy thông tin thẻ tín dụng.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "vnpost-tracking-vn.com",
+        "25.000đ/ngày",
+        "48 giờ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Vietnam Post để lấy thông tin thanh toán!",
+        "summary": "Phishing giao hàng rất phổ biến vì ai cũng mua hàng online. Theo dõi bưu kiện thật tại vnpost.vn — không qua link email.",
+        "learning_point": "Vietnam Post và các dịch vụ giao hàng không yêu cầu thanh toán phí giữ kiện qua link email. Tra cứu mã vận đơn trực tiếp tại website chính thức.",
+        "psychology_display": "Curiosity + Urgency",
+        "attack_type_display": "Delivery Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-014",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority",
+      "attack_type": "Social Insurance Scam",
+      "learning_objective": "Nhận diện phishing giả Bảo hiểm Xã hội Việt Nam",
+      "email": {
+        "sender_name": "Bảo hiểm Xã hội Việt Nam",
+        "sender_email": "thongbao@bhxh-vietnam-portal.com",
+        "recipient_email": "nguyen.van.tung@viettel.com.vn",
+        "subject": "Thông báo: Sổ BHXH của bạn sắp hết hiệu lực — Gia hạn ngay",
+        "body": "Kính gửi Nguyễn Văn Tùng,\n\nSổ Bảo hiểm Xã hội mã số 1800234567 của bạn sẽ hết hiệu lực vào ngày 30/06/2026. Vui lòng cập nhật thông tin và gia hạn qua cổng điện tử trước thời hạn.\n\nSau thời hạn, bạn sẽ không được hưởng quyền lợi BHXH, BHYT.",
+        "cta_text": "Gia hạn BHXH ngay",
+        "cta_link": "http://bhxh-vietnam-portal.com/renew"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@bhxh-vietnam-portal.com",
+          "explanation": "BHXH Việt Nam dùng @baohiemxahoi.gov.vn — '.com' thay vì '.gov.vn' là dấu hiệu rõ ràng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "false_expiry",
+          "visible_text": "Sổ BHXH sắp hết hiệu lực",
+          "explanation": "Sổ BHXH không có khái niệm 'hết hiệu lực' cần gia hạn theo định kỳ — đây là thông tin sai sự thật để tạo áp lực.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "bhxh-vietnam-portal.com",
+        "hết hiệu lực",
+        "gia hạn"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Sổ BHXH không có khái niệm 'hết hiệu lực'!",
+        "summary": "BHXH dùng domain .gov.vn và sổ BHXH không cần gia hạn định kỳ — toàn bộ nội dung email là bịa đặt.",
+        "learning_point": "Cơ quan nhà nước dùng .gov.vn. Kiểm tra thông tin BHXH tại baohiemxahoi.gov.vn hoặc VssID app.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Government Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-015",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Greed",
+      "attack_type": "Lottery Scam",
+      "learning_objective": "Nhận diện phishing xổ số/trúng thưởng ngẫu nhiên không rõ nguồn gốc",
+      "email": {
+        "sender_name": "Vietlott — Chương trình tri ân",
+        "sender_email": "trithuan@vietlott-reward2026.com",
+        "recipient_email": "tran.thi.lan.huong@yahoo.com.vn",
+        "subject": "Chúc mừng! Số điện thoại của bạn trúng 500.000.000đ từ Vietlott",
+        "body": "Kính gửi Khách hàng,\n\nChúc mừng! Số điện thoại của bạn được hệ thống Vietlott chọn ngẫu nhiên để nhận giải thưởng tri ân 500.000.000đ nhân kỷ niệm 10 năm thành lập.\n\nĐể nhận giải thưởng, vui lòng cung cấp thông tin cá nhân và tài khoản ngân hàng để chuyển tiền thưởng.\n\nPhí xử lý hành chính: 2.000.000đ (hoàn lại kèm tiền thưởng).",
+        "cta_text": "Nhận giải thưởng ngay",
+        "cta_link": "http://vietlott-reward2026.com/claim-prize"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "trithuan@vietlott-reward2026.com",
+          "explanation": "Vietlott dùng @vietlott.com.vn — 'vietlott-reward2026.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "advance_fee",
+          "visible_text": "phí xử lý hành chính 2.000.000đ",
+          "explanation": "Yêu cầu nộp phí để nhận giải thưởng là Advance Fee Scam kinh điển — tiền phí mất đi, giải thưởng không tồn tại.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "too_good_to_be_true",
+          "visible_text": "500.000.000đ từ số điện thoại ngẫu nhiên",
+          "explanation": "Vietlott không tổ chức bốc thưởng ngẫu nhiên từ số điện thoại — người phải mua vé mới có cơ hội trúng.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vietlott-reward2026.com",
+        "500.000.000đ",
+        "phí 2.000.000đ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Lừa đảo xổ số cổ điển — phí hành chính là bẫy!",
+        "summary": "Không ai trúng thưởng mà không mua vé. Phí hành chính để nhận giải thưởng = lừa đảo Advance Fee.",
+        "learning_point": "Vietlott không thông báo trúng thưởng qua email. Giải thưởng thật không cần nộp phí trước. Không có giải thưởng nào từ số điện thoại ngẫu nhiên.",
+        "psychology_display": "Greed",
+        "attack_type_display": "Lottery Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-016",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Urgency + Fear",
+      "attack_type": "Mobile Banking Scam",
+      "learning_objective": "Nhận diện phishing cảnh báo giao dịch OTP bị rò rỉ",
+      "email": {
+        "sender_name": "TPBank Security Alert",
+        "sender_email": "security@tpbank-alert-center.com",
+        "recipient_email": "do.van.quoc@gmail.com",
+        "subject": "CẢNH BÁO: OTP tài khoản bạn vừa bị rò rỉ — Khóa ngay",
+        "body": "Kính gửi Đỗ Văn Quốc,\n\nHệ thống bảo mật TPBank phát hiện mã OTP tài khoản của bạn có thể đã bị lộ qua ứng dụng bên thứ ba.\n\nĐể bảo vệ tài khoản, vui lòng truy cập ngay để thay đổi phương thức xác thực và khóa tạm thời tính năng chuyển tiền.\n\nThời gian xử lý: trước 23:59 đêm nay.",
+        "cta_text": "Bảo vệ tài khoản ngay",
+        "cta_link": "http://tpbank-alert-center.com/secure-account"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@tpbank-alert-center.com",
+          "explanation": "TPBank dùng @tpbank.vn — 'tpbank-alert-center.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "false_technical_alert",
+          "visible_text": "OTP bị rò rỉ qua ứng dụng bên thứ ba",
+          "explanation": "OTP không thể bị 'rò rỉ qua ứng dụng' theo cách mô tả — đây là cảnh báo kỹ thuật giả để tạo hoảng loạn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "tpbank-alert-center.com",
+        "OTP bị rò rỉ",
+        "trước 23:59"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Cảnh báo OTP rò rỉ là kỹ thuật giả!",
+        "summary": "OTP không bị rò rỉ theo cách email mô tả. Đây là cảnh báo kỹ thuật bịa đặt để dụ đăng nhập vào trang giả.",
+        "learning_point": "Mở app TPBank trực tiếp để kiểm tra trạng thái tài khoản — không click link email khi nhận cảnh báo bảo mật.",
+        "psychology_display": "Fear + Urgency",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-017",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "Phishing Basics",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email xác nhận đặt phòng khách sạn hợp lệ",
+      "email": {
+        "sender_name": "Booking.com",
+        "sender_email": "noreply@booking.com",
+        "recipient_email": "pham.ngoc.linh@gmail.com",
+        "subject": "Xác nhận đặt phòng: Sheraton Saigon — 15/06/2026",
+        "body": "Kính gửi Phạm Ngọc Linh,\n\nĐặt phòng của bạn đã được xác nhận!\n\nKhách sạn: Sheraton Saigon Hotel & Towers\nPhòng: Superior King — 1 đêm\nNhận phòng: 15/06/2026 (từ 14:00)\nTrả phòng: 16/06/2026 (trước 12:00)\nMã đặt phòng: 3892475018\nTổng tiền: 3.200.000đ (đã thanh toán qua thẻ ****4521)\n\nXem hoặc hủy đặt phòng tại booking.com — mã xác nhận của bạn: 3892475018.\n\nChúc bạn kỳ nghỉ vui vẻ!",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email từ Booking.com với thông tin đặt phòng chi tiết — có thể nghi ngờ",
+        "why_legitimate": "Domain @booking.com chính thức. Có mã đặt phòng cụ thể. Thẻ đã được thanh toán (không yêu cầu thanh toán thêm). Không có link đáng ngờ. Không tạo áp lực."
+      },
+      "feedback": {
+        "title": "Đây là xác nhận đặt phòng hợp lệ từ Booking.com!",
+        "summary": "Email từ @booking.com với mã đặt phòng, đã thanh toán, không yêu cầu thêm hành động — hoàn toàn hợp lệ.",
+        "learning_point": "Email đặt phòng hợp lệ: domain chính thức, mã xác nhận cụ thể, thanh toán đã hoàn tất, không yêu cầu thêm thông tin hay hành động.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-018",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Police / Cybercrime Impersonation",
+      "learning_objective": "Nhận diện phishing giả Cục An ninh mạng yêu cầu 'trình báo trực tuyến'",
+      "email": {
+        "sender_name": "Phòng Cảnh sát Điều tra tội phạm mạng — CA TP.HCM",
+        "sender_email": "capccc@catp-hcm-cyber.com",
+        "recipient_email": "bui.thi.thu.nga@gmail.com",
+        "subject": "Triệu tập: Bùi Thị Thu Nga — Điều tra giao dịch tài chính nghi vấn",
+        "body": "Kính gửi Bà Bùi Thị Thu Nga,\n\nPhòng Cảnh sát điều tra tội phạm sử dụng công nghệ cao — Công an TP.HCM thông báo tài khoản ngân hàng của bà có liên quan đến giao dịch tài chính nghi vấn đang được điều tra.\n\nBà được yêu cầu hoàn thành khai báo trực tuyến trong vòng 24 giờ để làm rõ sự việc. Nếu không hợp tác, chúng tôi sẽ ra lệnh phong tỏa tài khoản ngân hàng của bà.\n\nKhai báo qua cổng trực tuyến bên dưới.",
+        "cta_text": "Khai báo trực tuyến",
+        "cta_link": "http://catp-hcm-cyber.com/khai-bao"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "capccc@catp-hcm-cyber.com",
+          "explanation": "Công an TP.HCM dùng @catp.hochiminhcity.gov.vn — 'catp-hcm-cyber.com' là domain giả mạo hoàn toàn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "legal_threat",
+          "visible_text": "ra lệnh phong tỏa tài khoản ngân hàng",
+          "explanation": "Phong tỏa tài khoản ngân hàng là thủ tục tư pháp phức tạp — không thể thực hiện chỉ vì 'không khai báo trực tuyến trong 24 giờ'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "online_declaration_trap",
+          "visible_text": "khai báo trực tuyến",
+          "explanation": "Công an không yêu cầu khai báo qua link email — tất cả thủ tục điều tra diễn ra tại trụ sở hoặc qua giấy triệu tập chính thức.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "catp-hcm-cyber.com",
+        "phong tỏa tài khoản",
+        "khai báo trực tuyến"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Công an để đánh cắp thông tin — rất nguy hiểm!",
+        "summary": "Đây là lừa đảo khai thác sợ hãi cơ quan pháp luật — phổ biến và gây thiệt hại lớn tại VN. Công an không điều tra qua link email.",
+        "learning_point": "Giấy triệu tập thật được giao tận tay hoặc qua bưu điện có dấu đỏ. Nhận email dạng này: gọi 113 hoặc đến trụ sở công an để xác minh.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Law Enforcement Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-019",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Trust",
+      "attack_type": "Brand Impersonation",
+      "learning_objective": "Nhận diện phishing giả email từ đồng nghiệp quen biết — tên thật nhưng domain khác",
+      "email": {
+        "sender_name": "Nguyễn Thị Minh Trang",
+        "sender_email": "nguyen.thi.minh.trang@pvgasgroup.com",
+        "recipient_email": "le.van.duc@pvgas.com.vn",
+        "subject": "Tài liệu họp tuần này — Xem trước khi họp",
+        "body": "Anh Đức ơi,\n\nEm gửi anh tài liệu chuẩn bị cho buổi họp chiều thứ 5 nhé. Anh xem qua và có ý kiến gì thì nhắn em.\n\nFile ở link này ạ, em để chế độ chỉ xem với tài khoản công ty.",
+        "cta_text": "Xem tài liệu",
+        "cta_link": "https://pvgas-docs-internal.com/meeting-docs-t6"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "wrong_sender_domain",
+          "visible_text": "nguyen.thi.minh.trang@pvgasgroup.com",
+          "explanation": "Đồng nghiệp PV Gas dùng @pvgas.com.vn — '@pvgasgroup.com' là domain khác, có thể là domain giả mạo hoặc email bị xâm phạm.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_link",
+          "visible_text": "pvgas-docs-internal.com",
+          "explanation": "Link tài liệu trỏ về 'pvgas-docs-internal.com' — không phải SharePoint hay Google Drive nội bộ. Domain giả mạo.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "pvgasgroup.com",
+        "pvgas-docs-internal.com"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Tên quen nhưng domain lạ — vẫn là phishing!",
+        "summary": "Kẻ tấn công dùng tên thật của đồng nghiệp nhưng gửi từ domain khác. Email công việc thật đến từ domain công ty nhất quán.",
+        "learning_point": "Luôn kiểm tra domain email — không chỉ tên hiển thị. Nếu nhận file từ đồng nghiệp qua link lạ: liên hệ trực tiếp qua Teams/Zalo để xác nhận.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Colleague Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-020",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Curiosity + Authority",
+      "attack_type": "Tax Refund Scam",
+      "learning_objective": "Nhận diện phishing giả hoàn thuế TNCN để lấy thông tin tài khoản ngân hàng",
+      "email": {
+        "sender_name": "Tổng cục Thuế — Bộ phận Hoàn thuế",
+        "sender_email": "hoanthue@gdt-hoanthue.com",
+        "recipient_email": "vo.minh.tuan@saigon-tech.com.vn",
+        "subject": "Thông báo hoàn thuế TNCN năm 2025: 3.420.000đ — Nhận ngay",
+        "body": "Kính gửi Võ Minh Tuân,\n\nTổng cục Thuế thông báo bạn có khoản hoàn thuế Thu nhập cá nhân năm 2025: 3.420.000đ.\n\nĐể nhận hoàn thuế, vui lòng xác nhận thông tin tài khoản ngân hàng qua cổng điện tử trước ngày 30/06/2026. Sau thời hạn, khoản hoàn thuế sẽ bị hủy theo quy định.\n\nXác nhận tài khoản để nhận hoàn thuế.",
+        "cta_text": "Xác nhận nhận hoàn thuế",
+        "cta_link": "http://gdt-hoanthue.com/confirm-refund"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hoanthue@gdt-hoanthue.com",
+          "explanation": "Tổng cục Thuế dùng @gdt.gov.vn — 'gdt-hoanthue.com' là domain giả mạo, chú ý .com thay .gov.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "refund_bait",
+          "visible_text": "3.420.000đ hoàn thuế TNCN",
+          "explanation": "Thông báo hoàn thuế không yêu cầu 'xác nhận tài khoản' qua link email — hệ thống eTax đã có thông tin tài khoản đăng ký trước.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "false_deadline",
+          "visible_text": "khoản hoàn thuế sẽ bị hủy",
+          "explanation": "Hoàn thuế không bị hủy theo kiểu này — đây là áp lực giả tạo để người dùng hành động nhanh.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "gdt-hoanthue.com",
+        "3.420.000đ",
+        "bị hủy"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Lừa hoàn thuế để lấy thông tin tài khoản ngân hàng!",
+        "summary": "Thông báo hoàn thuế hấp dẫn vì ai cũng muốn nhận tiền. Nhưng Tổng cục Thuế dùng @gdt.gov.vn và hoàn thuế qua eTax — không qua link email.",
+        "learning_point": "Kiểm tra hoàn thuế TNCN tại etax.gdt.gov.vn hoặc app eTax Mobile. Tổng cục Thuế không yêu cầu xác nhận tài khoản qua link email.",
+        "psychology_display": "Greed + Authority",
+        "attack_type_display": "Tax Refund Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-021",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Fear",
+      "attack_type": "Credit Card Fraud Alert Scam",
+      "learning_objective": "Nhận diện phishing giả cảnh báo thẻ tín dụng bị sử dụng trái phép",
+      "email": {
+        "sender_name": "Citibank Vietnam — Fraud Alert",
+        "sender_email": "fraud.alert@citibank-vn-security.com",
+        "recipient_email": "nguyen.hoang.phuc@fpt.com.vn",
+        "subject": "Giao dịch thẻ Citibank bị từ chối — Thẻ có nguy cơ bị chặn",
+        "body": "Kính gửi Nguyễn Hoàng Phúc,\n\nHệ thống bảo mật Citibank phát hiện giao dịch bất thường từ thẻ tín dụng của bạn (**** 4521):\n\nGiao dịch: Amazon.com — $234.99\nThời gian: 03:45 sáng 06/06/2026\nTrạng thái: Bị từ chối do nghi vấn\n\nNếu không xác minh trong 2 giờ, thẻ sẽ bị chặn hoàn toàn để bảo vệ tài sản. Xác minh ngay.",
+        "cta_text": "Xác minh và mở khóa thẻ",
+        "cta_link": "http://citibank-vn-security.com/card-verify"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "fraud.alert@citibank-vn-security.com",
+          "explanation": "Citibank dùng @citibank.com — 'citibank-vn-security.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_urgency_combo",
+          "visible_text": "$234.99 lúc 03:45 sáng",
+          "explanation": "Giao dịch nước ngoài lúc nửa đêm tạo nỗi sợ mạnh — được thiết kế để người dùng hoảng loạn và click ngay.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong 2 giờ",
+          "explanation": "Deadline 2 giờ là áp lực cực ngắn — không đủ thời gian gọi hotline ngân hàng để xác minh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "citibank-vn-security.com",
+        "$234.99 lúc 03:45 sáng",
+        "trong 2 giờ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Cảnh báo giao dịch thẻ giả từ domain lạ!",
+        "summary": "Citibank thật dùng @citibank.com. Giao dịch bất thường thật được thông báo qua SMS và app — không yêu cầu xác minh qua link email.",
+        "learning_point": "Nhận cảnh báo giao dịch: gọi số hotline ở mặt sau thẻ để xác minh. Không click link email.",
+        "psychology_display": "Fear + Urgency",
+        "attack_type_display": "Credit Card Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-022",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority",
+      "attack_type": "Scholarship / Education Scam",
+      "learning_objective": "Nhận diện phishing giả học bổng để thu thập thông tin cá nhân sinh viên",
+      "email": {
+        "sender_name": "Học bổng Chính phủ Úc — Austudy Vietnam",
+        "sender_email": "scholarship@austudy-vietnam-grant.com",
+        "recipient_email": "tran.thu.hang.2001@student.hcmus.edu.vn",
+        "subject": "Thông báo: Bạn đủ điều kiện nhận học bổng AUD 25,000 năm 2026",
+        "body": "Kính gửi Trần Thu Hằng,\n\nChương trình học bổng Chính phủ Úc (Austudy) thông báo hồ sơ của bạn đã được chọn vào danh sách ứng viên tiềm năng.\n\nGiá trị: AUD 25,000 (khoảng 425.000.000đ)\nHạn nộp hồ sơ đầy đủ: 10/06/2026\n\nHồ sơ bổ sung cần:\n• CCCD, hộ chiếu\n• Bảng điểm (bản scan)\n• Phí xử lý hồ sơ: 500.000đ\n\nGửi hồ sơ qua cổng trực tuyến.",
+        "cta_text": "Nộp hồ sơ học bổng",
+        "cta_link": "http://austudy-vietnam-grant.com/apply"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "scholarship@austudy-vietnam-grant.com",
+          "explanation": "Học bổng Chính phủ Úc thật quản lý qua australiaawards.org.vn hoặc au.org.vn — 'austudy-vietnam-grant.com' là domain giả.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "advance_fee",
+          "visible_text": "Phí xử lý hồ sơ: 500.000đ",
+          "explanation": "Học bổng chính phủ hợp pháp không thu phí xử lý hồ sơ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "document_harvesting",
+          "visible_text": "CCCD, hộ chiếu",
+          "explanation": "Yêu cầu giấy tờ tùy thân trong bước nộp hồ sơ ban đầu là data harvesting.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "austudy-vietnam-grant.com",
+        "phí 500.000đ",
+        "AUD 25,000"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Học bổng giả với phí xử lý — lừa sinh viên!",
+        "summary": "Học bổng chính phủ không bao giờ thu phí. Thông tin học bổng Úc thật tại australiaawards.org.vn.",
+        "learning_point": "Học bổng hợp pháp không thu phí xử lý hồ sơ. Kiểm tra học bổng qua website chính thức của chính phủ/tổ chức cấp học bổng.",
+        "psychology_display": "Authority + Greed",
+        "attack_type_display": "Scholarship Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-023",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Urgency",
+      "attack_type": "Domain Expiry Scam",
+      "learning_objective": "Nhận diện email giả cảnh báo tên miền website sắp hết hạn",
+      "email": {
+        "sender_name": "Domain Registry — Vietnam Network",
+        "sender_email": "alert@vn-domain-registry-notice.com",
+        "recipient_email": "admin@phuongtrang-travel.com.vn",
+        "subject": "KHẨN: Tên miền phuongtrang-travel.com.vn hết hạn sau 3 ngày",
+        "body": "Kính gửi Quản trị viên,\n\nTên miền phuongtrang-travel.com.vn sẽ hết hạn vào ngày 10/06/2026. Nếu không gia hạn kịp thời, tên miền sẽ bị thu hồi và có thể được đăng ký bởi bên khác.\n\nGia hạn ngay với ưu đãi đặc biệt: 1 năm chỉ 299.000đ (giá thị trường 450.000đ).\n\nNhấp để gia hạn và bảo vệ tên miền của bạn.",
+        "cta_text": "Gia hạn tên miền ngay",
+        "cta_link": "http://vn-domain-registry-notice.com/renew-domain"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@vn-domain-registry-notice.com",
+          "explanation": "VNNIC (cơ quan quản lý tên miền .vn) dùng @vnnic.vn — 'vn-domain-registry-notice.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "unsolicited_renewal_offer",
+          "visible_text": "gia hạn tên miền với ưu đãi",
+          "explanation": "Thông báo gia hạn tên miền thật đến từ nhà đăng ký đang quản lý tên miền đó — không từ bên thứ ba qua email lạnh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "vn-domain-registry-notice.com",
+        "hết hạn sau 3 ngày",
+        "299.000đ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Lừa gia hạn tên miền từ đơn vị không quản lý!",
+        "summary": "Thông báo gia hạn tên miền thật đến từ nhà đăng ký bạn đang dùng (Matbao, PA, VNPT...) — không từ 'vn-domain-registry-notice.com'.",
+        "learning_point": "Kiểm tra ngày hết hạn tên miền trực tiếp tại nhà đăng ký đang quản lý tên miền của bạn. Không gia hạn qua link email từ bên không quen biết.",
+        "psychology_display": "Urgency + Fear",
+        "attack_type_display": "Domain Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-024",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Trust",
+      "attack_type": "Watering Hole Phishing",
+      "learning_objective": "Nhận diện phishing nhắm vào cộng đồng chuyên môn — giả mạo newsletter/tài liệu ngành",
+      "email": {
+        "sender_name": "Vietnam CFO Club — Bản tin tháng 6",
+        "sender_email": "newsletter@vn-cfo-club.net",
+        "recipient_email": "nguyen.thi.hong.loan@phumy-corp.com.vn",
+        "subject": "CFO Insights: Thay đổi chính sách kế toán IFRS 17 — Tải báo cáo độc quyền",
+        "body": "Kính gửi thành viên Nguyễn Thị Hồng Loan,\n\nVietnam CFO Club gửi đến bạn báo cáo phân tích chuyên sâu về tác động của IFRS 17 đối với doanh nghiệp bảo hiểm Việt Nam — tài liệu độc quyền dành cho thành viên.\n\nNội dung báo cáo:\n• Lộ trình áp dụng IFRS 17 tại VN\n• Tác động lên báo cáo tài chính Q3/2026\n• Khuyến nghị từ Big 4\n\nTải báo cáo bằng tài khoản thành viên CFO Club.",
+        "cta_text": "Tải báo cáo IFRS 17",
+        "cta_link": "https://vn-cfo-club.net/member-reports/ifrs17-2026"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "newsletter@vn-cfo-club.net",
+          "explanation": "Cần xác minh domain của Vietnam CFO Club thật — nếu domain thật khác 'vn-cfo-club.net' đây là giả mạo. Domain .net cho tổ chức chuyên môn Việt Nam là bất thường.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "tải bằng tài khoản thành viên CFO Club",
+          "explanation": "Yêu cầu đăng nhập vào website để tải tài liệu — nếu domain không phải của tổ chức thật, đây là credential harvesting nhắm CFO.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "high_value_target",
+          "visible_text": "IFRS 17 ... Big 4",
+          "explanation": "Nội dung chuyên môn cụ thể (IFRS 17, Big 4) tạo cảm giác email đến từ cộng đồng chuyên môn thật — CFO thường ít cảnh giác với nội dung liên quan trực tiếp đến công việc.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vn-cfo-club.net",
+        "tài khoản thành viên",
+        "IFRS 17"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Watering Hole — nhắm cộng đồng CFO bằng nội dung chuyên môn!",
+        "summary": "Phishing nhắm cộng đồng chuyên môn dùng nội dung đúng ngành để giảm cảnh giác. CFO là mục tiêu cao giá vì có quyền tài chính lớn.",
+        "learning_point": "Kiểm tra domain tổ chức chuyên môn trước khi đăng nhập. Nếu là thành viên thật, bạn đã biết URL chính thức của tổ chức — gõ tay thay vì click link email.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "Watering Hole"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-025",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Authority + Compliance",
+      "attack_type": "GDPR / Data Breach Notification Fake",
+      "learning_objective": "Nhận diện phishing giả thông báo rò rỉ dữ liệu (data breach) để dụ cung cấp thêm thông tin",
+      "email": {
+        "sender_name": "Trung tâm Bảo vệ Dữ liệu Cá nhân — Bộ Công an",
+        "sender_email": "pdpd@molisa-dataprotect.com",
+        "recipient_email": "pham.thi.quynh.anh@vincom.com.vn",
+        "subject": "Thông báo: Dữ liệu cá nhân của bạn bị rò rỉ trong vụ tấn công hệ thống",
+        "body": "Kính gửi Phạm Thị Quỳnh Anh,\n\nTrung tâm Bảo vệ Dữ liệu Cá nhân (PDPD) — Bộ Công an thông báo: dữ liệu cá nhân của bạn được phát hiện trong bộ dữ liệu bị rò rỉ từ vụ tấn công mạng ngày 01/06/2026.\n\nDữ liệu bị lộ có thể bao gồm: họ tên, CCCD, số điện thoại, địa chỉ, thông tin tài khoản.\n\nĐể xác nhận phạm vi dữ liệu bị lộ và nhận hỗ trợ bảo vệ, vui lòng xác minh danh tính qua cổng PDPD.",
+        "cta_text": "Xác minh danh tính",
+        "cta_link": "http://molisa-dataprotect.com/identity-verify"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "pdpd@molisa-dataprotect.com",
+          "explanation": "PDPD thuộc Bộ Công an dùng domain .gov.vn — 'molisa-dataprotect.com' là domain giả mạo, thêm tên Bộ LĐTBXH (Molisa) để tăng tính phức tạp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "ironic_data_request",
+          "visible_text": "xác minh danh tính qua cổng PDPD",
+          "explanation": "Email thông báo dữ liệu bị lộ nhưng lại yêu cầu cung cấp thêm dữ liệu để 'xác minh' — cực kỳ mâu thuẫn. Mục đích thật là thu thập thêm thông tin cá nhân.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_of_data_exposure",
+          "visible_text": "CCCD, số điện thoại, địa chỉ, thông tin tài khoản",
+          "explanation": "Liệt kê dữ liệu nhạy cảm cụ thể gây lo lắng mạnh — người dùng muốn biết chính xác dữ liệu nào bị lộ và làm theo để 'tự bảo vệ'.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "molisa-dataprotect.com",
+        "xác minh danh tính",
+        "PDPD"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Thông báo data breach giả — mâu thuẫn khi yêu cầu thêm dữ liệu!",
+        "summary": "Đây là phishing tinh vi: thông báo dữ liệu bị lộ nhưng lại yêu cầu cung cấp thêm dữ liệu để 'kiểm tra'. Cơ quan nhà nước không làm vậy.",
+        "learning_point": "Thông báo data breach thật đến từ tổ chức bị tấn công (ngân hàng, app...) — không từ cơ quan nhà nước. Không cần 'xác minh danh tính' để kiểm tra dữ liệu bị lộ.",
+        "psychology_display": "Fear + Authority",
+        "attack_type_display": "Data Breach Notification Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-026",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Trust",
+      "attack_type": "AI-generated Spear Phishing",
+      "learning_objective": "Nhận diện spear phishing được AI tạo ra — viết hoàn hảo, không có lỗi ngữ pháp, rất khó nhận biết qua văn phong",
+      "email": {
+        "sender_name": "Lê Quang Hùng — Partner, PwC Vietnam",
+        "sender_email": "le.quang.hung@pwcvietnam-advisory.com",
+        "recipient_email": "nguyen.thi.minh.hoa@bidv.com.vn",
+        "subject": "Mời tham dự: PwC Vietnam Financial Sector Outlook 2026 — Chỉ dành cho khách mời",
+        "body": "Kính gửi chị Nguyễn Thị Minh Hoa,\n\nTôi là Lê Quang Hùng, Partner phụ trách mảng Financial Services tại PwC Vietnam. Qua mạng lưới chuyên gia ngành ngân hàng, tôi được biết chị đang phụ trách mảng quản lý rủi ro tại BIDV — một lĩnh vực rất phù hợp với nội dung chúng tôi sẽ thảo luận.\n\nPwC Vietnam tổ chức buổi briefing kín 'Financial Sector Outlook H2/2026' vào ngày 12/06/2026 tại văn phòng PwC (Bitexco Financial Tower, tầng 34). Chúng tôi giới hạn 20 khách mời là lãnh đạo cấp cao từ các tổ chức tài chính hàng đầu.\n\nChị có muốn tham dự không? Để xác nhận suất tham dự và nhận pre-read materials, chị đăng nhập bằng tài khoản chuyên nghiệp của mình.",
+        "cta_text": "Xác nhận tham dự",
+        "cta_link": "https://pwcvietnam-advisory.com/fs-outlook-confirm"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "le.quang.hung@pwcvietnam-advisory.com",
+          "explanation": "PwC Vietnam dùng @pwc.com — 'pwcvietnam-advisory.com' là domain giả mạo. PwC không có domain riêng cho Vietnam.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request_professional",
+          "visible_text": "đăng nhập bằng tài khoản chuyên nghiệp",
+          "explanation": "Yêu cầu đăng nhập tài khoản chuyên nghiệp (có thể là Microsoft 365 / Google Workspace của BIDV) để 'xác nhận suất' — credential harvesting tinh vi.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "ai_spear_phishing",
+          "visible_text": "phụ trách mảng quản lý rủi ro tại BIDV",
+          "explanation": "Email biết chính xác vai trò của người nhận — dấu hiệu AI spear phishing dùng dữ liệu LinkedIn/công khai để cá nhân hóa.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "pwcvietnam-advisory.com",
+        "đăng nhập tài khoản chuyên nghiệp",
+        "20 khách mời"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "AI Spear Phishing — viết hoàn hảo, cá nhân hóa cao!",
+        "summary": "Email này không có lỗi ngữ pháp, biết đúng vai trò nạn nhân, và lý do nghe rất hợp lý. Chỉ có domain người gửi là lộ — dấu hiệu duy nhất.",
+        "learning_point": "AI spear phishing ngày càng tinh vi — không thể dùng 'ngữ pháp sai' để nhận biết. Kiểm tra domain người gửi là quy tắc bất biến duy nhất còn hiệu quả.",
+        "psychology_display": "Trust + Authority",
+        "attack_type_display": "AI Spear Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-027",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Fear + Urgency",
+      "attack_type": "Account Suspension via Legal Notice",
+      "learning_objective": "Nhận diện phishing giả thông báo pháp lý yêu cầu khóa tài khoản mạng xã hội do 'vi phạm bản quyền'",
+      "email": {
+        "sender_name": "Meta Legal — Vietnam Enforcement",
+        "sender_email": "legal-vn@meta-legal-enforcement.com",
+        "recipient_email": "hoang.thi.diem.trang@gmail.com",
+        "subject": "Tài khoản Facebook của bạn bị báo cáo vi phạm bản quyền — Phản hồi trong 24h",
+        "body": "Kính gửi Hoàng Thị Diễm Trang,\n\nBộ phận Pháp lý Meta (Facebook) tại Việt Nam thông báo tài khoản Facebook của bạn (ID: 100094567890) bị báo cáo vi phạm bản quyền nghiêm trọng theo Digital Millennium Copyright Act (DMCA).\n\nNếu không phản hồi trong 24 giờ, tài khoản sẽ bị đình chỉ vĩnh viễn và thông tin có thể được chuyển cho cơ quan chức năng Việt Nam.\n\nĐể kháng cáo và bảo vệ tài khoản, đăng nhập Facebook để xác minh.",
+        "cta_text": "Kháng cáo vi phạm bản quyền",
+        "cta_link": "https://meta-legal-enforcement.com/dmca-appeal"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "legal-vn@meta-legal-enforcement.com",
+          "explanation": "Meta gửi thông báo pháp lý từ @meta.com hoặc @facebookmail.com — 'meta-legal-enforcement.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "legal_threat_with_deadline",
+          "visible_text": "thông tin có thể được chuyển cho cơ quan chức năng Việt Nam",
+          "explanation": "Đe dọa pháp lý kép: mất tài khoản + bị báo cơ quan chức năng — áp lực tâm lý tối đa để người dùng hành động ngay.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "dmca_false_claim",
+          "visible_text": "Digital Millennium Copyright Act (DMCA)",
+          "explanation": "DMCA là luật Mỹ — không áp dụng trực tiếp cho người dùng Việt Nam theo cách email mô tả. Dùng tên luật thật để tạo tính xác thực giả.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "meta-legal-enforcement.com",
+        "chuyển cho cơ quan chức năng",
+        "DMCA"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả Meta Legal để chiếm tài khoản Facebook!",
+        "summary": "Meta không có bộ phận pháp lý riêng tại Việt Nam liên lạc qua email riêng biệt. Thông báo vi phạm thật hiển thị trong Facebook — không qua email từ domain ngoài.",
+        "learning_point": "Thông báo vi phạm Facebook thật hiện trong Hỗ trợ tài khoản tại facebook.com/help. Đăng nhập trực tiếp vào Facebook để kiểm tra — không click link email.",
+        "psychology_display": "Fear + Authority",
+        "attack_type_display": "Legal Threat Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-028",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Urgency + Compliance",
+      "attack_type": "Supplier Portal Credential Theft",
+      "learning_objective": "Nhận diện phishing nhắm vào cổng nhà cung cấp của tập đoàn lớn — giả mời đăng ký để lấy thông tin",
+      "email": {
+        "sender_name": "Supplier Management — Vingroup Procurement",
+        "sender_email": "supplier@vingroup-procurement-portal.com",
+        "recipient_email": "giam.doc@thienphu-packaging.com.vn",
+        "subject": "Yêu cầu đăng ký Nhà cung cấp Vingroup 2026 — Hạn chót 10/06",
+        "body": "Kính gửi Ban Giám đốc Thiên Phú Packaging,\n\nVingroup thông báo triển khai hệ thống quản lý nhà cung cấp tập trung mới (Supplier Portal 2.0). Tất cả nhà cung cấp hiện tại và tiềm năng cần hoàn thành đăng ký trước 10/06/2026 để tiếp tục được xem xét trong các vòng đấu thầu Q3/2026.\n\nThông tin đăng ký bao gồm: thông tin công ty, tài chính, tài khoản ngân hàng, và tải lên giấy phép kinh doanh.\n\nNhà cung cấp chưa đăng ký sẽ không được xét hồ sơ thầu.",
+        "cta_text": "Đăng ký Supplier Portal",
+        "cta_link": "https://vingroup-procurement-portal.com/supplier-register"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "supplier@vingroup-procurement-portal.com",
+          "explanation": "Vingroup dùng @vingroup.net — 'vingroup-procurement-portal.com' là domain bên ngoài giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "financial_data_harvesting",
+          "visible_text": "tài khoản ngân hàng",
+          "explanation": "Yêu cầu tài khoản ngân hàng ngay trong bước đăng ký cổng nhà cung cấp — thông tin này chỉ cần khi đã ký hợp đồng, không phải khi đăng ký ban đầu.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "business_fomo",
+          "visible_text": "không được xét hồ sơ thầu",
+          "explanation": "Đe dọa mất hợp đồng với tập đoàn lớn tạo áp lực kinh doanh mạnh — nhà cung cấp nhỏ rất sợ mất khách hàng Vingroup.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vingroup-procurement-portal.com",
+        "tài khoản ngân hàng",
+        "không xét hồ sơ thầu"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả cổng nhà cung cấp Vingroup để lấy thông tin tài chính!",
+        "summary": "Tập đoàn lớn như Vingroup có quy trình đăng ký nhà cung cấp chính thức qua kênh nội bộ — không qua email lạnh từ domain bên ngoài.",
+        "learning_point": "Nhận yêu cầu đăng ký nhà cung cấp từ email lạ: gọi trực tiếp đến bộ phận Mua hàng của Vingroup qua số điện thoại tổng đài để xác minh.",
+        "psychology_display": "Business FOMO + Authority",
+        "attack_type_display": "Supplier Portal Scam"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-029",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Phishing Basics",
+      "psychology": "Trust",
+      "attack_type": "Conference / Event Phishing",
+      "learning_objective": "Nhận diện phishing giả hội thảo chuyên ngành để lấy thông tin thẻ thanh toán",
+      "email": {
+        "sender_name": "Vietnam FinTech Forum 2026",
+        "sender_email": "registration@vn-fintech-forum-2026.com",
+        "recipient_email": "nguyen.thanh.dat@vib.com.vn",
+        "subject": "Xác nhận đăng ký: Vietnam FinTech Forum 2026 — Early Bird còn 48 giờ",
+        "body": "Kính gửi Nguyễn Thành Đạt,\n\nCảm ơn bạn đã quan tâm đến Vietnam FinTech Forum 2026 — sự kiện hàng đầu ngành tài chính công nghệ tại Việt Nam.\n\nGói Early Bird (tiết kiệm 40%):\n• Standard Pass: 2.800.000đ (gốc 4.700.000đ)\n• Premium Pass (bao gồm gala dinner): 4.500.000đ\n\nĐể hoàn tất đăng ký Early Bird trước khi hết hạn 48 giờ, điền thông tin thẻ tín dụng để xử lý thanh toán.",
+        "cta_text": "Hoàn tất đăng ký và thanh toán",
+        "cta_link": "https://vn-fintech-forum-2026.com/checkout"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "registration@vn-fintech-forum-2026.com",
+          "explanation": "Cần xác minh domain chính thức của Vietnam FinTech Forum — nếu event thật có domain khác, đây là giả mạo. Domain có năm (2026) trong tên là bất thường cho tổ chức uy tín.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credit_card_harvesting",
+          "visible_text": "điền thông tin thẻ tín dụng",
+          "explanation": "Yêu cầu thông tin thẻ tín dụng qua link email — sự kiện uy tín dùng cổng thanh toán an toàn như Stripe/PayPal/VNPAY có thể xác minh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "còn 48 giờ",
+          "explanation": "Early Bird countdown tạo FOMO — người dùng muốn tiết kiệm 40% và hành động nhanh mà không kiểm tra.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vn-fintech-forum-2026.com",
+        "thông tin thẻ tín dụng",
+        "còn 48 giờ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Giả hội thảo ngành để lấy thông tin thẻ tín dụng!",
+        "summary": "Đăng ký hội thảo giả kết hợp Early Bird urgency để dụ nhập thông tin thẻ vào trang checkout giả.",
+        "learning_point": "Tìm thông tin hội thảo thật qua Google tên sự kiện — không qua link email. Cổng thanh toán hội thảo uy tín dùng VNPAY, Stripe, hoặc chuyển khoản ngân hàng có hóa đơn.",
+        "psychology_display": "Trust + FOMO",
+        "attack_type_display": "Event Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-WP-030",
+      "batch": "06",
+      "phase": 1,
+      "lesson": "1.1",
+      "difficulty": "hard",
+      "email_type": "legitimate",
+      "category": "Phishing Basics",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email thông báo bảo mật hợp lệ từ ngân hàng — có đầy đủ thông tin xác minh",
+      "email": {
+        "sender_name": "OCB — Thông báo bảo mật",
+        "sender_email": "security@ocb.com.vn",
+        "recipient_email": "tran.van.minh.duc@ocb.com.vn",
+        "subject": "Thông báo đăng nhập mới vào OCB OMNI — iPhone, TP.HCM",
+        "body": "Kính gửi Trần Văn Minh Đức,\n\nOCB ghi nhận đăng nhập vào tài khoản OCB OMNI của bạn:\n\nThiết bị: iPhone 15 Pro\nHệ điều hành: iOS 17.4\nVị trí: Quận 7, TP.HCM\nThời gian: 08:32, 07/06/2026\n\nNếu đây là bạn, không cần thực hiện thêm bước nào.\n\nNếu KHÔNG PHẢI bạn: liên hệ ngay Trung tâm hỗ trợ OCB 1800 6678 (24/7) hoặc khóa thẻ trong app OCB OMNI.\n\nOCB sẽ KHÔNG BAO GIỜ yêu cầu mật khẩu hoặc OTP qua email.\n\nTrân trọng,\nOCB — Phòng Bảo mật",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email bảo mật từ ngân hàng về đăng nhập mới — có thể nghi ngờ là phishing",
+        "why_legitimate": "Domain @ocb.com.vn chính thức. Không có link đáng ngờ. Không yêu cầu hành động nếu là bạn đăng nhập. Có hotline 1800 6678 xác minh được. Email chủ động nói 'OCB không bao giờ yêu cầu mật khẩu qua email'."
+      },
+      "feedback": {
+        "title": "Đây là thông báo bảo mật hợp lệ từ OCB!",
+        "summary": "Email từ @ocb.com.vn, không link đáng ngờ, có hotline xác minh, và chủ động cảnh báo ngân hàng không yêu cầu mật khẩu qua email.",
+        "learning_point": "Thông báo bảo mật hợp lệ từ ngân hàng: không yêu cầu hành động nếu là bạn đăng nhập, cung cấp hotline xác minh, không có link đăng nhập, và chủ động cảnh báo bảo mật.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    }
+  ]
+}
