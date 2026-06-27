@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using AntiPhisher.Infrastructure.Data;
 namespace AntiPhisher.Infrastructure
 {
     public class AppDbContext : DbContext
@@ -23,7 +23,7 @@ namespace AntiPhisher.Infrastructure
         public DbSet<TeamMember> TeamMembers { get; set; }
 
         // --- Chiến dịch & Kịch bản Thực hành ---
-        public DbSet<Campaign> Campaigns { get; set; }
+        public DbSet<Campaign> Campaigns { get; set; } 
         public DbSet<CampaignScenario> CampaignScenarios { get; set; }
         public DbSet<CampaignTeamAssignment> CampaignTeamAssignments { get; set; }
         public DbSet<CampaignUserAssignment> CampaignUserAssignments { get; set; }
@@ -62,16 +62,18 @@ namespace AntiPhisher.Infrastructure
         public DbSet<CompanyInvitation> CompanyInvitations { get; set; }
 
         // --- QUIZ BÀI HỌC ---
-        public DbSet<LessonQuiz>    LessonQuizzes  { get; set; }
-        public DbSet<QuizQuestion>  QuizQuestions  { get; set; }
-        public DbSet<QuizOption>    QuizOptions    { get; set; }
+        public DbSet<LessonQuiz> LessonQuizzes { get; set; }
+        public DbSet<QuizQuestion> QuizQuestions { get; set; }
+        public DbSet<QuizOption> QuizOptions { get; set; }
+
+        // --- KẾT QUẢ BÀI HỌC & CHIẾN DỊCH ---
+        public DbSet<UserCampaignResult> UserCampaignResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Tự động quét quét và cấu hình Fluent API từ tất cả các file kế thừa IEntityTypeConfiguration
-            // bao gồm cả OrderConfiguration lẫn các cấu hình LessonConfiguration, PhaseConfiguration,... vừa tạo.
+            // Cấu hình Fluent API tự động từ Assembly
             modelBuilder.ApplyConfigurationsFromAssembly(
                 typeof(AppDbContext).Assembly
             );

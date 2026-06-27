@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace AntiPhisher.Infrastructure.Configuration
 {
-    public class CampaignConfiguration : IEntityTypeConfiguration<Campaign>
+    public class CampaignConfiguration : IEntityTypeConfiguration<Domain.Models.Campaign>
     {
-        public void Configure(EntityTypeBuilder<Campaign> builder)
+        public void Configure(EntityTypeBuilder<Domain.Models.Campaign> builder)
         {
             builder.HasKey(x => x.CampaignId);
 

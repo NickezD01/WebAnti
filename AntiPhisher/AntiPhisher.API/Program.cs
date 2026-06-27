@@ -219,8 +219,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cấu hình lắng nghe cổng (Quan trọng cho Render)
-builder.WebHost.UseUrls($"http://*:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
+// Cấu hình lắng nghe cổng (Quan trọng cho Render — chỉ override khi PORT được set)
+var renderPort = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(renderPort))
+{
+    builder.WebHost.UseUrls($"http://*:{renderPort}");
+}
 
 // ======================================================
 // CONFIGURATION
@@ -283,6 +287,7 @@ builder.Services
 // SWAGGER (Luôn bật)
 // ======================================================
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "AntiPhisher API", Version = "v1" });
@@ -313,7 +318,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
-builder.Services.AddHttpClient<IScenarioService, ScenarioService>();
+builder.Services.AddScoped<IScenarioService, ScenarioService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
@@ -324,6 +329,9 @@ builder.Services.AddScoped<MoMoService>();
 builder.Services.AddScoped<IPaymentService, MoMoService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.Configure<OpenRouterOptions>(builder.Configuration.GetSection("OpenRouter"));
+builder.Services.AddHttpClient<IOpenRouterAnalysisService, OpenRouterAnalysisService>();
+
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 
