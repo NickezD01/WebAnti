@@ -1,0 +1,401 @@
+{
+  "batch_id": "02",
+  "batch_name": "Phase 1 — Attack Vectors",
+  "phase": 1,
+  "lesson": "1.3",
+  "total": 6,
+  "distribution": {
+    "difficulty": {
+      "easy": 4,
+      "medium": 0,
+      "hard": 2
+    },
+    "type": {
+      "malicious": 6,
+      "legitimate": 0
+    }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P1-AV-001",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Urgency",
+      "attack_type": "Smishing",
+      "learning_objective": "Nhận diện Smishing — phishing qua SMS giả mạo ngân hàng yêu cầu xác minh khẩn cấp",
+      "email": {
+        "sender_name": "Vietcombank SMS",
+        "sender_email": "sms-alert@vcb-sms-notify.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "[SMS Forward] VCB: Tài khoản bị khóa — Xác minh ngay",
+        "body": "--- Tin nhắn SMS được chuyển tiếp ---\n\nTừ: VCB-ALERT\nNội dung: 'VCB: TK cua ban bi khoa do dang nhap bat thuong. Xac minh tai: http://vcb-verify.net/sms Neu khong xac minh trong 30p, TK se bi dinh chi. VCB HotLine: 1800545415'\n\n---\nLưu ý: Đây là mô phỏng tin nhắn SMS phishing. Trong thực tế bạn sẽ nhận trực tiếp trên điện thoại."
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_link",
+          "visible_text": "http://vcb-verify.net/sms",
+          "explanation": "'vcb-verify.net' là domain giả — Vietcombank thật không gửi link xác minh qua SMS. Domain thật là vietcombank.com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "30p",
+          "explanation": "Deadline 30 phút là cực ngắn — tạo áp lực để bạn click ngay mà không kịp kiểm tra link.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "spoofed_brand",
+          "visible_text": "VCB HotLine: 1800545415",
+          "explanation": "Thêm số hotline thật vào cuối SMS để tăng tính thuyết phục — nhưng hotline thật không làm cho link giả trở nên an toàn.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vcb-verify.net/sms",
+        "30p",
+        "VCB-ALERT"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Smishing — Phishing qua SMS!",
+        "summary": "Smishing (SMS Phishing) hoạt động giống email phishing nhưng qua tin nhắn điện thoại. Link rút gọn và deadline cực ngắn là hai đặc điểm nhận dạng phổ biến nhất.",
+        "learning_point": "Ngân hàng không bao giờ gửi link xác minh qua SMS. Khi nhận SMS có link từ 'ngân hàng': gọi hotline thật in trên thẻ để kiểm tra — không click link trong tin nhắn.",
+        "psychology_display": "Urgency",
+        "attack_type_display": "Smishing (SMS Phishing)"
+      }
+    },
+    {
+      "simulation_id": "P1-AV-002",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Curiosity",
+      "attack_type": "Quishing",
+      "learning_objective": "Nhận diện Quishing — phishing qua mã QR trong email, nguy hiểm vì URL ẩn không thể đọc bằng mắt thường",
+      "email": {
+        "sender_name": "VNPay Khuyến Mãi",
+        "sender_email": "promo@vnpay-cashback-event.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Quét QR nhận ngay 200.000đ hoàn tiền từ VNPay",
+        "body": "Kính gửi Quý Khách hàng,\n\nVNPay tri ân khách hàng thân thiết tháng 6/2026 với chương trình hoàn tiền 200.000đ. Chỉ cần quét mã QR bên dưới bằng camera điện thoại và đăng nhập tài khoản VNPay để nhận thưởng ngay.\n\n[MÃ QR — dẫn đến vnpay-cashback-event.com/redeem]\n\nChương trình chỉ áp dụng đến hết ngày 30/06/2026.",
+        "cta_text": "Hoặc click tại đây",
+        "cta_link": "http://vnpay-cashback-event.com/redeem"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "promo@vnpay-cashback-event.com",
+          "explanation": "'vnpay-cashback-event.com' là domain giả — VNPay thật dùng @vnpay.vn. Domain riêng cho sự kiện khuyến mãi là dấu hiệu giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_link",
+          "visible_text": "vnpay-cashback-event.com/redeem",
+          "explanation": "QR Code ẩn URL mà mắt thường không đọc được trước khi quét — đây là lý do Quishing nguy hiểm hơn link thông thường.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "payment_request",
+          "visible_text": "đăng nhập tài khoản VNPay",
+          "explanation": "Yêu cầu đăng nhập qua trang được dẫn từ QR — đây là credential harvesting ẩn sau mồi nhử hoàn tiền.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "vnpay-cashback-event.com",
+        "quét mã QR",
+        "đăng nhập tài khoản VNPay"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Quishing — Phishing qua mã QR!",
+        "summary": "Quishing (QR Phishing) nguy hiểm vì mắt thường không đọc được URL trong QR trước khi quét. Kẻ tấn công lợi dụng điều này để ẩn link độc hại sau mã QR trông vô hại.",
+        "learning_point": "Trước khi quét QR trong email: kiểm tra domain sender trước. Sau khi quét: đọc kỹ URL hiện ra trước khi nhấn 'Mở' — nếu domain không phải vnpay.vn thì đừng tiếp tục.",
+        "psychology_display": "Curiosity",
+        "attack_type_display": "Quishing (QR Phishing)"
+      }
+    },
+    {
+      "simulation_id": "P1-AV-003",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Curiosity + Fear",
+      "attack_type": "Social Media Phishing",
+      "learning_objective": "Nhận diện phishing qua mạng xã hội được chuyển tiếp qua email — Zalo/Telegram scam phổ biến tại Việt Nam",
+      "email": {
+        "sender_name": "Thông Báo Zalo",
+        "sender_email": "notification@zalo-system-alert.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Tin nhắn Zalo quan trọng từ người thân — Xem ngay",
+        "body": "Bạn có tin nhắn Zalo chưa đọc từ một người trong danh bạ:\n\n'Lan ơi mình đang kẹt tiền gấp, nhờ bạn chuyển giúp 3.000.000đ, mình trả lại ngay chiều nay. Số TK: 9988776655 - Techcombank - Nguyễn Thị Hoa. Cảm ơn bạn nhiều!'\n\nNhấp vào đây để xem và trả lời tin nhắn đầy đủ.",
+        "cta_text": "Xem tin nhắn trên Zalo",
+        "cta_link": "http://zalo-system-alert.com/message/view"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "notification@zalo-system-alert.com",
+          "explanation": "'zalo-system-alert.com' là domain giả — Zalo thật dùng @zalo.me. Thông báo Zalo thật hiện trong app, không gửi qua email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_request",
+          "visible_text": "chuyển giúp 3.000.000đ",
+          "explanation": "Kịch bản 'người thân vay tiền gấp qua Zalo' là chiêu lừa đảo phổ biến nhất tại Việt Nam — tài khoản người thân bị chiếm hoặc bị giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_link",
+          "visible_text": "zalo-system-alert.com/message/view",
+          "explanation": "Link dẫn đến trang giả mạo Zalo để lấy thông tin đăng nhập — Zalo thật mở trong app, không qua link email.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "chuyển giúp 3.000.000đ",
+        "zalo-system-alert.com",
+        "trả lại ngay chiều nay"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Social Media Phishing qua Zalo!",
+        "summary": "Kịch bản 'người thân vay tiền gấp qua Zalo' là lừa đảo phổ biến nhất tại Việt Nam hiện nay. Kẻ tấn công chiếm tài khoản Zalo của người thân hoặc tạo tài khoản giả để nhắn tin.",
+        "learning_point": "Khi nhận tin nhắn vay tiền qua Zalo — dù từ người thân — hãy gọi điện thoại trực tiếp để xác nhận trước khi chuyển bất kỳ khoản tiền nào.",
+        "psychology_display": "Curiosity + Fear",
+        "attack_type_display": "Social Media Phishing (Zalo Scam)"
+      }
+    },
+    {
+      "simulation_id": "P1-AV-004",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Authority + Fear",
+      "attack_type": "Vishing",
+      "learning_objective": "Nhận diện Vishing — phishing qua cuộc gọi điện thoại giả danh công an hoặc ngân hàng",
+      "email": {
+        "sender_name": "Cảnh Báo An Ninh",
+        "sender_email": "alert@canhbao-antoan.net",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Cảnh báo: Số điện thoại của bạn bị dùng trong gian lận",
+        "body": "Kính gửi,\n\nSố điện thoại của bạn bị phát hiện liên quan đến đường dây lừa đảo tài chính đang bị điều tra. Cơ quan Công an đã liên hệ với chúng tôi về trường hợp của bạn.\n\nĐể làm rõ và tránh bị khởi tố, vui lòng gọi ngay cho Điều tra viên Nguyễn Văn Thắng theo số: 0909.XXX.XXX trong vòng 2 giờ.\n\nĐây là thông báo khẩn cấp từ hệ thống giám sát an ninh mạng quốc gia.",
+        "cta_text": "Gọi ngay cho điều tra viên",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@canhbao-antoan.net",
+          "explanation": "Cơ quan an ninh nhà nước không liên lạc qua email domain '.net' tư nhân — thông báo thật đến qua kênh chính thức, không qua email ngẫu nhiên.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "Cơ quan Công an",
+          "explanation": "Giả danh công an là chiêu Vishing phổ biến nhất tại Việt Nam — tạo nỗi sợ bị 'khởi tố' để nạn nhân làm theo mọi yêu cầu.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong vòng 2 giờ",
+          "explanation": "Deadline 2 giờ để 'tránh bị khởi tố' — áp lực thời gian ngăn nạn nhân tìm hiểu thêm hoặc hỏi ý kiến người khác.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "Cơ quan Công an",
+        "bị khởi tố",
+        "trong vòng 2 giờ",
+        "canhbao-antoan.net"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Vishing — Phishing qua điện thoại!",
+        "summary": "Vishing (Voice Phishing) giả danh công an là lừa đảo phổ biến nhất tại Việt Nam. Email này chuẩn bị tâm lý để nạn nhân sẵn sàng nhận cuộc gọi từ 'điều tra viên' giả.",
+        "learning_point": "Công an Việt Nam không liên hệ điều tra qua email hay điện thoại lạ — họ làm việc trực tiếp hoặc qua giấy mời chính thức. Khi nghi ngờ: gọi đến số 113 hoặc đồn công an gần nhất để xác minh.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "Vishing (Voice Phishing)"
+      }
+    },
+    {
+      "simulation_id": "P1-AV-005",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Curiosity + Urgency",
+      "attack_type": "Spear Phishing",
+      "learning_objective": "Nhận diện Spear Phishing — email cá nhân hóa cao với thông tin thật về nạn nhân, khó phát hiện hơn phishing thông thường",
+      "email": {
+        "sender_name": "Phòng Nhân Sự — ABC Technology",
+        "sender_email": "hr@abctech-internal.net",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Lan — Cập nhật thông tin lương tháng 7 trước 20/06",
+        "body": "Chào Lan,\n\nBộ phận HR thông báo đợt điều chỉnh lương quý 3/2026 đã được phê duyệt. Để đảm bảo lương tháng 7 được chuyển đúng tài khoản, em vui lòng xác nhận hoặc cập nhật thông tin ngân hàng nhận lương trước ngày 20/06/2026.\n\nThông tin hiện tại hệ thống đang lưu:\n- Ngân hàng: Techcombank\n- Số tài khoản: ****4521\n\nNếu thông tin trên chính xác, nhấp 'Xác nhận'. Nếu cần thay đổi, nhấp 'Cập nhật'.",
+        "cta_text": "Xác nhận / Cập nhật thông tin",
+        "cta_link": "http://abctech-internal.net/payroll-update"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr@abctech-internal.net",
+          "explanation": "'abctech-internal.net' là domain giả — HR thật của ABC Technology dùng @abctech.com.vn. Domain '.net' bên ngoài cho email nội bộ là Red Flag rõ ràng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "xác nhận hoặc cập nhật thông tin ngân hàng nhận lương",
+          "explanation": "Yêu cầu cập nhật tài khoản ngân hàng nhận lương qua link email là Payroll Diversion — chiêu phổ biến trong HR Scam. HR thật xử lý qua hệ thống nội bộ hoặc gặp trực tiếp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "spoofed_brand",
+          "visible_text": "Số tài khoản: ****4521",
+          "explanation": "Thông tin tài khoản một phần (****4521) tạo cảm giác email được cá nhân hóa thật — thực ra đây là số ngẫu nhiên để tăng tính thuyết phục.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2",
+        "rf3"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "abctech-internal.net",
+        "cập nhật thông tin ngân hàng nhận lương",
+        "****4521"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Spear Phishing nhắm vào bạn cụ thể!",
+        "summary": "Spear Phishing cá nhân hóa email với tên nạn nhân, tên công ty, và thậm chí thông tin tài khoản một phần để trông thuyết phục hơn phishing thông thường. Đây là lý do nó khó phát hiện hơn.",
+        "learning_point": "HR thật xử lý thông tin lương qua hệ thống nội bộ hoặc gặp trực tiếp — không qua link email bên ngoài. Khi nhận email HR từ domain lạ: xác minh trực tiếp với bộ phận HR bằng số điện thoại đã biết.",
+        "psychology_display": "Curiosity + Urgency",
+        "attack_type_display": "Spear Phishing"
+      }
+    },
+    {
+      "simulation_id": "P1-AV-006",
+      "batch": "02",
+      "phase": 1,
+      "lesson": "1.3",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Attack Vectors",
+      "psychology": "Authority + Urgency",
+      "attack_type": "Whaling",
+      "learning_objective": "Nhận diện Whaling — Spear Phishing nhắm vào lãnh đạo cấp cao với nội dung nghiên cứu kỹ, thiệt hại lớn nhất",
+      "email": {
+        "sender_name": "PricewaterhouseCoopers Vietnam",
+        "sender_email": "audit@pwc-vietnam-advisory.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Báo cáo kiểm toán Q2/2026 — Yêu cầu xác nhận gấp từ CFO",
+        "body": "Kính gửi chị Nguyễn Thị Lan,\n\nTheo lịch kiểm toán đã thỏa thuận với Ban Giám đốc ABC Technology, PwC Vietnam cần xác nhận một số điểm trong báo cáo tài chính Q2/2026 trước deadline nộp UBCKNN ngày 30/06/2026.\n\nCụ thể, chúng tôi cần chị xác nhận số dư tài khoản ngân hàng và danh sách giao dịch trọng yếu trong kỳ. Vui lòng đăng nhập vào cổng kiểm toán bảo mật để hoàn tất xác nhận.\n\nMọi thắc mắc liên hệ Mr. Phạm Thanh Tùng, Audit Manager: ptung@pwc-vietnam-advisory.com",
+        "cta_text": "Đăng nhập cổng kiểm toán PwC",
+        "cta_link": "https://pwc-vietnam-advisory.com/audit-portal"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "audit@pwc-vietnam-advisory.com",
+          "explanation": "'pwc-vietnam-advisory.com' là domain giả — PwC thật dùng @pwc.com hoặc @vn.pwc.com. Domain '.com' riêng cho 'advisory' là Red Flag với người biết cấu trúc domain công ty kiểm toán lớn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "credential_request",
+          "visible_text": "xác nhận số dư tài khoản ngân hàng và danh sách giao dịch trọng yếu",
+          "explanation": "Kiểm toán viên thật không yêu cầu xác nhận dữ liệu tài chính qua cổng đăng nhập trong email — họ làm việc trực tiếp với kế toán qua quy trình kiểm toán chính thức.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "authority_impersonation",
+          "visible_text": "deadline nộp UBCKNN ngày 30/06/2026",
+          "explanation": "Tham chiếu UBCKNN (Ủy ban Chứng khoán Nhà nước) và deadline thật tạo Authority mạnh — người trong ngành tài chính biết deadline này nên dễ tin hơn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2",
+        "rf3"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "pwc-vietnam-advisory.com",
+        "xác nhận số dư tài khoản ngân hàng",
+        "deadline nộp UBCKNN"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là Whaling — Spear Phishing nhắm lãnh đạo tài chính!",
+        "summary": "Whaling nhắm vào CFO, kế toán trưởng hoặc người có quyền truy cập dữ liệu tài chính. Email này được nghiên cứu kỹ: tên công ty thật, deadline UBCKNN thật, tên kiểm toán viên giả để trông chuyên nghiệp.",
+        "learning_point": "PwC và các công ty kiểm toán Big4 không yêu cầu xác nhận dữ liệu tài chính qua cổng đăng nhập trong email. Khi nhận yêu cầu từ 'kiểm toán viên': xác minh qua số điện thoại chính thức của công ty kiểm toán — không qua thông tin trong email.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Whaling (Targeted Executive Phishing)"
+      }
+    }
+  ]
+}

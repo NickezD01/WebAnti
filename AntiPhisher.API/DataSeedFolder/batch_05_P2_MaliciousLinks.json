@@ -1,0 +1,424 @@
+[
+  {
+    "simulation_id": "P2-SL-001",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Urgency",
+    "attack_type": "Banking Scam",
+    "learning_objective": "Nhận diện link HTTP (không có S) trong email ngân hàng — dấu hiệu cơ bản nhất của link không an toàn",
+    "email": {
+      "sender_name": "Agribank Thông Báo",
+      "sender_email": "notify@agribank-update.net",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Cập nhật thông tin tài khoản Agribank — Hạn 25/06/2026",
+      "body": "Kính gửi Quý Khách hàng,\n\nAgribank thông báo cập nhật hệ thống bảo mật mới. Tất cả khách hàng cần xác nhận lại thông tin tài khoản trước ngày 25/06/2026.\n\nVui lòng truy cập đường link bên dưới để hoàn tất cập nhật và tránh bị gián đoạn dịch vụ.",
+      "cta_text": "Cập nhật tài khoản",
+      "cta_link": "http://agribank-update.net/account-update"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "http://agribank-update.net/account-update",
+        "explanation": "Link dùng HTTP (không có S) — ngân hàng thật luôn dùng HTTPS. Ngoài ra domain 'agribank-update.net' không phải agribank.com.vn.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "suspicious_sender_domain",
+        "visible_text": "notify@agribank-update.net",
+        "explanation": "'agribank-update.net' là domain giả — Agribank thật dùng @agribank.com.vn.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "trước ngày 25/06/2026",
+        "explanation": "Deadline cụ thể tạo áp lực thời gian để người dùng không kịp kiểm tra link kỹ.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["http://agribank-update.net", "agribank-update.net", "trước ngày 25/06/2026"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing!",
+      "summary": "Link dùng HTTP thay vì HTTPS là dấu hiệu cơ bản nhất — ngân hàng và mọi trang web tài chính thật luôn dùng HTTPS. Kết hợp domain giả 'agribank-update.net' là hai red flag rõ ràng.",
+      "learning_point": "Kiểm tra link trước khi click: (1) phải có HTTPS, không phải HTTP; (2) domain phải là agribank.com.vn, không phải biến thể nào khác. Cả hai điều kiện phải đúng cùng lúc.",
+      "psychology_display": "Urgency",
+      "attack_type_display": "Banking Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-002",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Curiosity",
+    "attack_type": "Delivery Scam",
+    "learning_objective": "Nhận diện link rút gọn (shortened URL) trong email giao hàng — ẩn URL thật để vượt qua kiểm tra",
+    "email": {
+      "sender_name": "J&T Express",
+      "sender_email": "tracking@jt-express-vn.net",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Kiện hàng JT-2026-441872 đang chờ giao — Xác nhận ngay",
+      "body": "Kính gửi Quý Khách,\n\nKiện hàng JT-2026-441872 đã đến kho phân phối khu vực của bạn và đang chờ xác nhận thông tin giao hàng.\n\nVui lòng xác nhận địa chỉ và khung giờ giao hàng trong 6 giờ. Sau thời hạn kiện hàng sẽ được chuyển về điểm tập kết.",
+      "cta_text": "Xác nhận giao hàng",
+      "cta_link": "https://bit.ly/jt-vn-441872-confirm"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "https://bit.ly/jt-vn-441872-confirm",
+        "explanation": "Link rút gọn bit.ly ẩn URL thật — không thể biết trang dẫn đến đâu mà không kiểm tra. Đơn vị vận chuyển hợp pháp không dùng link rút gọn trong email chính thức.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "suspicious_sender_domain",
+        "visible_text": "tracking@jt-express-vn.net",
+        "explanation": "'jt-express-vn.net' là domain giả — J&T Express thật dùng @jtexpress.vn.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "trong 6 giờ",
+        "explanation": "Deadline 6 giờ ngăn người dùng tra mã vận đơn trực tiếp trên jtexpress.vn.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["bit.ly/jt-vn-441872", "jt-express-vn.net", "trong 6 giờ"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing dùng link rút gọn!",
+      "summary": "Link rút gọn bit.ly ẩn URL thật — đây là kỹ thuật né tránh kiểm tra. Đơn vị vận chuyển hợp pháp dùng link đầy đủ để khách hàng thấy domain của họ.",
+      "learning_point": "Khi thấy link rút gọn (bit.ly, tinyurl, t.co) trong email giao hàng: kiểm tra tại checkshorturl.com trước khi click. J&T thật dùng link jtexpress.vn — không cần rút gọn.",
+      "psychology_display": "Curiosity + Urgency",
+      "attack_type_display": "Delivery Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-003",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Fear",
+    "attack_type": "Password Reset Scam",
+    "learning_objective": "Nhận diện link có domain giả ẩn sau text hợp lệ — text hiển thị và URL thật hoàn toàn khác nhau",
+    "email": {
+      "sender_name": "Zalo Support",
+      "sender_email": "support@zalo-helpdesk.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Tài khoản Zalo của bạn bị đăng nhập lạ — Đổi mật khẩu ngay",
+      "body": "Xin chào,\n\nChúng tôi phát hiện đăng nhập bất thường vào Zalo của bạn từ thiết bị mới tại TP.HCM lúc 22:13 tối qua.\n\nĐể bảo vệ tài khoản, hãy đổi mật khẩu ngay tại trang bảo mật Zalo chính thức.",
+      "cta_text": "Đổi mật khẩu tại zalo.me/security",
+      "cta_link": "http://zalo-helpdesk.com/reset-password"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "zalo.me/security",
+        "explanation": "Text hiển thị 'zalo.me/security' trông hợp lệ nhưng URL thật là 'http://zalo-helpdesk.com/reset-password' — đây là kỹ thuật ẩn link nguy hiểm sau text an toàn.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "suspicious_sender_domain",
+        "visible_text": "support@zalo-helpdesk.com",
+        "explanation": "'zalo-helpdesk.com' là domain giả — Zalo thật dùng @zalo.me hoặc @zng.vn.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "fear_tactic",
+        "visible_text": "22:13 tối qua",
+        "explanation": "Thời gian cụ thể lúc đêm muộn tạo cảm giác thật và khẩn cấp hơn — kỹ thuật Fear tăng cường.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["zalo-helpdesk.com", "zalo.me/security", "22:13 tối qua"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing dùng link ẩn!",
+      "summary": "Text CTA hiển thị 'zalo.me/security' trông hợp lệ nhưng URL thật là 'zalo-helpdesk.com' — kỹ thuật ẩn link nguy hiểm sau text an toàn. Hover chuột lên link để thấy URL thật trước khi click.",
+      "learning_point": "Luôn hover chuột lên link (không click) để xem URL thật ở status bar góc trái trình duyệt. Text hiển thị có thể là bất kỳ thứ gì — chỉ URL thật mới quan trọng.",
+      "psychology_display": "Fear",
+      "attack_type_display": "Password Reset Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-004",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "easy",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Urgency + Fear",
+    "attack_type": "Banking Scam",
+    "learning_objective": "Nhận diện link có tên ngân hàng thật nhưng domain sai — kỹ thuật nhúng tên thương hiệu vào URL giả",
+    "email": {
+      "sender_name": "VPBank Internet Banking",
+      "sender_email": "ibanking@vpbank-ibanking-secure.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Phát hiện giao dịch đáng ngờ — Xác nhận ngay",
+      "body": "Kính gửi Quý Khách hàng,\n\nHệ thống VPBank phát hiện giao dịch chuyển tiền 9.500.000đ đang chờ xác nhận từ thiết bị không xác định.\n\nNếu không phải bạn thực hiện, nhấp vào đường link bên dưới để hủy giao dịch và bảo vệ tài khoản ngay lập tức.",
+      "cta_text": "Hủy giao dịch và bảo vệ tài khoản",
+      "cta_link": "https://secure.vpbank.com.vn.vpbank-ibanking-secure.com/cancel-transaction"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "secure.vpbank.com.vn.vpbank-ibanking-secure.com/cancel-transaction",
+        "explanation": "URL chứa 'secure.vpbank.com.vn' ở đầu nhưng domain thật là 'vpbank-ibanking-secure.com' — phần trước dấu chấm cuối cùng trước /cancel là domain thật. Đây là kỹ thuật nhúng domain thật làm subdomain giả.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "fear_tactic",
+        "visible_text": "9.500.000đ",
+        "explanation": "Số tiền cụ thể tạo cảm giác giao dịch thật đang xảy ra — Fear mạnh khiến người dùng muốn 'hủy' ngay mà không kiểm tra link.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "suspicious_sender_domain",
+        "visible_text": "ibanking@vpbank-ibanking-secure.com",
+        "explanation": "'vpbank-ibanking-secure.com' là domain giả — VPBank thật dùng @vpbank.com.vn.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["vpbank-ibanking-secure.com", "9.500.000đ", "secure.vpbank.com.vn.vpbank"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing với URL giả tinh vi!",
+      "summary": "URL 'secure.vpbank.com.vn.vpbank-ibanking-secure.com' dùng domain VPBank thật làm subdomain của domain giả — kỹ thuật khó nhận ra nhất khi đọc nhanh.",
+      "learning_point": "Cách đọc URL đúng: đọc từ PHẢI sang TRÁI sau dấu '//' — phần ngay trước '/' đầu tiên là domain thật. 'vpbank-ibanking-secure.com' là domain thật, không phải 'vpbank.com.vn'.",
+      "psychology_display": "Urgency + Fear",
+      "attack_type_display": "Banking Scam"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-005",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "medium",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Curiosity",
+    "attack_type": "Cloud Service Phishing",
+    "learning_objective": "Nhận diện link redirect — link hợp lệ dẫn qua một bước trung gian trước khi chuyển đến trang độc hại",
+    "email": {
+      "sender_name": "Google Drive",
+      "sender_email": "drive-share@google-drive-share.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Nguyen Van An đã chia sẻ tài liệu với bạn",
+      "body": "Xin chào Nguyễn Thị Lan,\n\nNguyễn Văn An (vanb@abctech.com.vn) đã chia sẻ tài liệu 'Báo cáo Q2 2026 — Bản nháp cuối' với bạn qua Google Drive.\n\nTài liệu này được bảo vệ và yêu cầu xác thực tài khoản Google để xem. Nhấp vào đường link để truy cập tài liệu.",
+      "cta_text": "Xem tài liệu được chia sẻ",
+      "cta_link": "https://docs.google.com.view-document.net/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "docs.google.com.view-document.net/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms",
+        "explanation": "URL bắt đầu bằng 'docs.google.com' nhưng domain thật là 'view-document.net' — 'docs.google.com' chỉ là subdomain giả. Đường dẫn dài và ID ngẫu nhiên để trông giống Google Docs thật.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "suspicious_sender_domain",
+        "visible_text": "drive-share@google-drive-share.com",
+        "explanation": "'google-drive-share.com' là domain giả — thông báo chia sẻ Drive thật đến từ @google.com hoặc @drive.google.com.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "credential_request",
+        "visible_text": "yêu cầu xác thực tài khoản Google để xem",
+        "explanation": "File Drive được chia sẻ thật không yêu cầu xác thực riêng ngoài đăng nhập Google bình thường — đây là lý do trang giả cần bạn 'đăng nhập lại'.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["view-document.net", "docs.google.com.view-document", "xác thực tài khoản Google"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là email phishing giả mạo Google Drive!",
+      "summary": "URL 'docs.google.com.view-document.net' dùng Google Docs làm subdomain của domain giả — kỹ thuật tinh vi nhắm người dùng quen với link Google Docs. Domain thật là 'view-document.net'.",
+      "learning_point": "Khi nhận link tài liệu từ đồng nghiệp: xác nhận qua chat/gặp trực tiếp trước khi mở. Google Drive thật dùng link bắt đầu bằng 'https://docs.google.com' — domain gốc phải là 'google.com', không phải gì khác.",
+      "psychology_display": "Curiosity",
+      "attack_type_display": "Cloud Service Phishing"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-006",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "medium",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Authority + Urgency",
+    "attack_type": "Vendor Fraud",
+    "learning_objective": "Nhận diện link trong email nhà cung cấp giả — domain nhà cung cấp thật bị thay bằng domain gần giống",
+    "email": {
+      "sender_name": "Công ty TNHH Phần Mềm XYZ",
+      "sender_email": "invoice@xyz-software-vn.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Hóa đơn #INV-2026-0892 — Thanh toán trước 28/06/2026",
+      "body": "Kính gửi Phòng Kế Toán ABC Technology,\n\nĐính kèm hóa đơn #INV-2026-0892 cho dịch vụ bảo trì phần mềm tháng 6/2026 theo hợp đồng HĐ-2024-XYZ-015.\n\nLưu ý quan trọng: Chúng tôi vừa cập nhật thông tin ngân hàng. Vui lòng tải hóa đơn mới nhất tại đường link bên dưới để có thông tin tài khoản chính xác.",
+      "cta_text": "Tải hóa đơn mới nhất",
+      "cta_link": "https://xyz-software-vn.com/invoice/INV-2026-0892.pdf"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "xyz-software-vn.com/invoice/INV-2026-0892.pdf",
+        "explanation": "Link tải hóa đơn từ domain cần đối chiếu với thông tin nhà cung cấp trong hệ thống — 'xyz-software-vn.com' có thể là domain giả mạo 'xyz-software.com.vn' thật.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "payment_request",
+        "visible_text": "vừa cập nhật thông tin ngân hàng",
+        "explanation": "Thông báo đổi tài khoản ngân hàng trong email hóa đơn gần kỳ thanh toán là Red Flag kinh điển của Vendor Fraud — Man-in-the-Email.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "trước 28/06/2026",
+        "explanation": "Deadline thanh toán gần tạo áp lực để xử lý hóa đơn nhanh mà không kiểm tra kỹ thông tin ngân hàng mới.",
+        "severity": "medium"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2"],
+    "missable_flags": ["rf3"],
+    "highlight_keywords": ["xyz-software-vn.com", "vừa cập nhật thông tin ngân hàng", "trước 28/06/2026"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là Vendor Fraud — Man-in-the-Email!",
+      "summary": "Thông báo đổi tài khoản ngân hàng kèm link hóa đơn mới gần kỳ thanh toán là dấu hiệu Man-in-the-Email. Kẻ tấn công chen vào luồng email giữa hai bên để chuyển hướng thanh toán.",
+      "learning_point": "Khi nhà cung cấp báo đổi tài khoản ngân hàng qua email: gọi điện xác nhận theo số đã biết trước đó — không gọi số trong email vừa nhận. Đây là quy trình bắt buộc không có ngoại lệ.",
+      "psychology_display": "Authority + Urgency",
+      "attack_type_display": "Vendor Fraud / Man-in-the-Email"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-007",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "hard",
+    "email_type": "malicious",
+    "category": "Suspicious Links",
+    "psychology": "Authority + Fear",
+    "attack_type": "Cloud Service Phishing",
+    "learning_objective": "Nhận diện link trong email M365 giả tinh vi — URL dài phức tạp được thiết kế để trông như link Microsoft thật",
+    "email": {
+      "sender_name": "Microsoft Azure AD",
+      "sender_email": "azuread-noreply@microsoftonline-secure.com",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Yêu cầu đăng nhập bất thường — Xác minh danh tính ngay",
+      "body": "Kính gửi Nguyễn Thị Lan,\n\nHệ thống Azure Active Directory phát hiện đăng nhập từ địa chỉ IP 103.72.XX.XX tại Hà Nội không khớp với vị trí thường dùng của bạn.\n\nĐể xác minh danh tính và ngăn truy cập trái phép, vui lòng hoàn tất Multi-Factor Authentication qua đường link bên dưới trong vòng 15 phút.",
+      "cta_text": "Xác minh ngay tại Microsoft Identity",
+      "cta_link": "https://login.microsoftonline.com.identity-verify.net/oauth2/v2.0/authorize?client_id=499b84ac&response_type=code&redirect_uri=https%3A%2F%2Fmicrosoftonline-secure.com%2Fcallback"
+    },
+    "red_flags": [
+      {
+        "id": "rf1",
+        "type": "suspicious_link",
+        "visible_text": "login.microsoftonline.com.identity-verify.net/oauth2/v2.0/authorize",
+        "explanation": "URL bắt đầu bằng 'login.microsoftonline.com' nhưng domain thật là 'identity-verify.net'. Đường dẫn /oauth2/v2.0/authorize được copy y chang từ Microsoft thật để trông xác thực.",
+        "severity": "high"
+      },
+      {
+        "id": "rf2",
+        "type": "suspicious_sender_domain",
+        "visible_text": "azuread-noreply@microsoftonline-secure.com",
+        "explanation": "'microsoftonline-secure.com' là domain giả — Azure AD thật gửi email từ @microsoft.com hoặc @microsoftonline.com.",
+        "severity": "high"
+      },
+      {
+        "id": "rf3",
+        "type": "urgency_language",
+        "visible_text": "trong vòng 15 phút",
+        "explanation": "Deadline 15 phút là cực ngắn — không đủ thời gian để phân tích URL phức tạp, đó chính xác là mục đích của deadline ngắn này.",
+        "severity": "high"
+      }
+    ],
+    "correct_flags": ["rf1", "rf2", "rf3"],
+    "missable_flags": [],
+    "highlight_keywords": ["identity-verify.net", "microsoftonline-secure.com", "trong vòng 15 phút", "oauth2/v2.0/authorize"],
+    "correct_answer": "phishing",
+    "feedback": {
+      "title": "Đây là phishing Azure AD với URL cực tinh vi!",
+      "summary": "URL dài với /oauth2/v2.0/authorize, client_id, redirect_uri được copy từ Microsoft thật để tạo tính xác thực. Nhưng domain thật vẫn là 'identity-verify.net' — không phải microsoftonline.com.",
+      "learning_point": "URL càng dài và phức tạp — càng cần đọc kỹ phần domain. Bỏ qua toàn bộ phần sau dấu '?' và tập trung vào phần giữa '//' và '/' đầu tiên — đó là domain thật duy nhất cần kiểm tra.",
+      "psychology_display": "Authority + Fear + Urgency",
+      "attack_type_display": "Cloud Service Phishing (AiTM)"
+    }
+  },
+  {
+    "simulation_id": "P2-SL-008",
+    "batch": "05",
+    "phase": 2,
+    "lesson": "2.3",
+    "difficulty": "hard",
+    "email_type": "legitimate",
+    "category": "Suspicious Links",
+    "psychology": "N/A",
+    "attack_type": "N/A",
+    "learning_objective": "Nhận biết link tracking hợp lệ trong email marketing — URL dài với tham số tracking không có nghĩa là phishing",
+    "email": {
+      "sender_name": "Shopee",
+      "sender_email": "no-reply@mail.shopee.vn",
+      "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+      "subject": "Flash Sale 12h hôm nay — Sản phẩm trong Wishlist giảm 40%",
+      "body": "Xin chào Nguyễn Thị Lan,\n\nTin vui! 3 sản phẩm trong Wishlist của bạn đang trong chương trình Flash Sale 12h hôm nay với mức giảm lên đến 40%.\n\nChương trình diễn ra từ 12:00 đến 14:00 ngày 18/06/2026. Số lượng có hạn.\n\nXem sản phẩm trong Wishlist của bạn.",
+      "cta_text": "Xem Wishlist ngay",
+      "cta_link": "https://shopee.vn/wishlist?utm_source=email&utm_medium=flash_sale&utm_campaign=20260618&token=eyJhbGciOiJIUzI1NiJ9"
+    },
+    "red_flags": [],
+    "correct_flags": [],
+    "missable_flags": [],
+    "highlight_keywords": [],
+    "correct_answer": "legitimate",
+    "suspicious_element": {
+      "element": "Link có nhiều tham số ?utm_source=email&utm_medium=... và token=eyJhbGciOiJIUzI1NiJ9 trông phức tạp và đáng ngờ — người dùng mới có thể nghĩ đây là link tracking độc hại",
+      "why_legitimate": "Domain 'shopee.vn' là domain chính thức của Shopee — phần quan trọng nhất. Các tham số utm_source, utm_medium, utm_campaign là công cụ tracking marketing tiêu chuẩn mọi nền tảng email lớn đều dùng. Token JWT (eyJhbGci...) là chuỗi xác thực phiên bình thường. Không yêu cầu đăng nhập hay thông tin nhạy cảm. Email có tên người nhận cụ thể và đề cập Wishlist thật của người dùng."
+    },
+    "feedback": {
+      "title": "Đây là email marketing hợp lệ từ Shopee!",
+      "summary": "Tham số utm_source, utm_medium, token JWT trong URL là công cụ tracking marketing tiêu chuẩn — không phải dấu hiệu phishing. Domain 'shopee.vn' hợp lệ là điều quan trọng nhất.",
+      "learning_point": "URL dài với nhiều tham số không có nghĩa là nguy hiểm. Cách đánh giá đúng: (1) domain có phải shopee.vn không? (2) email có yêu cầu mật khẩu hoặc thông tin tài chính không? Nếu domain đúng và không yêu cầu thông tin nhạy cảm — email an toàn dù URL có phức tạp đến đâu.",
+      "psychology_display": "N/A — Email hợp lệ",
+      "attack_type_display": "N/A — Email hợp lệ"
+    }
+  }
+]
