@@ -1,3 +1,4 @@
+using AntiPhisher.Application.DTOs.Analytics;
 using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.Analytics;
@@ -553,6 +554,132 @@ namespace AntiPhisher.Application.Services
             {
                 return new ApiResponse().SetBadRequest($"Lỗi lấy admin overview: {ex.Message}");
             }
+        }
+
+        // ======================================================================
+        // GET MY REPORT — Báo cáo cá nhân cho User đang đăng nhập
+        // ======================================================================
+        public async Task<MyReportResponse> GetMyReportAsync(int userId)
+        {
+            var attempts = await _unitOfWork.UserAttempts.GetAllAsync(
+                filter: a => a.UserId == userId,
+                include: q => q.Include(a => a.AIFeedbacks).Include(a => a.Scenario),
+                pageIndex: 1,
+                pageSize: 10000);
+
+            if (attempts == null || !attempts.Any())
+                return new MyReportResponse();
+
+            int total = attempts.Count;
+            int correctCount = attempts.Count(a => a.IsCorrect);
+            float correctRate = MathF.Round((float)correctCount / total * 100f, 1);
+
+            // RecentTrend: 7 ngày gần nhất (tính theo giờ VN)
+            var today = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _vnTz).Date;
+            var recentTrend = Enumerable.Range(0, 7)
+                .Select(i => today.AddDays(-6 + i))
+                .Select(d =>
+                {
+                    var dayAttempts = attempts
+                        .Where(a => TimeZoneInfo.ConvertTimeFromUtc(a.SubmittedAt, _vnTz).Date == d)
+                        .ToList();
+                    return new DailyTrend
+                    {
+                        Date    = d.ToString("dd/MM"),
+                        Correct = dayAttempts.Count(a => a.IsCorrect),
+                        Total   = dayAttempts.Count
+                    };
+                })
+                .ToList();
+
+            // SkillBreakdown
+            var phishingAttempts = attempts.Where(a => a.Scenario != null && a.Scenario.IsPhishing).ToList();
+            var safeAttempts     = attempts.Where(a => a.Scenario != null && !a.Scenario.IsPhishing).ToList();
+
+            var skillBreakdown = new SkillBreakdown
+            {
+                ClickedLinkRate        = MathF.Round((float)attempts.Count(a => a.IsClickedLink)             / total * 100f, 1),
+                CredentialLeakedRate   = MathF.Round((float)attempts.Count(a => a.IsCredentialLeaked)        / total * 100f, 1),
+                ReportedCorrectlyRate  = MathF.Round((float)attempts.Count(a => a.IsReported && a.IsCorrect) / total * 100f, 1),
+                PhishingDetectionRate  = phishingAttempts.Count > 0
+                    ? MathF.Round((float)phishingAttempts.Count(a => a.IsCorrect) / phishingAttempts.Count * 100f, 1)
+                    : 0f,
+                SafeEmailAccuracy      = safeAttempts.Count > 0
+                    ? MathF.Round((float)safeAttempts.Count(a => a.IsCorrect) / safeAttempts.Count * 100f, 1)
+                    : 0f,
+            };
+
+            // TopFeedbacks: 3 AIFeedback gần nhất có FeedbackText
+            var topFeedbacks = attempts
+                .SelectMany(a => a.AIFeedbacks
+                    .Where(f => !string.IsNullOrWhiteSpace(f.FeedbackText))
+                    .Select(f => new { Feedback = f, ScenarioTitle = a.Scenario?.Title ?? "N/A" }))
+                .OrderByDescending(x => x.Feedback.CreatedAt)
+                .Take(3)
+                .Select(x => new RecentFeedback
+                {
+                    ScenarioTitle  = x.ScenarioTitle,
+                    FeedbackText   = x.Feedback.FeedbackText   ?? "",
+                    ImprovementTips = x.Feedback.ImprovementTips ?? "",
+                    CreatedAt      = TimeZoneInfo.ConvertTimeFromUtc(x.Feedback.CreatedAt, _vnTz)
+                                        .ToString("dd/MM/yyyy HH:mm")
+                })
+                .ToList();
+
+            return new MyReportResponse
+            {
+                TotalAttempts  = total,
+                CorrectRate    = correctRate,
+                RecentTrend    = recentTrend,
+                SkillBreakdown = skillBreakdown,
+                TopFeedbacks   = topFeedbacks,
+            };
+        }
+
+        // ======================================================================
+        // COMPANY LEADERBOARD — Xếp hạng nhân viên theo tỉ lệ đúng
+        // ======================================================================
+        public async Task<LeaderboardResponse> GetCompanyLeaderboardAsync(int managerId)
+        {
+            var (companyId, employeeIds) = await GetCompanyContextAsync(managerId);
+            if (companyId == -1)
+                return new LeaderboardResponse();
+
+            var employees = await _unitOfWork.Users.GetAllAsync(
+                u => u.CompanyId == companyId && u.RoleId == 3);
+
+            if (employees == null || !employees.Any())
+                return new LeaderboardResponse();
+
+            var allAttempts = employeeIds.Any()
+                ? await _unitOfWork.UserAttempts.GetAllAsync(a => employeeIds.Contains(a.UserId))
+                : new List<UserAttempt>();
+            allAttempts ??= new List<UserAttempt>();
+
+            var entries = employees.Select(emp =>
+            {
+                var empAttempts = allAttempts.Where(a => a.UserId == emp.UserId).ToList();
+                int total   = empAttempts.Count;
+                int correct = empAttempts.Count(a => a.IsCorrect);
+                float correctRate = total > 0 ? MathF.Round((float)correct / total * 100f, 1) : 0f;
+
+                return new LeaderboardEntry
+                {
+                    UserId        = emp.UserId,
+                    FullName      = emp.FullName ?? "",
+                    Email         = emp.Email    ?? "",
+                    TotalAttempts = total,
+                    CorrectRate   = correctRate,
+                };
+            })
+            .OrderByDescending(e => e.CorrectRate)
+            .ThenByDescending(e => e.TotalAttempts)
+            .ToList();
+
+            for (int i = 0; i < entries.Count; i++)
+                entries[i].Rank = i + 1;
+
+            return new LeaderboardResponse { Entries = entries };
         }
     }
 }

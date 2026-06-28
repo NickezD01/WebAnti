@@ -125,11 +125,15 @@ namespace AntiPhisher.Application.Services
 
                 try
                 {
+                    var combinedHint = scenario.PhishingIndicators ?? "[]";
+                    if (!string.IsNullOrWhiteSpace(request.UserObservations))
+                        combinedHint += $"\n\n[Nhận xét của người dùng]: {request.UserObservations}";
+
                     var rawJson = await _openRouter.AnalyzeScenarioAttemptAsync(
                         scenario.Subject,
                         scenario.SenderEmail,
                         scenario.EmailBodyHtml,
-                        scenario.PhishingIndicators,
+                        combinedHint,
                         isPhishingScenario,
                         request.IsClickedLink,
                         request.IsCredentialLeaked,

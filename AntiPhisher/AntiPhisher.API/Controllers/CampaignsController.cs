@@ -31,14 +31,14 @@ namespace AntiPhisher.API.Controllers
         private readonly ICampaignService _campaignService;
         private readonly IClaimService _claimService;
         private readonly AppDbContext _context;
-        private readonly OpenRouterAnalysisService _aiService;
+        private readonly IOpenRouterAnalysisService _aiService;
 
         // ✅ Một constructor duy nhất, assign đủ 4 field
         public CampaignsController(
             ICampaignService campaignService,
             IClaimService claimService,
             AppDbContext context,
-            OpenRouterAnalysisService aiService)
+            IOpenRouterAnalysisService aiService)
          {
             _campaignService = campaignService;
             _claimService = claimService;

@@ -65,5 +65,23 @@ namespace AntiPhisher.API.Controllers
             var result = await _analyticsService.GetCampaignCompletionAsync(claim.Id);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        [Authorize]
+        [HttpGet("my-report")]
+        public async Task<IActionResult> GetMyReport()
+        {
+            var claim = _claimService.GetUserClaim();
+            var result = await _analyticsService.GetMyReportAsync(claim.Id);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Manager")]
+        [HttpGet("company-leaderboard")]
+        public async Task<IActionResult> GetCompanyLeaderboard()
+        {
+            var claim = _claimService.GetUserClaim();
+            var result = await _analyticsService.GetCompanyLeaderboardAsync(claim.Id);
+            return Ok(result);
+        }
     }
 }

@@ -132,6 +132,9 @@ namespace AntiPhisher.Infrastructure
                 "cho một bài tập mô phỏng nhận diện email phishing (Scenario). " +
                 "Dựa vào nội dung email và hành vi thực tế của học viên, hãy viết phản hồi giáo dục, " +
                 "khuyến khích, dễ hiểu. " +
+                "Nếu có phần [Nhận xét của người dùng] trong gợi ý dấu hiệu, hãy đánh giá nhận xét đó trong feedbackText: " +
+                "họ nhận ra đúng bao nhiêu dấu hiệu, hiểu đúng thủ thuật tâm lý không, phân loại tấn công có chính xác không. " +
+                "Khen những điểm đúng và chỉ ra điểm sai hoặc thiếu. " +
                 "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
                 "{\"feedbackText\": \"...\", \"indicatorsExplained\": \"...\", \"improvementTips\": \"...\"}";
 

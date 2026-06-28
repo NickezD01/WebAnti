@@ -1,3 +1,4 @@
+using AntiPhisher.Application.DTOs.Analytics;
 using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.Analytics;
 
@@ -5,6 +6,8 @@ namespace AntiPhisher.Application.Interfaces
 {
     public interface IAnalyticsService
     {
+        Task<MyReportResponse> GetMyReportAsync(int userId);
+        Task<LeaderboardResponse> GetCompanyLeaderboardAsync(int managerId);
         /// <summary>
         /// Tổng quan hiệu suất bảo mật toàn công ty của Manager đang đăng nhập.
         /// Gồm: avg risk score, detection rate, lesson completion, heatmap click nhầm UTC+7.
