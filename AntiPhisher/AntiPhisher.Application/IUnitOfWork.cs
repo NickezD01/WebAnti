@@ -48,6 +48,8 @@ namespace AntiPhisher.Application
         IUserAttemptRepository UserAttempts { get; }
         IAIFeedbackRepository AIFeedbacks { get; }
         INotificationRepository Notifications { get; }
+        IUserFlawSummaryRepository UserFlawSummaries { get; }
+        IAIExpandedKnowledgeRepository AIExpandedKnowledges { get; }
 
         // =========================
         // SUBSCRIPTION / PAYMENT

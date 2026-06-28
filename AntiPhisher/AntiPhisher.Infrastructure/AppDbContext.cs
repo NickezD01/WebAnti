@@ -37,6 +37,8 @@ namespace AntiPhisher.Infrastructure
         // --- Kết quả & Đánh giá (AI) ---
         public DbSet<UserAttempt> UserAttempts { get; set; }
         public DbSet<AIFeedback> AIFeedbacks { get; set; }
+        public DbSet<UserFlawSummary> UserFlawSummaries { get; set; }
+        public DbSet<AIExpandedKnowledge> AIExpandedKnowledges { get; set; }
 
         // --- Bảo mật, Nhật ký & Thông báo ---
         public DbSet<Notification> Notifications { get; set; }

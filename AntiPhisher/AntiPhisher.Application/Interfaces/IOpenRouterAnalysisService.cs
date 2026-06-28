@@ -16,5 +16,24 @@ namespace AntiPhisher.Application.Interfaces
             bool isCredentialLeaked,
             bool isReported,
             bool isCorrect);
+
+        Task<string> GenerateUserPredictiveAdviceAsync(
+            string tacticStatsJson,
+            int totalAttempts,
+            int totalFlaws);
+
+        Task<string> GenerateExecutiveSummaryAsync(
+            string companyName,
+            int totalEmployees,
+            decimal orgFailRate,
+            string tacticBreakdownJson);
+
+        Task<string> GenerateScenarioFromContextAsync(
+            string difficultyName,
+            string fewShotContextJson);
+
+        Task<string> GenerateSimilarScenarioAsync(
+            string difficultyName,
+            string fewShotScenariosJson);
     }
 }

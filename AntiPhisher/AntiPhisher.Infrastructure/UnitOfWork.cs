@@ -54,6 +54,8 @@ namespace AntiPhisher.Infrastructure
         public IUserAttemptRepository UserAttempts { get; }
         public IAIFeedbackRepository AIFeedbacks { get; }
         public INotificationRepository Notifications { get; }
+        public IUserFlawSummaryRepository UserFlawSummaries { get; }
+        public IAIExpandedKnowledgeRepository AIExpandedKnowledges { get; }
 
         // =========================
         // SUBSCRIPTION / PAYMENT
@@ -112,6 +114,8 @@ namespace AntiPhisher.Infrastructure
             UserAttempts = new UserAttemptRepository(context);
             AIFeedbacks = new AIFeedbackRepository(context);
             Notifications = new NotificationRepository(context);
+            UserFlawSummaries = new UserFlawSummaryRepository(context);
+            AIExpandedKnowledges = new AIExpandedKnowledgeRepository(context);
 
             // SUBSCRIPTION / PAYMENT
             Subscriptions = new SubscriptionRepository(context);

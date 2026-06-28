@@ -196,5 +196,309 @@ namespace AntiPhisher.Infrastructure
 
             return aiTextResult ?? string.Empty;
         }
+
+        public Task<string> GenerateUserPredictiveAdviceAsync(
+            string tacticStatsJson,
+            int totalAttempts,
+            int totalFlaws)
+            => GenerateUserPredictiveAdviceAsync(tacticStatsJson, totalAttempts, totalFlaws, useFallback: false);
+
+        private async Task<string> GenerateUserPredictiveAdviceAsync(
+            string tacticStatsJson,
+            int totalAttempts,
+            int totalFlaws,
+            bool useFallback)
+        {
+            var model = useFallback ? _options.FallbackModel : _options.Model;
+            var url = $"{_options.BaseUrl}/chat/completions";
+
+            string systemPrompt =
+                "Bạn là chuyên gia phân tích hành vi an toàn thông tin (security awareness analyst) " +
+                "của hệ thống AntiPhisher. Dựa trên dữ liệu lịch sử lỗi của một học viên trong " +
+                "các bài mô phỏng phishing, hãy phân tích pattern lỗi và đưa ra lời khuyên hành động " +
+                "ngắn gọn, cụ thể, mang tính khích lệ — không chỉ trích. " +
+                "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
+                "{\"riskPattern\": \"...\", \"primaryWeakness\": \"...\", \"confidenceScore\": 0.0, " +
+                "\"actionableAdvice\": [\"...\", \"...\"], \"recommendedNextDifficulty\": \"Easy|Medium|Hard\"}";
+
+            string userPrompt =
+                $"Dữ liệu lỗi theo danh mục (90 ngày gần nhất, top 5): {tacticStatsJson}\n" +
+                $"Tổng số lần làm bài: {totalAttempts}. Tổng số lần mắc lỗi: {totalFlaws}.";
+
+            var requestBody = new
+            {
+                model,
+                messages = new object[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt }
+                },
+                response_format = new { type = "json_object" },
+                temperature = 0.3
+            };
+
+            var jsonPayload = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("OpenRouter (PredictiveAdvice) call failed: model={Model}, status={Status}", model, response.StatusCode);
+                if (!useFallback && (response.StatusCode == HttpStatusCode.TooManyRequests
+                                      || response.StatusCode == HttpStatusCode.PaymentRequired))
+                    return await GenerateUserPredictiveAdviceAsync(tacticStatsJson, totalAttempts, totalFlaws, useFallback: true);
+
+                return "{\"riskPattern\": \"Không thể phân tích lúc này\", " +
+                       "\"primaryWeakness\": \"Không xác định\", \"confidenceScore\": 0, " +
+                       "\"actionableAdvice\": [\"Hệ thống AI đang bận, vui lòng thử lại sau.\"], " +
+                       "\"recommendedNextDifficulty\": \"Medium\"}";
+            }
+
+            var jsonResponse2 = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("=== OPENROUTER (PredictiveAdvice) RAW RESPONSE === {Response}", jsonResponse2);
+
+            using var doc2 = JsonDocument.Parse(jsonResponse2);
+            return doc2.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString() ?? string.Empty;
+        }
+
+        public Task<string> GenerateExecutiveSummaryAsync(
+            string companyName,
+            int totalEmployees,
+            decimal orgFailRate,
+            string tacticBreakdownJson)
+            => GenerateExecutiveSummaryAsync(companyName, totalEmployees, orgFailRate, tacticBreakdownJson, useFallback: false);
+
+        private async Task<string> GenerateExecutiveSummaryAsync(
+            string companyName,
+            int totalEmployees,
+            decimal orgFailRate,
+            string tacticBreakdownJson,
+            bool useFallback)
+        {
+            var model = useFallback ? _options.FallbackModel : _options.Model;
+            var url = $"{_options.BaseUrl}/chat/completions";
+
+            string systemPrompt =
+                "Bạn là chuyên gia phân tích an toàn thông tin viết báo cáo cấp quản lý (executive summary) " +
+                "về kết quả huấn luyện chống phishing của một tổ chức trong hệ thống AntiPhisher. " +
+                "Văn phong ngắn gọn, định hướng hành động, phù hợp gửi cho ban lãnh đạo. " +
+                "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
+                "{\"executiveSummary\": \"...\", \"topRisks\": [\"...\", \"...\"], " +
+                "\"suggestedNextCampaignContext\": \"...\", \"suggestedDifficulty\": \"Easy|Medium|Hard\"}";
+
+            string userPrompt =
+                $"Công ty: {companyName}\n" +
+                $"Tổng số nhân viên: {totalEmployees}\n" +
+                $"Tỉ lệ mắc lỗi toàn công ty (90 ngày gần nhất): {orgFailRate}%\n" +
+                $"Phân tích theo loại kỹ thuật lừa đảo (category): {tacticBreakdownJson}";
+
+            var requestBody = new
+            {
+                model,
+                messages = new object[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt }
+                },
+                response_format = new { type = "json_object" },
+                temperature = 0.3
+            };
+
+            var jsonPayload = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("OpenRouter (ExecutiveSummary) call failed: model={Model}, status={Status}", model, response.StatusCode);
+                if (!useFallback && (response.StatusCode == HttpStatusCode.TooManyRequests
+                                      || response.StatusCode == HttpStatusCode.PaymentRequired))
+                    return await GenerateExecutiveSummaryAsync(companyName, totalEmployees, orgFailRate, tacticBreakdownJson, useFallback: true);
+
+                return "{\"executiveSummary\": \"Không thể phân tích lúc này, vui lòng thử lại sau.\", " +
+                       "\"topRisks\": [], \"suggestedNextCampaignContext\": \"\", \"suggestedDifficulty\": \"Medium\"}";
+            }
+
+            var jsonResponse3 = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("=== OPENROUTER (ExecutiveSummary) RAW RESPONSE === {Response}", jsonResponse3);
+
+            using var doc3 = JsonDocument.Parse(jsonResponse3);
+            return doc3.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString() ?? string.Empty;
+        }
+
+        public Task<string> GenerateScenarioFromContextAsync(
+            string difficultyName,
+            string fewShotContextJson)
+            => GenerateScenarioFromContextAsync(difficultyName, fewShotContextJson, useFallback: false);
+
+        private async Task<string> GenerateScenarioFromContextAsync(
+            string difficultyName,
+            string fewShotContextJson,
+            bool useFallback)
+        {
+            var model = useFallback ? _options.FallbackModel : _options.Model;
+            var url = $"{_options.BaseUrl}/chat/completions";
+
+            string systemPrompt =
+                "Bạn là chuyên gia thiết kế tình huống đào tạo nhận diện email lừa đảo (phishing " +
+                "awareness training) cho mục đích giáo dục nội bộ trong tổ chức thuộc hệ thống AntiPhisher. " +
+                "Nhiệm vụ của bạn là soạn một email giả lập (simulation email) dùng để TEST khả năng " +
+                "nhận diện của nhân viên — không phải để tấn công thật. " +
+                "Email phải có các dấu hiệu lừa đảo điển hình nhưng PHẢI rõ ràng là nội dung mô phỏng " +
+                "nội bộ, dùng domain giả lập dạng *.phishtraining.internal. " +
+                "TRẢ LỜI NGẮN GỌN, súc tích, không suy luận dài dòng, không giải thích thêm. " +
+                "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
+                "{\"title\": \"...\", \"senderName\": \"...\", \"senderEmail\": \"...\", " +
+                "\"recipientName\": \"...\", \"subject\": \"...\", \"emailBodyHtml\": \"...\", " +
+                "\"phishingIndicators\": \"...\", \"explanationHint\": \"...\", \"isPhishing\": true}";
+
+            string userPrompt =
+                $"Mức độ khó yêu cầu: {difficultyName}\n" +
+                $"Ngữ cảnh tham khảo (do Admin cung cấp, dùng làm cảm hứng — KHÔNG sao chép nguyên văn):\n" +
+                $"{fewShotContextJson}\n\n" +
+                $"Hãy tạo MỘT email giả lập mới, lấy cảm hứng từ ngữ cảnh trên nhưng có tình huống cụ thể " +
+                $"khác biệt, phù hợp với bối cảnh doanh nghiệp công nghệ tại Việt Nam.";
+
+            var requestBody = new
+            {
+                model,
+                messages = new object[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt }
+                },
+                response_format = new { type = "json_object" },
+                temperature = 0.7,
+                max_tokens = 1500
+            };
+
+            var jsonPayload = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("OpenRouter (GenerateScenario) call failed: model={Model}, status={Status}", model, response.StatusCode);
+                if (!useFallback && (response.StatusCode == HttpStatusCode.TooManyRequests
+                                      || response.StatusCode == HttpStatusCode.PaymentRequired))
+                    return await GenerateScenarioFromContextAsync(difficultyName, fewShotContextJson, useFallback: true);
+
+                return BuildScenarioErrorFallbackJson();
+            }
+
+            var jsonResponse4 = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("=== OPENROUTER (GenerateScenario) RAW RESPONSE === {Response}", jsonResponse4);
+
+            using var doc4 = JsonDocument.Parse(jsonResponse4);
+
+            if (!doc4.RootElement.TryGetProperty("choices", out var choicesElement) || choicesElement.GetArrayLength() == 0)
+            {
+                var errorMsg = doc4.RootElement.TryGetProperty("error", out var errEl) ? errEl.ToString() : "Không xác định";
+                _logger.LogWarning("OpenRouter (GenerateScenario) returned 200 but no choices. Error: {Error}", errorMsg);
+                if (!useFallback)
+                    return await GenerateScenarioFromContextAsync(difficultyName, fewShotContextJson, useFallback: true);
+                return BuildScenarioErrorFallbackJson();
+            }
+
+            return choicesElement[0].GetProperty("message").GetProperty("content").GetString()
+                   ?? BuildScenarioErrorFallbackJson();
+        }
+
+        private static string BuildScenarioErrorFallbackJson() =>
+            "{\"title\": \"Lỗi sinh kịch bản\", \"senderName\": \"\", \"senderEmail\": \"\", " +
+            "\"recipientName\": \"\", \"subject\": \"\", \"emailBodyHtml\": \"\", " +
+            "\"phishingIndicators\": \"\", \"explanationHint\": \"Hệ thống AI đang bận hoặc quá tải, vui lòng thử lại sau.\", " +
+            "\"isPhishing\": true}";
+
+        public Task<string> GenerateSimilarScenarioAsync(
+            string difficultyName,
+            string fewShotScenariosJson)
+            => GenerateSimilarScenarioAsync(difficultyName, fewShotScenariosJson, useFallback: false);
+
+        private async Task<string> GenerateSimilarScenarioAsync(
+            string difficultyName,
+            string fewShotScenariosJson,
+            bool useFallback)
+        {
+            var model = useFallback ? _options.FallbackModel : _options.Model;
+            var url = $"{_options.BaseUrl}/chat/completions";
+
+            string systemPrompt =
+                "Bạn là chuyên gia thiết kế email mô phỏng phishing cho mục đích đào tạo nội bộ " +
+                "trong hệ thống AntiPhisher. Dưới đây là các email mẫu ĐÃ CÓ trong hệ thống ở cùng " +
+                "mức độ khó. Hãy tạo MỘT email MỚI: " +
+                "(1) Cùng mức độ khó, cùng 'họ' kỹ thuật tấn công (tactic) với các mẫu trên; " +
+                "(2) KHÁC BIỆT rõ rệt về: chủ đề cụ thể, tên thương hiệu giả mạo, cách diễn đạt, tình huống; " +
+                "(3) KHÔNG sao chép gần giống bất kỳ mẫu nào ở trên; " +
+                "(4) Dùng domain giả lập dạng *.phishtraining.internal. " +
+                "TRẢ LỜI NGẮN GỌN, súc tích, không suy luận dài dòng, không giải thích thêm. " +
+                "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
+                "{\"title\": \"...\", \"senderName\": \"...\", \"senderEmail\": \"...\", " +
+                "\"recipientName\": \"...\", \"subject\": \"...\", \"emailBodyHtml\": \"...\", " +
+                "\"phishingIndicators\": \"...\", \"explanationHint\": \"...\", \"isPhishing\": true}";
+
+            string userPrompt =
+                $"Mức độ khó: {difficultyName}\n" +
+                $"Các mẫu hiện có (KHÔNG được tạo email giống các mẫu này):\n" +
+                $"{fewShotScenariosJson}";
+
+            var requestBody = new
+            {
+                model,
+                messages = new object[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt }
+                },
+                response_format = new { type = "json_object" },
+                temperature = 0.8,
+                max_tokens = 1500
+            };
+
+            var jsonPayload = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("OpenRouter (SimilarScenario) call failed: model={Model}, status={Status}", model, response.StatusCode);
+                if (!useFallback && (response.StatusCode == HttpStatusCode.TooManyRequests
+                                      || response.StatusCode == HttpStatusCode.PaymentRequired))
+                    return await GenerateSimilarScenarioAsync(difficultyName, fewShotScenariosJson, useFallback: true);
+
+                return BuildSimilarScenarioErrorFallbackJson();
+            }
+
+            var jsonResponse5 = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("=== OPENROUTER (SimilarScenario) RAW RESPONSE === {Response}", jsonResponse5);
+
+            using var doc5 = JsonDocument.Parse(jsonResponse5);
+
+            if (!doc5.RootElement.TryGetProperty("choices", out var choices5) || choices5.GetArrayLength() == 0)
+            {
+                var errorMsg = doc5.RootElement.TryGetProperty("error", out var errEl) ? errEl.ToString() : "Không xác định";
+                _logger.LogWarning("OpenRouter (SimilarScenario) returned 200 but no choices. Error: {Error}", errorMsg);
+                if (!useFallback)
+                    return await GenerateSimilarScenarioAsync(difficultyName, fewShotScenariosJson, useFallback: true);
+                return BuildSimilarScenarioErrorFallbackJson();
+            }
+
+            return choices5[0].GetProperty("message").GetProperty("content").GetString()
+                   ?? BuildSimilarScenarioErrorFallbackJson();
+        }
+
+        private static string BuildSimilarScenarioErrorFallbackJson() =>
+            "{\"title\": \"Lỗi sinh biến thể\", \"senderName\": \"\", \"senderEmail\": \"\", " +
+            "\"recipientName\": \"\", \"subject\": \"\", \"emailBodyHtml\": \"\", " +
+            "\"phishingIndicators\": \"\", \"explanationHint\": \"Hệ thống AI đang bận hoặc quá tải, vui lòng thử lại sau.\", " +
+            "\"isPhishing\": true}";
     }
 }

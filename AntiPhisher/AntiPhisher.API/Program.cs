@@ -329,6 +329,12 @@ builder.Services.AddScoped<MoMoService>();
 builder.Services.AddScoped<IPaymentService, MoMoService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IUserFlawSummaryService, UserFlawSummaryService>();
+builder.Services.AddScoped<IOrgReportService, OrgReportService>();
+builder.Services.AddScoped<IAIKnowledgeService, AIKnowledgeService>();
+builder.Services.AddScoped<ICampaignGeneratorService, CampaignGeneratorService>();
+builder.Services.AddScoped<ITemplateExpansionService, TemplateExpansionService>();
+builder.Services.AddScoped<IScenarioReviewService, ScenarioReviewService>();
 builder.Services.Configure<OpenRouterOptions>(builder.Configuration.GetSection("OpenRouter"));
 builder.Services.AddHttpClient<IOpenRouterAnalysisService, OpenRouterAnalysisService>();
 
