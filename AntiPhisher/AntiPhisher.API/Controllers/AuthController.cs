@@ -84,5 +84,19 @@ namespace AntiPhisher.API.Controllers
             var result = await _service.ResetPasswordAsync(request);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        /// <summary>
+        /// Tái cấp JWT với role hiện tại từ DB.
+        /// Dùng sau khi SePay webhook nâng cấp role lên Manager nhưng FE vẫn giữ token cũ.
+        /// POST /api/Auth/refresh-token
+        /// </summary>
+        [Authorize]
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var userId = _claimService.GetUserClaim().Id;
+            var result = await _service.RefreshTokenAsync(userId);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AntiPhisher.Application.Request.CompanyRequest;
+using AntiPhisher.Application.Request.CompanyRequest;
 using AntiPhisher.Application.Response;
 using System;
 using System.Collections.Generic;
@@ -18,5 +18,8 @@ namespace AntiPhisher.Application.Interfaces
 
         /// <summary>Nhân viên bấm link xác nhận trong email → thêm vào công ty.</summary>
         Task<ApiResponse> AcceptInvitationAsync(string token);
+
+        /// <summary>Cập nhật tên công ty (chủ công ty, không cần role Manager).</summary>
+        Task<ApiResponse> UpdateCompanyNameAsync(string companyName);
     }
 }

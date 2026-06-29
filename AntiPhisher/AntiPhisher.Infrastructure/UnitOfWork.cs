@@ -79,6 +79,11 @@ namespace AntiPhisher.Infrastructure
         public IQuizOptionRepository   QuizOptions    { get; }
 
         // =========================
+        // GAMIFICATION
+        // =========================
+        public IUserCertificateRepository Certificates { get; }
+
+        // =========================
         // CONSTRUCTOR
         // =========================
         public UnitOfWork(AppDbContext context)
@@ -133,6 +138,8 @@ namespace AntiPhisher.Infrastructure
             LessonQuizzes = new LessonQuizRepository(context);
             QuizQuestions = new QuizQuestionRepository(context);
             QuizOptions   = new QuizOptionRepository(context);
+
+            Certificates = new UserCertificateRepository(context);
         }
 
         // =========================

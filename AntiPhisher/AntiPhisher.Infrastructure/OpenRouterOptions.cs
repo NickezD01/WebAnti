@@ -217,6 +217,7 @@ namespace AntiPhisher.Infrastructure
                 "của hệ thống AntiPhisher. Dựa trên dữ liệu lịch sử lỗi của một học viên trong " +
                 "các bài mô phỏng phishing, hãy phân tích pattern lỗi và đưa ra lời khuyên hành động " +
                 "ngắn gọn, cụ thể, mang tính khích lệ — không chỉ trích. " +
+                "TẤT CẢ nội dung text trong JSON BẮT BUỘC phải viết bằng tiếng Việt. " +
                 "BẮT BUỘC trả về CHỈ JSON thuần túy, không kèm ký tự hay lời dẫn nào khác, theo cấu trúc: " +
                 "{\"riskPattern\": \"...\", \"primaryWeakness\": \"...\", \"confidenceScore\": 0.0, " +
                 "\"actionableAdvice\": [\"...\", \"...\"], \"recommendedNextDifficulty\": \"Easy|Medium|Hard\"}";

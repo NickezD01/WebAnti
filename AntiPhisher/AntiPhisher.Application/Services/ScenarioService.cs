@@ -273,6 +273,23 @@ namespace AntiPhisher.Application.Services
             return _mapper.Map<IEnumerable<ScenarioDetailResponse>>(scenarios);
         }
 
+        // 1b. LẤY KỊCH BẢN PHÙ HỢP VỚI USER (global + công ty cùng CompanyId)
+        public async Task<IEnumerable<ScenarioDetailResponse>> GetScenariosForUserAsync(int userId)
+        {
+            var user = await _unitOfWork.Users.GetAsync(filter: u => u.UserId == userId);
+            if (user?.CompanyId == null)
+                return await GetAllScenariosAsync();
+
+            var companyId = user.CompanyId.Value;
+            var scenarios = await _unitOfWork.Scenarios.GetAllAsync(
+                filter: s => s.CreatedByUserId == null || s.CreatedByUser.CompanyId == companyId,
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category).Include(s => s.CreatedByUser),
+                pageIndex: 1,
+                pageSize: 200
+            );
+            return _mapper.Map<IEnumerable<ScenarioDetailResponse>>(scenarios);
+        }
+
         // 2. LẤY CHI TIẾT KỊCH BẢN THEO ID
         public async Task<ScenarioDetailResponse?> GetScenarioByIdAsync(int id)
         {
@@ -302,7 +319,27 @@ namespace AntiPhisher.Application.Services
             return _mapper.Map<ScenarioDetailResponse>(result);
         }
 
-        // 4. CẬP NHẬT KỊCH BẢN 
+        // 3b. TẠO KỊCH BẢN CÔNG TY (Manager, gắn CreatedByUserId)
+        public async Task<ScenarioDetailResponse> CreateCompanyScenarioAsync(CreateScenarioRequest request, int creatorUserId)
+        {
+            var scenario = _mapper.Map<Scenario>(request);
+            scenario.CreatedAt = DateTime.UtcNow;
+            scenario.UpdatedAt = DateTime.UtcNow;
+            scenario.CreatedByUserId = creatorUserId;
+            scenario.IsAIGenerated = true;
+            scenario.IsActive = true;
+
+            await _unitOfWork.Scenarios.AddAsync(scenario);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = await _unitOfWork.Scenarios.GetAsync(
+                filter: s => s.ScenarioId == scenario.ScenarioId,
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category)
+            );
+            return _mapper.Map<ScenarioDetailResponse>(result);
+        }
+
+        // 4. CẬP NHẬT KỊCH BẢN
         public async Task<ScenarioDetailResponse> UpdateScenarioAsync(int id, UpdateScenarioRequest request)
         {
             var existingScenario = await _unitOfWork.Scenarios.GetAsync(filter: s => s.ScenarioId == id);

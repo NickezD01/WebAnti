@@ -73,6 +73,11 @@ namespace AntiPhisher.Application
         IQuizOptionRepository   QuizOptions    { get; }
 
         // =========================
+        // GAMIFICATION
+        // =========================
+        IUserCertificateRepository Certificates { get; }
+
+        // =========================
         // METHODS
         // =========================
         Task SaveChangeAsync();

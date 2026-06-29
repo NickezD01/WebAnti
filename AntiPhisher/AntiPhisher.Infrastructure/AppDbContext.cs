@@ -71,6 +71,9 @@ namespace AntiPhisher.Infrastructure
         // --- KẾT QUẢ BÀI HỌC & CHIẾN DỊCH ---
         public DbSet<UserCampaignResult> UserCampaignResults { get; set; }
 
+        // --- CHỨNG CHỈ ---
+        public DbSet<UserCertificate> UserCertificates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

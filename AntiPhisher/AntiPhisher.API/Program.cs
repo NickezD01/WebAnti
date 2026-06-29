@@ -338,6 +338,7 @@ builder.Services.AddScoped<IScenarioReviewService, ScenarioReviewService>();
 builder.Services.Configure<OpenRouterOptions>(builder.Configuration.GetSection("OpenRouter"));
 builder.Services.AddHttpClient<IOpenRouterAnalysisService, OpenRouterAnalysisService>();
 
+builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 

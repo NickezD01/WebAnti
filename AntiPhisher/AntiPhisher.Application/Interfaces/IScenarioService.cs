@@ -17,8 +17,10 @@ namespace AntiPhisher.Application.Interfaces
 
         // Các hàm CRUD mới thêm
         Task<IEnumerable<ScenarioDetailResponse>> GetAllScenariosAsync();
+        Task<IEnumerable<ScenarioDetailResponse>> GetScenariosForUserAsync(int userId);
         Task<ScenarioDetailResponse?> GetScenarioByIdAsync(int id);
         Task<ScenarioDetailResponse> CreateScenarioAsync(CreateScenarioRequest request);
+        Task<ScenarioDetailResponse> CreateCompanyScenarioAsync(CreateScenarioRequest request, int creatorUserId);
         Task<ScenarioDetailResponse> UpdateScenarioAsync(int id, UpdateScenarioRequest request);
         Task<bool> DeleteScenarioAsync(int id);
     }

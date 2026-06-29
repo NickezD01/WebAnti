@@ -718,8 +718,29 @@ namespace AntiPhisher.Application.Services
         }
 
         // =====================================================
-        // UNUSED
+        // REFRESH TOKEN
         // =====================================================
+
+        public async Task<ApiResponse> RefreshTokenAsync(int userId)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var user = await _unitOfWork.Users.GetAsync(
+                    u => u.UserId == userId,
+                    include: source => source.Include(u => u.Role)
+                );
+                if (user == null)
+                    return response.SetBadRequest("Người dùng không tồn tại.");
+
+                string token = CreateToken(user);
+                return response.SetOk(token);
+            }
+            catch (Exception ex)
+            {
+                return response.SetBadRequest($"Lỗi làm mới token: {ex.Message}");
+            }
+        }
 
     }
 }
