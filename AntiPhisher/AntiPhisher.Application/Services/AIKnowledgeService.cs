@@ -32,8 +32,8 @@ namespace AntiPhisher.Application.Services
                 DifficultyId = request.DifficultyId,
                 IsActive = true,
                 CreatedByUserId = createdByUserId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
             };
 
             await _unitOfWork.AIExpandedKnowledges.AddAsync(entity);
@@ -49,7 +49,7 @@ namespace AntiPhisher.Application.Services
                 include: q => q.Include(k => k.Difficulty));
 
             return (items ?? new List<AIExpandedKnowledge>())
-                .OrderByDescending(k => k.CreatedAt)
+                .OrderByDescending(k => k.CreatedDate)
                 .Select(k => MapToResponse(k, k.Difficulty?.LevelName))
                 .ToList();
         }
@@ -75,7 +75,7 @@ namespace AntiPhisher.Application.Services
                 Tags = entity.Tags,
                 DifficultyId = entity.DifficultyId,
                 DifficultyName = difficultyName,
-                CreatedAt = entity.CreatedAt
+                CreatedDate = (DateTime)entity.CreatedDate
             };
         }
     }

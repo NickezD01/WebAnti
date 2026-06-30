@@ -120,7 +120,7 @@ namespace AntiPhisher.Application.Services
                     AttemptId        = attempt.AttemptId,
                     AIModel          = _openRouterModel,
                     PromptTokensUsed = null,
-                    CreatedAt        = DateTime.UtcNow
+                    CreatedDate        = DateTime.UtcNow
                 };
 
                 try

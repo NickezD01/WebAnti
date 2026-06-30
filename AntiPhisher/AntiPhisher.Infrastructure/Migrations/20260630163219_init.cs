@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AntiPhisher.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -262,6 +262,44 @@ namespace AntiPhisher.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AIExpandedKnowledges",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ContextDescription = table.Column<string>(type: "text", nullable: false),
+                    SourceType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    SourceUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    SampleEmailContent = table.Column<string>(type: "text", nullable: true),
+                    Tags = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    DifficultyId = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    CreatedByUserId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AIExpandedKnowledges", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AIExpandedKnowledges_DifficultyLevels_DifficultyId",
+                        column: x => x.DifficultyId,
+                        principalTable: "DifficultyLevels",
+                        principalColumn: "DifficultyId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AIExpandedKnowledges_Users_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Campaigns",
                 columns: table => new
                 {
@@ -399,7 +437,7 @@ namespace AntiPhisher.Infrastructure.Migrations
                     Token = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsRevoked = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -437,7 +475,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                     SimulationId = table.Column<string>(type: "text", nullable: true),
                     SimulationMetaJson = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    GenerationStatus = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true, defaultValue: "Manual"),
+                    SourceScenarioIds = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    ContentHash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: true),
+                    ReviewedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -460,6 +503,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Scenarios_Users_ReviewedByUserId",
+                        column: x => x.ReviewedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -533,6 +582,56 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserCertificates",
+                columns: table => new
+                {
+                    CertificateId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    CertificateCode = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    IssuedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    CorrectRateSnapshot = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
+                    TotalAttemptsSnapshot = table.Column<int>(type: "integer", nullable: false),
+                    FullNameSnapshot = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    CompanyNameSnapshot = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCertificates", x => x.CertificateId);
+                    table.ForeignKey(
+                        name: "FK_UserCertificates_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserFlawSummaries",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    TopTacticsJson = table.Column<string>(type: "text", nullable: true),
+                    TotalAttempts = table.Column<int>(type: "integer", nullable: false),
+                    TotalFlaws = table.Column<int>(type: "integer", nullable: false),
+                    CurrentRiskScore = table.Column<decimal>(type: "numeric(5,2)", nullable: false, defaultValue: 0m),
+                    LastAiAdviceJson = table.Column<string>(type: "text", nullable: true),
+                    LastAnalyzedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFlawSummaries", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserFlawSummaries_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -641,6 +740,32 @@ namespace AntiPhisher.Infrastructure.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserCampaignResults",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    CampaignId = table.Column<int>(type: "integer", nullable: false),
+                    UserAction = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    IsCorrect = table.Column<bool>(type: "boolean", nullable: false),
+                    DetectedFlaw = table.Column<string>(type: "text", nullable: false),
+                    Reason = table.Column<string>(type: "text", nullable: false),
+                    Advice = table.Column<string>(type: "text", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCampaignResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCampaignResults_Campaigns_CampaignId",
+                        column: x => x.CampaignId,
+                        principalTable: "Campaigns",
+                        principalColumn: "CampaignId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -864,7 +989,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                     ImprovementTips = table.Column<string>(type: "text", nullable: true),
                     AIModel = table.Column<string>(type: "text", nullable: true),
                     PromptTokensUsed = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifiedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -946,6 +1075,16 @@ namespace AntiPhisher.Infrastructure.Migrations
                         principalColumn: "QuestionId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AIExpandedKnowledges_CreatedByUserId",
+                table: "AIExpandedKnowledges",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AIExpandedKnowledges_DifficultyId",
+                table: "AIExpandedKnowledges",
+                column: "DifficultyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AIFeedbacks_AttemptId",
@@ -1132,6 +1271,11 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "DifficultyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Scenarios_ReviewedByUserId",
+                table: "Scenarios",
+                column: "ReviewedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_AccountId",
                 table: "Subscriptions",
                 column: "AccountId");
@@ -1183,6 +1327,22 @@ namespace AntiPhisher.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserCampaignResults_CampaignId",
+                table: "UserCampaignResults",
+                column: "CampaignId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCertificates_CertificateCode",
+                table: "UserCertificates",
+                column: "CertificateCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCertificates_UserId",
+                table: "UserCertificates",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLessonProgresses_LessonId",
                 table: "UserLessonProgresses",
                 column: "LessonId");
@@ -1213,6 +1373,9 @@ namespace AntiPhisher.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AIExpandedKnowledges");
+
             migrationBuilder.DropTable(
                 name: "AIFeedbacks");
 
@@ -1257,6 +1420,15 @@ namespace AntiPhisher.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "TeamMembers");
+
+            migrationBuilder.DropTable(
+                name: "UserCampaignResults");
+
+            migrationBuilder.DropTable(
+                name: "UserCertificates");
+
+            migrationBuilder.DropTable(
+                name: "UserFlawSummaries");
 
             migrationBuilder.DropTable(
                 name: "UserLessonProgresses");

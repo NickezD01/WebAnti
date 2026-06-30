@@ -10,6 +10,6 @@ namespace AntiPhisher.Application.Response.AIKnowledge
         public string Tags { get; set; }
         public int DifficultyId { get; set; }
         public string DifficultyName { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }
