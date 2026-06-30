@@ -21,5 +21,7 @@ namespace AntiPhisher.Application.Interfaces
         // Đã đồng bộ kiểu trả về PasswordDTO theo cấu trúc thực tế của AuthService
         Services.AuthService.PasswordDTO CreatePasswordHash(string password);
 
+        /// <summary>Tái cấp JWT với role hiện tại từ DB (dùng sau khi webhook upgrade role).</summary>
+        Task<ApiResponse> RefreshTokenAsync(int userId);
     }
 }

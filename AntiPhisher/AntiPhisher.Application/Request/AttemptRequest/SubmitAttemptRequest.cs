@@ -27,5 +27,8 @@ namespace AntiPhisher.Application.Request.AttemptRequest
 
         /// <summary>User đã nhấn nút "Báo cáo lừa đảo" (hành vi đúng nhất với phishing).</summary>
         public bool IsReported { get; set; } = false;
+
+        /// <summary>Nhận xét tự do của user: dấu hiệu nhận ra, thủ thuật tâm lý, loại tấn công — truyền vào AI để đánh giá.</summary>
+        public string? UserObservations { get; set; }
     }
 }

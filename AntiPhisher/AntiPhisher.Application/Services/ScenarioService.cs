@@ -10,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -20,16 +18,23 @@ namespace AntiPhisher.Application.Services
     public class ScenarioService : IScenarioService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly HttpClient _httpClient;
+        private readonly IOpenRouterAnalysisService _openRouter;
+        private readonly ILessonService _lessonService;
         private readonly IMapper _mapper;
-        private readonly string _apiKey;
+        private readonly string _openRouterModel;
 
-        public ScenarioService(IUnitOfWork unitOfWork, HttpClient httpClient, IConfiguration configuration, IMapper mapper)
+        public ScenarioService(
+            IUnitOfWork unitOfWork,
+            IOpenRouterAnalysisService openRouter,
+            ILessonService lessonService,
+            IConfiguration configuration,
+            IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _httpClient = httpClient;
+            _openRouter = openRouter;
+            _lessonService = lessonService;
             _mapper = mapper;
-            _apiKey = configuration["OpenAI:ApiKey"] ?? string.Empty;
+            _openRouterModel = configuration["OpenRouter:Model"] ?? "openrouter/free";
         }
 
         // =========================================================
@@ -92,28 +97,88 @@ namespace AntiPhisher.Application.Services
                 await _unitOfWork.UserAttempts.AddAsync(attempt);
                 await _unitOfWork.SaveChangeAsync();
 
-                // 6. Gọi AI với context hành vi phong phú hơn
-                var aiFeedback = await FetchAIFeedbackFromOpenAI(
-                    scenario, isCorrect,
-                    request.IsClickedLink, request.IsCredentialLeaked, request.IsReported);
-                aiFeedback.AttemptId = attempt.AttemptId;
+                // 6. Gate: chỉ gọi AI nếu user đã có gói trả phí
+                bool unlocked = await _lessonService.IsUserUnlockedAsync(userId);
+                if (!unlocked)
+                {
+                    return new AttemptResultResponse
+                    {
+                        AttemptId          = attempt.AttemptId,
+                        IsCorrect          = isCorrect,
+                        ScoreEarned        = scoreEarned,
+                        IsClickedLink      = request.IsClickedLink,
+                        IsCredentialLeaked = request.IsCredentialLeaked,
+                        IsReported         = request.IsReported,
+                        RiskLevel          = riskLevel,
+                        IsAiLocked         = true
+                    };
+                }
+
+                // 7. Gọi OpenRouter + parse JSON phòng thủ
+                var aiFeedback = new AIFeedback
+                {
+                    AttemptId        = attempt.AttemptId,
+                    AIModel          = _openRouterModel,
+                    PromptTokensUsed = null,
+                    CreatedAt        = DateTime.UtcNow
+                };
+
+                try
+                {
+                    var combinedHint = scenario.PhishingIndicators ?? "[]";
+                    if (!string.IsNullOrWhiteSpace(request.UserObservations))
+                        combinedHint += $"\n\n[Nhận xét của người dùng]: {request.UserObservations}";
+
+                    var rawJson = await _openRouter.AnalyzeScenarioAttemptAsync(
+                        scenario.Subject,
+                        scenario.SenderEmail,
+                        scenario.EmailBodyHtml,
+                        combinedHint,
+                        isPhishingScenario,
+                        request.IsClickedLink,
+                        request.IsCredentialLeaked,
+                        request.IsReported,
+                        isCorrect);
+
+                    var cleaned = rawJson.Trim();
+                    if (cleaned.StartsWith("```"))
+                    {
+                        var start = cleaned.IndexOf('\n') + 1;
+                        var end   = cleaned.LastIndexOf("```");
+                        if (end > start) cleaned = cleaned[start..end].Trim();
+                    }
+
+                    using var doc = JsonDocument.Parse(cleaned);
+                    var root = doc.RootElement;
+                    aiFeedback.FeedbackText        = root.GetProperty("feedbackText").GetString()        ?? string.Empty;
+                    aiFeedback.IndicatorsExplained = root.GetProperty("indicatorsExplained").GetString() ?? string.Empty;
+                    aiFeedback.ImprovementTips     = root.GetProperty("improvementTips").GetString()     ?? string.Empty;
+                }
+                catch
+                {
+                    aiFeedback.FeedbackText        = "Hệ thống AI đang bận, không thể phân tích chi tiết lúc này.";
+                    aiFeedback.IndicatorsExplained = "Không thể phân tích dấu hiệu do lỗi kết nối AI.";
+                    aiFeedback.ImprovementTips     = "Hãy luôn kiểm tra kỹ địa chỉ người gửi và đường link trước khi click.";
+                    aiFeedback.AIModel             = "fallback";
+                }
 
                 await _unitOfWork.AIFeedbacks.AddAsync(aiFeedback);
                 await _unitOfWork.SaveChangeAsync();
 
                 return new AttemptResultResponse
                 {
-                    AttemptId = attempt.AttemptId,
-                    IsCorrect = isCorrect,
-                    ScoreEarned = scoreEarned,
-                    IsClickedLink = request.IsClickedLink,
-                    IsCredentialLeaked = request.IsCredentialLeaked,
-                    IsReported = request.IsReported,
-                    RiskLevel = riskLevel,
-                    FeedbackText = aiFeedback.FeedbackText ?? "Không có phản hồi.",
+                    AttemptId           = attempt.AttemptId,
+                    IsCorrect           = isCorrect,
+                    ScoreEarned         = scoreEarned,
+                    IsClickedLink       = request.IsClickedLink,
+                    IsCredentialLeaked  = request.IsCredentialLeaked,
+                    IsReported          = request.IsReported,
+                    RiskLevel           = riskLevel,
+                    IsAiLocked          = false,
+                    FeedbackText        = aiFeedback.FeedbackText        ?? "Không có phản hồi.",
                     IndicatorsExplained = aiFeedback.IndicatorsExplained ?? "Không có giải thích.",
-                    ImprovementTips = aiFeedback.ImprovementTips ?? "Không có mẹo.",
-                    AIModel = aiFeedback.AIModel ?? "gpt-4o"
+                    ImprovementTips     = aiFeedback.ImprovementTips     ?? "Không có mẹo.",
+                    AIModel             = aiFeedback.AIModel             ?? "openrouter"
                 };
             }
             catch (DbUpdateException ex)
@@ -208,6 +273,23 @@ namespace AntiPhisher.Application.Services
             return _mapper.Map<IEnumerable<ScenarioDetailResponse>>(scenarios);
         }
 
+        // 1b. LẤY KỊCH BẢN PHÙ HỢP VỚI USER (global + công ty cùng CompanyId)
+        public async Task<IEnumerable<ScenarioDetailResponse>> GetScenariosForUserAsync(int userId)
+        {
+            var user = await _unitOfWork.Users.GetAsync(filter: u => u.UserId == userId);
+            if (user?.CompanyId == null)
+                return await GetAllScenariosAsync();
+
+            var companyId = user.CompanyId.Value;
+            var scenarios = await _unitOfWork.Scenarios.GetAllAsync(
+                filter: s => s.CreatedByUserId == null || s.CreatedByUser.CompanyId == companyId,
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category).Include(s => s.CreatedByUser),
+                pageIndex: 1,
+                pageSize: 200
+            );
+            return _mapper.Map<IEnumerable<ScenarioDetailResponse>>(scenarios);
+        }
+
         // 2. LẤY CHI TIẾT KỊCH BẢN THEO ID
         public async Task<ScenarioDetailResponse?> GetScenarioByIdAsync(int id)
         {
@@ -237,7 +319,27 @@ namespace AntiPhisher.Application.Services
             return _mapper.Map<ScenarioDetailResponse>(result);
         }
 
-        // 4. CẬP NHẬT KỊCH BẢN 
+        // 3b. TẠO KỊCH BẢN CÔNG TY (Manager, gắn CreatedByUserId)
+        public async Task<ScenarioDetailResponse> CreateCompanyScenarioAsync(CreateScenarioRequest request, int creatorUserId)
+        {
+            var scenario = _mapper.Map<Scenario>(request);
+            scenario.CreatedAt = DateTime.UtcNow;
+            scenario.UpdatedAt = DateTime.UtcNow;
+            scenario.CreatedByUserId = creatorUserId;
+            scenario.IsAIGenerated = true;
+            scenario.IsActive = true;
+
+            await _unitOfWork.Scenarios.AddAsync(scenario);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = await _unitOfWork.Scenarios.GetAsync(
+                filter: s => s.ScenarioId == scenario.ScenarioId,
+                include: query => query.Include(s => s.Difficulty).Include(s => s.Category)
+            );
+            return _mapper.Map<ScenarioDetailResponse>(result);
+        }
+
+        // 4. CẬP NHẬT KỊCH BẢN
         public async Task<ScenarioDetailResponse> UpdateScenarioAsync(int id, UpdateScenarioRequest request)
         {
             var existingScenario = await _unitOfWork.Scenarios.GetAsync(filter: s => s.ScenarioId == id);
@@ -271,86 +373,5 @@ namespace AntiPhisher.Application.Services
             return checkDeleted == null;
         }
 
-        // =========================================================
-        // HÀM PRIVATE GỌI OPENAI GPT-4O (GIỮ NGUYÊN GỐC)
-        // =========================================================
-        private async Task<AIFeedback> FetchAIFeedbackFromOpenAI(
-            Scenario scenario, bool isCorrect,
-            bool isClickedLink, bool isCredentialLeaked, bool isReported)
-        {
-            var fallbackFeedback = new AIFeedback
-            {
-                FeedbackText = "Hệ thống phân tích AI đang bận, vui lòng kiểm tra lại phản hồi chi tiết trong lịch sử.",
-                IndicatorsExplained = "Không thể phân tích dấu hiệu.",
-                ImprovementTips = "Hãy cẩn trọng với các email yêu cầu hành động khẩn cấp.",
-                AIModel = "gpt-4o",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            if (string.IsNullOrEmpty(_apiKey)) return fallbackFeedback;
-
-            string systemPrompt = "Bạn là chuyên gia phân tích bảo mật thông tin (Phishing Security Expert). " +
-                                  "Hãy đưa ra phản hồi bằng tiếng Việt dưới định dạng JSON Object chứa chính xác 3 key: " +
-                                  "\"feedbackText\" (nhận xét hành vi của user trong bài test này), " +
-                                  "\"indicatorsExplained\" (giải thích các dấu hiệu phishing/an toàn trong email), " +
-                                  "\"improvementTips\" (mẹo bảo mật cốt lõi để không bị lừa lần sau).";
-
-            // CHANGED: Prompt mới dùng 3 hành vi cụ thể thay vì "Safe"/"Phishing"
-            string behaviorDesc = $"- Đã bấm vào link giả mạo: {(isClickedLink ? "CÓ ⚠️" : "KHÔNG ✅")}\n" +
-                                  $"- Đã nhập thông tin đăng nhập/thẻ: {(isCredentialLeaked ? "CÓ 🚨" : "KHÔNG ✅")}\n" +
-                                  $"- Đã báo cáo email đáng ngờ: {(isReported ? "CÓ ✅" : "KHÔNG")}";
-
-            string userPrompt = $"[Thông tin Email Phishing]\n" +
-                               $"- Tiêu đề: {scenario.Subject}\n" +
-                               $"- Người gửi: {scenario.SenderEmail}\n" +
-                               $"- Nội dung HTML: {scenario.EmailBodyHtml}\n" +
-                               $"- Dấu hiệu lừa đảo gốc: {scenario.PhishingIndicators}\n\n" +
-                               $"[Hành vi của người dùng]\n" +
-                               behaviorDesc + "\n" +
-                               $"- Kết quả đánh giá: {(isCorrect ? "ĐÚNG ✅ — Đã nhận diện được tấn công" : "SAI ❌ — Bị mắc bẫy lừa đảo")}";
-
-            var requestBody = new
-            {
-                model = "gpt-4o",
-                response_format = new { type = "json_object" },
-                messages = new[]
-                {
-                    new { role = "system", content = systemPrompt },
-                    new { role = "user", content = userPrompt }
-                }
-            };
-
-            try
-            {
-                using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-                requestMessage.Headers.Add("Authorization", $"Bearer {_apiKey}");
-                requestMessage.Content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.SendAsync(requestMessage);
-                if (!response.IsSuccessStatusCode) return fallbackFeedback;
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(responseString);
-
-                var contentJson = doc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
-                var tokensUsed = doc.RootElement.GetProperty("usage").GetProperty("total_tokens").GetInt32();
-
-                using var contentDoc = JsonDocument.Parse(contentJson ?? "{}");
-
-                return new AIFeedback
-                {
-                    FeedbackText = contentDoc.RootElement.GetProperty("feedbackText").GetString(),
-                    IndicatorsExplained = contentDoc.RootElement.GetProperty("indicatorsExplained").GetString(),
-                    ImprovementTips = contentDoc.RootElement.GetProperty("improvementTips").GetString(),
-                    AIModel = "gpt-4o",
-                    PromptTokensUsed = tokensUsed,
-                    CreatedAt = DateTime.UtcNow
-                };
-            }
-            catch
-            {
-                return fallbackFeedback;
-            }
-        }
     }
 }

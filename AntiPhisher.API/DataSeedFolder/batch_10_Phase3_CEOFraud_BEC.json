@@ -1,0 +1,575 @@
+{
+  "batch_id": "10",
+  "batch_name": "Phase 3 — CEO Fraud / BEC",
+  "phase": 3,
+  "lesson": "3.2",
+  "total": 11,
+  "distribution": {
+    "difficulty": { "easy": 4, "medium": 4, "hard": 3 },
+    "type": { "malicious": 9, "legitimate": 2 }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P3-BEC-001",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Urgency",
+      "attack_type": "BEC / CEO Fraud",
+      "learning_objective": "Nhận diện BEC cơ bản — CEO yêu cầu chuyển tiền gấp từ domain giả",
+      "email": {
+        "sender_name": "Nguyễn Văn Đức — Tổng Giám đốc",
+        "sender_email": "nguyen.van.duc@pvpower-group.com",
+        "recipient_email": "tran.thi.lan.chi@pvpower.vn",
+        "subject": "Cần xử lý gấp — Chuyển tiền đối tác hôm nay",
+        "body": "Chị Chi,\n\nAnh đang có cuộc họp quan trọng không thể nghe điện thoại. Chị xử lý gấp giúp anh chuyển khoản 150.000.000đ cho đối tác theo thông tin:\n\nCông ty: Green Energy Partners Ltd\nSố TK: 19036781234567\nNgân hàng: Techcombank — CN Hoàn Kiếm\n\nĐây là thanh toán hợp đồng cung ứng thiết bị Q3. Chuyển xong nhắn anh qua Zalo. Cần xong trước 15:00 hôm nay.\n\nNguyễn Văn Đức\nTổng Giám đốc — PV Power",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "nguyen.van.duc@pvpower-group.com",
+          "explanation": "PV Power dùng @pvpower.vn — 'pvpower-group.com' là domain giả, thêm '-group' để trông như nhánh tập đoàn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "cannot_verify",
+          "visible_text": "đang có cuộc họp quan trọng không thể nghe điện thoại",
+          "explanation": "Lý do không liên lạc được là dấu hiệu BEC điển hình — ngăn nạn nhân xác minh qua điện thoại.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước 15:00 hôm nay",
+          "explanation": "Deadline trong ngày không cho thời gian kiểm tra quy trình phê duyệt thông thường.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["pvpower-group.com", "không thể nghe điện thoại", "trước 15:00"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là BEC — Business Email Compromise!",
+        "summary": "Yêu cầu chuyển tiền gấp từ 'CEO' không thể liên lạc qua điện thoại — cấu trúc BEC cơ bản nhất. Domain người gửi không phải nội bộ công ty.",
+        "learning_point": "Mọi yêu cầu chuyển tiền qua email đều phải xác nhận bằng cuộc gọi đến số điện thoại đã biết của CEO — không gọi số trong email, không nhắn Zalo mới.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "BEC / CEO Fraud"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-002",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Secrecy",
+      "attack_type": "BEC / CEO Fraud",
+      "learning_objective": "Nhận diện BEC dùng yếu tố bí mật (NDA, chưa công bố) để ngăn xác minh nội bộ",
+      "email": {
+        "sender_name": "Phạm Nhật Vượng — Chairman",
+        "sender_email": "pham.nhat.vuong@vingroup-executive.com",
+        "recipient_email": "nguyen.thi.bich@vingroup.net",
+        "subject": "Thương vụ M&A bí mật — Chuyển tiền đặt cọc NDA",
+        "body": "Bích,\n\nAnh đang ở Singapore đàm phán thương vụ M&A quan trọng chưa thể tiết lộ. Cần em xử lý ngay khoản đặt cọc 500.000 USD quy đổi VND theo tỷ giá hôm nay.\n\nBên nhận:\nCompany: Orion Capital Group Pte Ltd\nSWIFT: DBSSSGSG\nAccount: 0729-4456-7823\n\nĐây là NDA — tuyệt đối không trao đổi với ai trong công ty, kể cả CFO. Báo anh qua email này khi xong.\n\nAnh",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "pham.nhat.vuong@vingroup-executive.com",
+          "explanation": "'vingroup-executive.com' không phải domain nội bộ Vingroup — email nội bộ dùng @vingroup.net.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "secrecy_tactic",
+          "visible_text": "tuyệt đối không trao đổi với ai trong công ty, kể cả CFO",
+          "explanation": "Yêu cầu bí mật tuyệt đối — kể cả không báo CFO — là dấu hiệu BEC rõ nhất. Kẻ tấn công cố tình ngăn mọi kênh xác minh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "large_amount_wiring",
+          "visible_text": "500.000 USD",
+          "explanation": "Số tiền rất lớn (500K USD) chuyển ra nước ngoài qua lệnh email — không có quy trình phê duyệt chuẩn nào cho phép điều này.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["vingroup-executive.com", "không trao đổi với ai, kể cả CFO", "500.000 USD"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC dùng bí mật NDA — Red Flag số 1!",
+        "summary": "Yêu cầu 'không báo CFO' là dấu hiệu BEC rõ ràng nhất — mọi giao dịch hợp pháp đều có quy trình kiểm soát nội bộ. Không giao dịch nào hợp lệ cần giữ bí mật khỏi CFO.",
+        "learning_point": "BEC thường dùng: bí mật NDA, CEO đang ở nước ngoài, không nghe điện thoại. Quy tắc: Chuyển tiền lớn LUÔN cần xác nhận đa kênh. Không có ngoại lệ.",
+        "psychology_display": "Authority + Secrecy",
+        "attack_type_display": "BEC / CEO Fraud"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-003",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority",
+      "attack_type": "BEC — Vendor Payment Redirect",
+      "learning_objective": "Nhận diện BEC giả mạo CFO yêu cầu đổi tài khoản ngân hàng nhà cung cấp",
+      "email": {
+        "sender_name": "Lê Thị Thanh Hằng — CFO",
+        "sender_email": "le.thi.thanh.hang@petrolimex-finance.com",
+        "recipient_email": "kieu.van.minh@petrolimex.com.vn",
+        "subject": "Thay đổi tài khoản thanh toán — Nhà cung cấp Petro Logistics",
+        "body": "Anh Minh,\n\nPetro Logistics vừa thông báo họ đổi ngân hàng do hợp nhất. Từ lần thanh toán tới (hóa đơn tháng 6 — 2,3 tỷ), anh dùng thông tin tài khoản mới:\n\nNgân hàng: VPBank — CN Hà Nội\nSố TK: 214500789012\nTên TK: PETRO LOGISTICS COMPANY LTD\n\nTài khoản cũ sẽ bị hủy từ 10/06 nên lần này nhất định phải dùng TK mới.\n\nLê Thanh Hằng\nCFO — Petrolimex",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "le.thi.thanh.hang@petrolimex-finance.com",
+          "explanation": "Petrolimex dùng @petrolimex.com.vn — 'petrolimex-finance.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "payment_redirect",
+          "visible_text": "đổi tài khoản thanh toán",
+          "explanation": "Yêu cầu đổi số tài khoản nhà cung cấp qua email là kỹ thuật BEC Vendor Payment Redirect phổ biến — tiền chuyển thẳng đến tài khoản kẻ tấn công.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "tài khoản cũ sẽ bị hủy từ 10/06",
+          "explanation": "Deadline hủy tài khoản tạo áp lực phải dùng TK mới ngay — không có thời gian xác minh qua điện thoại với nhà cung cấp.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["petrolimex-finance.com", "đổi tài khoản thanh toán", "2,3 tỷ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC — Vendor Payment Redirect gây thiệt hại tỷ đồng!",
+        "summary": "Giả CFO yêu cầu đổi tài khoản nhà cung cấp là một trong những dạng BEC gây thiệt hại lớn nhất — tiền chuyển đến tài khoản kẻ tấn công ngay trong chu kỳ thanh toán bình thường.",
+        "learning_point": "Mọi yêu cầu đổi tài khoản ngân hàng nhà cung cấp PHẢI được xác nhận qua điện thoại với đầu mối đã biết tại nhà cung cấp đó — không xác nhận qua email.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Vendor Payment Redirect"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-004",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "easy",
+      "email_type": "legitimate",
+      "category": "CEO Fraud / BEC",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email từ lãnh đạo hợp lệ — yêu cầu thông tin không phải chuyển tiền",
+      "email": {
+        "sender_name": "Trần Đình Long — CEO",
+        "sender_email": "tran.dinh.long@hoasen.com.vn",
+        "recipient_email": "nguyen.thi.phuong.anh@hoasen.com.vn",
+        "subject": "Báo cáo doanh thu Q2/2026 — Cần trước cuộc họp HĐQT",
+        "body": "Phương Anh,\n\nAnh cần báo cáo tóm tắt doanh thu Q2/2026 (theo khu vực miền Nam) trước 14:00 thứ Sáu tuần này để chuẩn bị cho cuộc họp HĐQT.\n\nFormat: PowerPoint hoặc Excel đều được. Tập trung vào: doanh thu theo kênh phân phối, tỷ lệ đạt KPI so với kế hoạch, top 5 khách hàng.\n\nGửi qua email này là được. Cảm ơn em.\n\nTrần Đình Long",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email từ CEO yêu cầu gấp — có thể bị nhầm với BEC",
+        "why_legitimate": "Domain @hoasen.com.vn là domain nội bộ công ty — người nhận cũng dùng @hoasen.com.vn. Yêu cầu báo cáo (không phải chuyển tiền). Không yêu cầu bí mật. Không có tài khoản ngân hàng. Có deadline hợp lý (thứ Sáu)."
+      },
+      "feedback": {
+        "title": "Đây là email lãnh đạo hợp lệ!",
+        "summary": "Email từ CEO domain nội bộ yêu cầu báo cáo — không phải chuyển tiền, không có bí mật NDA, không có tài khoản ngân hàng.",
+        "learning_point": "BEC luôn liên quan đến chuyển tiền hoặc thông tin tài chính nhạy cảm. Email lãnh đạo yêu cầu tài liệu/báo cáo từ domain nội bộ là hợp lệ.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-005",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Urgency",
+      "attack_type": "BEC — Gift Card Scam",
+      "learning_objective": "Nhận diện BEC yêu cầu mua gift card thay vì chuyển khoản — biến thể phổ biến nhất",
+      "email": {
+        "sender_name": "Võ Quang Huệ — Giám đốc",
+        "sender_email": "vo.quang.hue@vietjet-management.com",
+        "recipient_email": "phan.thi.my.linh@vietjetair.com",
+        "subject": "Nhờ việc gấp — Mua gift card Google Play",
+        "body": "Linh ơi,\n\nAnh đang họp với đối tác nước ngoài, không tiện gọi. Anh cần nhờ em một việc nhỏ gấp: mua 10 thẻ Google Play loại 500.000đ (tổng 5.000.000đ) tại bất kỳ cửa hàng tiện lợi nào.\n\nMua xong chụp ảnh mặt sau thẻ (phần code) gửi anh qua email này ngay nhé. Anh cần để tặng quà đối tác hôm nay. Anh sẽ hoàn tiền lại cho em qua phiếu chi ngày mai.\n\nCảm ơn em!",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "vo.quang.hue@vietjet-management.com",
+          "explanation": "VietJet dùng @vietjetair.com — 'vietjet-management.com' là domain giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "gift_card_request",
+          "visible_text": "mua 10 thẻ Google Play ... gửi code qua email",
+          "explanation": "Yêu cầu mua gift card và gửi code qua email là biến thể BEC phổ biến nhất — gift card không thể truy vết và thu hồi như chuyển khoản.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "cannot_verify",
+          "visible_text": "đang họp với đối tác nước ngoài, không tiện gọi",
+          "explanation": "Lý do không liên lạc được kết hợp với 'việc nhỏ' làm người dùng không muốn làm phiền lãnh đạo bằng cách xác minh.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["vietjet-management.com", "gift card Google Play", "chụp ảnh code"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC Gift Card — không thể hoàn tiền sau khi gửi code!",
+        "summary": "Gift card scam là biến thể BEC phổ biến nhất vì: số tiền vừa đủ nhỏ để không nghi ngờ, gift card không thể truy vết, và code một khi gửi là mất hoàn toàn.",
+        "learning_point": "Không một lãnh đạo hợp pháp nào yêu cầu nhân viên mua gift card và gửi code qua email. Đây là scam 100% — dù email trông giống thật đến đâu.",
+        "psychology_display": "Authority + Social Proof",
+        "attack_type_display": "Gift Card Scam"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-006",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Fear",
+      "attack_type": "BEC — Lawyer Impersonation",
+      "learning_objective": "Nhận diện BEC qua luật sư giả — kẻ tấn công giả dạng luật sư của CEO để chuyển tiền",
+      "email": {
+        "sender_name": "Nguyễn Minh Hoàng — Luật sư tư vấn",
+        "sender_email": "minh.hoang@lhlaw-partners.com",
+        "recipient_email": "do.thi.kim.chi@truong-hai.com.vn",
+        "subject": "Thay mặt ông Trần Bá Dương — Yêu cầu thanh toán khẩn cấp",
+        "body": "Kính gửi chị Đỗ Thị Kim Chi,\n\nTôi là Nguyễn Minh Hoàng, luật sư tư vấn cho ông Trần Bá Dương — Chủ tịch THACO. Ông Dương hiện đang làm việc với tôi về một thương vụ M&A bảo mật và ủy quyền cho tôi liên lạc về các sắp xếp tài chính.\n\nỦy quyền được gửi kèm trong file đính kèm. Theo yêu cầu của ông Dương, chị vui lòng xử lý thanh toán 2.800.000.000đ vào tài khoản chỉ định trước EOD hôm nay.\n\nVui lòng giữ bí mật và không trao đổi nội bộ cho đến khi thương vụ được công bố chính thức.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "third_party_pressure",
+          "visible_text": "ủy quyền cho tôi liên lạc về các sắp xếp tài chính",
+          "explanation": "Luật sư thật không liên lạc trực tiếp với nhân viên kế toán qua email để yêu cầu chuyển tiền — giao dịch M&A có quy trình pháp lý đầy đủ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "secrecy_tactic",
+          "visible_text": "không trao đổi nội bộ",
+          "explanation": "Yêu cầu bí mật lần nữa — dấu hiệu BEC không thể nhầm. Không giao dịch tài chính hợp pháp nào yêu cầu 'không báo ai trong công ty'.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "large_wire_transfer",
+          "visible_text": "2.800.000.000đ",
+          "explanation": "Gần 3 tỷ đồng chuyển trong ngày qua yêu cầu email — không quy trình kiểm soát tài chính nào cho phép điều này.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["lhlaw-partners.com", "không trao đổi nội bộ", "2.800.000.000đ"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC qua luật sư giả — cấu trúc tinh vi hơn!",
+        "summary": "Kẻ tấn công thêm 'luật sư trung gian' để tăng tính hợp pháp và tạo thêm một lớp ngăn xác minh với CEO thật.",
+        "learning_point": "Dù ai yêu cầu — CEO, luật sư, hay đối tác — mọi chuyển khoản lớn đều phải qua quy trình phê duyệt nội bộ đầy đủ. Liên hệ CEO trực tiếp qua số điện thoại đã biết để xác nhận.",
+        "psychology_display": "Authority + Secrecy",
+        "attack_type_display": "BEC via Lawyer Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-007",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Trust + Authority",
+      "attack_type": "BEC — Account Compromise",
+      "learning_objective": "Nhận diện BEC từ tài khoản email thật bị xâm phạm — khó nhất vì domain là chính xác",
+      "email": {
+        "sender_name": "Hoàng Văn Nam — Giám đốc Tài chính",
+        "sender_email": "hoang.van.nam@dai-thanh.com.vn",
+        "recipient_email": "nguyen.thi.lan.chi@dai-thanh.com.vn",
+        "subject": "Re: Re: Re: Thanh toán nhà thầu tháng 6 — URGENT",
+        "body": "Chi,\n\nAnh forward lại chuỗi email này để Chi xử lý. Nhà thầu Đông Phương đổi ngân hàng, cần thanh toán vào TK mới lần này:\n\nNgân hàng: OCB — CN Phú Nhuận\nSố TK: 0061000888xxx\nTên TK: CTY TNHH XD DONG PHUONG\n\nAnh đã confirm với giám đốc rồi. Chi xử lý 850tr trong chiều nay nhé. Cần kịp để họ không delay công trình.\n\nAnh Nam",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "payment_redirect",
+          "visible_text": "đổi ngân hàng, cần thanh toán vào TK mới",
+          "explanation": "Yêu cầu đổi tài khoản thanh toán nhà thầu qua email — dù từ email nội bộ — phải được xác nhận qua điện thoại với nhà thầu trực tiếp.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "re_thread_manipulation",
+          "visible_text": "Re: Re: Re: Thanh toán nhà thầu",
+          "explanation": "Chuỗi Re: Re: Re: giả tạo cảm giác đây là email trong luồng hội thoại cũ — tăng tính tin cậy. Nhưng đây có thể là email mới được tạo để trông như chuỗi cũ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "verbal_approval_claim",
+          "visible_text": "Anh đã confirm với giám đốc rồi",
+          "explanation": "Claim đã được giám đốc xác nhận miệng — không có văn bản — để bỏ qua quy trình phê duyệt chính thức.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["đổi ngân hàng TK mới", "Re: Re: Re:", "confirm với giám đốc rồi"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC từ tài khoản nội bộ bị chiếm — khó nhất!",
+        "summary": "Nếu email CFO thật bị xâm phạm, kẻ tấn công có thể gửi từ đúng domain nội bộ. Dấu hiệu phát hiện: yêu cầu đổi tài khoản thanh toán qua email + chuỗi Re: giả.",
+        "learning_point": "Ngay cả khi email từ nội bộ — mọi yêu cầu đổi tài khoản ngân hàng nhà thầu/nhà cung cấp PHẢI được xác nhận qua điện thoại với nhà thầu đó. Không có ngoại lệ.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Compromised Account BEC"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-008",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "medium",
+      "email_type": "legitimate",
+      "category": "CEO Fraud / BEC",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Phân biệt email lãnh đạo hợp lệ về thanh toán — có quy trình phê duyệt đúng",
+      "email": {
+        "sender_name": "Đặng Thị Tuyết Mai — CFO",
+        "sender_email": "dang.thi.tuyet.mai@saigon-co-op.com.vn",
+        "recipient_email": "tran.van.duc@saigon-co-op.com.vn",
+        "subject": "Phê duyệt thanh toán PO-2026-0512 — Nhà cung cấp Thiên Long",
+        "body": "Anh Đức,\n\nChị phê duyệt thanh toán theo PO-2026-0512 cho Thiên Long (hóa đơn đã kiểm tra bởi phòng Mua hàng và kế toán trưởng).\n\nVui lòng xử lý theo thông tin tài khoản đã đăng ký trong hệ thống ERP — KHÔNG thay đổi tài khoản trừ khi có email từ phòng Mua hàng kèm xác nhận chữ ký số.\n\nSố tiền: 312.500.000đ\nHạn thanh toán: 10/06/2026\n\nTrân trọng,\nĐặng Thị Tuyết Mai",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email CFO về thanh toán — dễ nhầm với BEC vì liên quan đến tiền",
+        "why_legitimate": "Domain @saigon-co-op.com.vn là nội bộ. Tham chiếu PO cụ thể. Chỉ thị dùng TK đã đăng ký trong ERP (không đổi). Nhắc không thay đổi tài khoản trừ quy trình chuẩn. Có quy trình kiểm soát rõ ràng."
+      },
+      "feedback": {
+        "title": "Đây là email phê duyệt thanh toán hợp lệ!",
+        "summary": "CFO từ domain nội bộ phê duyệt đúng quy trình: tham chiếu PO, dùng TK đã đăng ký trong ERP, và chủ động nhắc không thay đổi tài khoản.",
+        "learning_point": "Email tài chính hợp lệ: tham chiếu số PO/hóa đơn, chỉ dùng tài khoản đã đăng ký, không yêu cầu bí mật. BEC thường ngược lại: không có PO, muốn đổi TK, yêu cầu bí mật.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-009",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Trust + Urgency",
+      "attack_type": "BEC — Multi-step with Deepfake Pretext",
+      "learning_objective": "Nhận diện BEC nhiều bước: email mở đường → 'cuộc gọi xác nhận' giả → email chuyển tiền",
+      "email": {
+        "sender_name": "Nguyễn Xuân Thắng — CEO",
+        "sender_email": "nguyen.xuan.thang@evn-ceo-office.com",
+        "recipient_email": "bui.thi.hong.nhung@evn.com.vn",
+        "subject": "Nhung — Anh sẽ gọi xác nhận trong 10 phút",
+        "body": "Nhung,\n\nAnh cần xử lý một việc quan trọng hôm nay, liên quan đến thỏa thuận mua điện tái tạo với đối tác Hàn Quốc.\n\nAnh sẽ gọi video call cho em trong 10 phút để giải thích chi tiết. Em bắt máy nhé — anh đang dùng số mới vì điện thoại công ty bị mất.\n\nSau khi nói chuyện, em sẽ hiểu tại sao cần xử lý gấp.\n\nAnh Thắng",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "nguyen.xuan.thang@evn-ceo-office.com",
+          "explanation": "EVN dùng @evn.com.vn — 'evn-ceo-office.com' là domain giả mạo, thêm '-ceo-office' để trông như văn phòng riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "deepfake_setup",
+          "visible_text": "anh đang dùng số mới vì điện thoại công ty bị mất",
+          "explanation": "Chuẩn bị cho 'cuộc gọi từ số lạ' — kẻ tấn công có thể dùng AI voice clone hoặc số lạ để xác nhận 'yêu cầu'. Email này là bước mở đường.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "multi_step_priming",
+          "visible_text": "Anh sẽ gọi ... em sẽ hiểu tại sao cần xử lý gấp",
+          "explanation": "Email này không có yêu cầu cụ thể — chỉ chuẩn bị tâm lý cho bước tiếp theo. Sau 'cuộc gọi' sẽ có yêu cầu chuyển tiền.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["evn-ceo-office.com", "số mới vì điện thoại bị mất", "sẽ gọi ... trong 10 phút"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Multi-step BEC — email này chuẩn bị cho deepfake call!",
+        "summary": "Email này không có yêu cầu tài chính — chỉ mở đường cho 'cuộc gọi xác nhận' tiếp theo (có thể là AI voice clone). Đây là BEC 2025-2026 tinh vi nhất.",
+        "learning_point": "Nhận email CEO báo 'sẽ gọi từ số lạ': gọi lại đến số đã biết của CEO để xác nhận trước khi nhận cuộc gọi từ số lạ. Deepfake voice ngày càng thuyết phục — quy trình kiểm soát là phòng thủ duy nhất.",
+        "psychology_display": "Authority + Trust",
+        "attack_type_display": "Multi-step BEC + Deepfake"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-010",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Authority + Urgency + Compliance",
+      "attack_type": "BEC — Regulatory Pretext",
+      "learning_objective": "Nhận diện BEC dùng quy định pháp lý giả (thanh tra, kiểm toán) để hợp thức hóa yêu cầu tài chính",
+      "email": {
+        "sender_name": "Lê Văn Thịnh — Chủ tịch HĐQT",
+        "sender_email": "le.van.thinh@an-phat-holdings.net",
+        "recipient_email": "pham.thi.kim.loan@anphat.com.vn",
+        "subject": "Yêu cầu khẩn: Chuyển tiền vào tài khoản đặc biệt theo yêu cầu Ủy ban Chứng khoán",
+        "body": "Loan,\n\nỦy ban Chứng khoán Nhà nước (SSC) vừa ra yêu cầu khẩn về việc tạm thời phong tỏa một phần vốn kinh doanh trong tài khoản đặc biệt để phục vụ điều tra thường kỳ. Thủ tục này theo Thông tư 96/2020 và cần hoàn thành trong ngày hôm nay.\n\nDo tính chất nhạy cảm, chỉ có chủ tịch và người thực hiện biết. Em chuyển 3.750.000.000đ vào tài khoản kiểm soát:\n\nNgân hàng: BIDV — CN Hà Nội\nSố TK: 12110005678901\nChủ TK: QUY KIEM SOAT CHUNG KHOAN SSC\n\nXong báo anh ngay.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "le.van.thinh@an-phat-holdings.net",
+          "explanation": "An Phát Holdings dùng @anphat.com.vn — 'an-phat-holdings.net' là domain giả mạo dùng .net.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fake_regulatory_pretext",
+          "visible_text": "yêu cầu khẩn của Ủy ban Chứng khoán",
+          "explanation": "SSC không yêu cầu doanh nghiệp chuyển tiền vào tài khoản qua email/điện thoại — đây là pretext giả phổ biến trong các vụ BEC lớn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "secrecy_tactic",
+          "visible_text": "chỉ có chủ tịch và người thực hiện biết",
+          "explanation": "3,75 tỷ đồng mà chỉ 2 người biết — không có quy trình kiểm soát nội bộ hợp lệ nào như vậy.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": ["rf1", "rf2"],
+      "missable_flags": ["rf3"],
+      "highlight_keywords": ["an-phat-holdings.net", "Ủy ban Chứng khoán SSC", "chỉ chủ tịch và người thực hiện biết"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "BEC dùng cơ quan quản lý giả — thiệt hại hàng chục tỷ!",
+        "summary": "Giả mạo yêu cầu từ cơ quan quản lý (SSC, NHNN, Bộ Tài chính) là BEC cấp độ cao nhất — khai thác cả Authority (chủ tịch) lẫn Compliance (sợ vi phạm pháp luật).",
+        "learning_point": "SSC và các cơ quan nhà nước KHÔNG yêu cầu chuyển tiền vào tài khoản qua email. Mọi yêu cầu như vậy cần xác minh trực tiếp với cơ quan qua số điện thoại chính thức — không dùng số trong email.",
+        "psychology_display": "Authority + Compliance + Secrecy",
+        "attack_type_display": "BEC with Regulatory Pretext"
+      }
+    },
+    {
+      "simulation_id": "P3-BEC-011",
+      "batch": "10",
+      "phase": 3,
+      "lesson": "3.2",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "CEO Fraud / BEC",
+      "psychology": "Trust",
+      "attack_type": "BEC — Supply Chain Compromise",
+      "learning_objective": "Nhận diện BEC chuỗi cung ứng — kẻ tấn công xâm phạm email nhà cung cấp thật và yêu cầu đổi tài khoản",
+      "email": {
+        "sender_name": "Phạm Văn Hùng — Kế toán trưởng",
+        "sender_email": "pham.van.hung@truong-thinh-co.com.vn",
+        "recipient_email": "le.thi.thu.hang@delta-pharma.com.vn",
+        "subject": "Thông báo đổi tài khoản ngân hàng — Hiệu lực từ 01/07/2026",
+        "body": "Kính gửi chị Thu Hằng,\n\nTrường Thịnh Co. thông báo từ 01/07/2026 chúng tôi đổi ngân hàng giao dịch chính từ Vietcombank sang MB Bank do chương trình tái cơ cấu tài chính.\n\nThông tin tài khoản mới:\nNgân hàng: MB Bank — CN TP.HCM\nSố TK: 0388200456789\nTên TK: CONG TY TNHH TRUONG THINH\n\nVui lòng cập nhật thông tin cho các thanh toán từ tháng 7. Tài khoản Vietcombank cũ sẽ hết hiệu lực 30/06.\n\nTrân trọng,\nPhạm Văn Hùng",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "payment_redirect",
+          "visible_text": "đổi ngân hàng giao dịch chính",
+          "explanation": "Dù email đến từ domain nhà cung cấp thật — yêu cầu đổi tài khoản ngân hàng qua email phải được xác nhận qua điện thoại với đầu mối đã biết. Email của nhà cung cấp có thể đã bị xâm phạm.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "timing_suspicion",
+          "visible_text": "tài khoản Vietcombank cũ sẽ hết hiệu lực 30/06",
+          "explanation": "Deadline hết hiệu lực tài khoản cũ tạo áp lực phải cập nhật sớm — kẻ tấn công biết thanh toán tháng 7 sắp đến.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": ["rf1"],
+      "missable_flags": ["rf2"],
+      "highlight_keywords": ["đổi ngân hàng giao dịch chính", "tài khoản hết hiệu lực 30/06"],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Supply Chain BEC — email nhà cung cấp thật có thể đã bị xâm phạm!",
+        "summary": "Đây là trường hợp khó nhất: email đến từ domain nhà cung cấp thật nhưng tài khoản email của họ đã bị kẻ tấn công xâm phạm. Domain đúng không đảm bảo email hợp lệ.",
+        "learning_point": "QUY TẮC BẤT BIẾN: Mọi yêu cầu đổi tài khoản ngân hàng nhà cung cấp — dù đến từ domain quen thuộc — đều phải xác nhận qua số điện thoại đã biết trước đó. Không bao giờ gọi số trong email.",
+        "psychology_display": "Trust",
+        "attack_type_display": "Supply Chain BEC"
+      }
+    }
+  ]
+}

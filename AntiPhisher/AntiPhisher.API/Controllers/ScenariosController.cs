@@ -31,7 +31,8 @@ namespace AntiPhisher.API.Controllers
             var response = new ApiResponse();
             try
             {
-                var scenarios = await _scenarioService.GetAllScenariosAsync();
+                var claim = _claimService.GetUserClaim();
+                var scenarios = await _scenarioService.GetScenariosForUserAsync(claim.Id);
                 response.SetOk(scenarios);
                 return Ok(response);
             }
@@ -101,6 +102,29 @@ namespace AntiPhisher.API.Controllers
             catch (ArgumentNullException)
             {
                 return Unauthorized(new { message = "Vui lòng đăng nhập." });
+            }
+            catch (Exception ex)
+            {
+                response.SetBadRequest(message: ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        #endregion
+
+        #region ================= MANAGER ENDPOINTS =================
+
+        [HttpPost("company")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> CreateCompanyScenario([FromBody] CreateScenarioRequest request)
+        {
+            var response = new ApiResponse();
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                var result = await _scenarioService.CreateCompanyScenarioAsync(request, claim.Id);
+                response.SetApiResponse(HttpStatusCode.Created, true, "Tạo kịch bản công ty thành công!", result);
+                return CreatedAtAction(nameof(GetScenarioById), new { id = result.ScenarioId }, response);
             }
             catch (Exception ex)
             {

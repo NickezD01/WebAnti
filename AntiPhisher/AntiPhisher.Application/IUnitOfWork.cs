@@ -48,6 +48,8 @@ namespace AntiPhisher.Application
         IUserAttemptRepository UserAttempts { get; }
         IAIFeedbackRepository AIFeedbacks { get; }
         INotificationRepository Notifications { get; }
+        IUserFlawSummaryRepository UserFlawSummaries { get; }
+        IAIExpandedKnowledgeRepository AIExpandedKnowledges { get; }
 
         // =========================
         // SUBSCRIPTION / PAYMENT
@@ -69,6 +71,11 @@ namespace AntiPhisher.Application
         ILessonQuizRepository   LessonQuizzes  { get; }
         IQuizQuestionRepository QuizQuestions  { get; }
         IQuizOptionRepository   QuizOptions    { get; }
+
+        // =========================
+        // GAMIFICATION
+        // =========================
+        IUserCertificateRepository Certificates { get; }
 
         // =========================
         // METHODS

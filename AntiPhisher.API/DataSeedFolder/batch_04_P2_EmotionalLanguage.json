@@ -1,0 +1,505 @@
+{
+  "batch_id": "04",
+  "batch_name": "Phase 2 — Emotional Language",
+  "phase": 2,
+  "lesson": "2.2",
+  "total": 8,
+  "distribution": {
+    "difficulty": {
+      "easy": 4,
+      "medium": 2,
+      "hard": 2
+    },
+    "type": {
+      "malicious": 7,
+      "legitimate": 1
+    }
+  },
+  "simulations": [
+    {
+      "simulation_id": "P2-EL-001",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Urgency",
+      "attack_type": "Banking Scam",
+      "learning_objective": "Nhận diện ngôn từ tạo deadline giả — các cụm từ thời gian cực ngắn trong email tài chính",
+      "email": {
+        "sender_name": "Techcombank Cảnh Báo",
+        "sender_email": "alert@techcombank-warning.net",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "KHẨN: Xác minh ngay — Tài khoản bị hạn chế sau 2 giờ",
+        "body": "Kính gửi Quý Khách hàng,\n\nTài khoản Techcombank của bạn sẽ bị HẠN CHẾ GIAO DỊCH sau 2 giờ do chưa hoàn tất xác minh định kỳ theo yêu cầu mới.\n\nHành động NGAY BÂY để tránh không thể thanh toán, chuyển tiền hoặc rút tiền. Mỗi phút trì hoãn làm tăng nguy cơ mất quyền truy cập.",
+        "cta_text": "Xác minh ngay bây giờ",
+        "cta_link": "http://techcombank-warning.net/verify-now"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "urgency_language",
+          "visible_text": "sau 2 giờ",
+          "explanation": "Deadline 2 giờ là chiến thuật Urgency điển hình — ngân hàng thật không hạn chế tài khoản với thông báo vài giờ qua email.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "urgency_language",
+          "visible_text": "NGAY BÂY",
+          "explanation": "Cụm 'NGAY BÂY' viết hoa là dấu hiệu rõ ràng của Urgency manipulation — tạo phản xạ hành động ngay không suy nghĩ.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "suspicious_sender_domain",
+          "visible_text": "alert@techcombank-warning.net",
+          "explanation": "'techcombank-warning.net' là domain giả — Techcombank thật dùng @techcombank.com.vn.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "KHẨN",
+        "sau 2 giờ",
+        "NGAY BÂY",
+        "Mỗi phút trì hoãn"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Email dùng liên tiếp nhiều từ khóa Urgency: 'KHẨN', 'sau 2 giờ', 'NGAY BÂY', 'Mỗi phút trì hoãn'. Càng nhiều từ ngữ tạo áp lực thời gian — email càng đáng nghi ngờ.",
+        "learning_point": "Quy tắc: cảm xúc càng mạnh khi đọc email → xác suất bị lừa càng cao. Khi thấy deadline dưới 24 giờ trong email ngân hàng, hãy mở app ngân hàng thật để kiểm tra trước khi làm gì.",
+        "psychology_display": "Urgency",
+        "attack_type_display": "Banking Scam"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-002",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Fear",
+      "attack_type": "Account Takeover",
+      "learning_objective": "Nhận diện ngôn từ đe dọa hậu quả nghiêm trọng — liệt kê cụ thể những gì sẽ mất để tạo nỗi sợ",
+      "email": {
+        "sender_name": "Google Security",
+        "sender_email": "security@google-security-vn.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Tài khoản Google sẽ bị xóa — Toàn bộ dữ liệu mất vĩnh viễn",
+        "body": "Xin chào,\n\nTài khoản Google của bạn vi phạm điều khoản dịch vụ và sẽ bị XÓA VĨNH VIỄN sau 72 giờ. Toàn bộ email, ảnh, tài liệu Drive và lịch sử tìm kiếm sẽ bị xóa không thể khôi phục.\n\nNếu bạn cho rằng đây là nhầm lẫn, hãy kháng cáo ngay trước khi quá muộn.",
+        "cta_text": "Kháng cáo ngay",
+        "cta_link": "http://google-security-vn.com/appeal"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "fear_tactic",
+          "visible_text": "email, ảnh, tài liệu Drive và lịch sử tìm kiếm sẽ bị xóa không thể khôi phục",
+          "explanation": "Liệt kê cụ thể từng loại dữ liệu bị mất tạo nỗi sợ cụ thể hơn là nói chung 'tài khoản bị xóa' — kỹ thuật Fear tinh vi hơn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "security@google-security-vn.com",
+          "explanation": "'google-security-vn.com' là domain giả — Google thật dùng @google.com hoặc @accounts.google.com.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước khi quá muộn",
+          "explanation": "'Trước khi quá muộn' là cụm từ Urgency cảm xúc — không có thông tin cụ thể nhưng tạo cảm giác thời gian đang cạn kiệt.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "XÓA VĨNH VIỄN",
+        "không thể khôi phục",
+        "google-security-vn.com",
+        "trước khi quá muộn"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Liệt kê cụ thể 'email, ảnh, tài liệu Drive, lịch sử tìm kiếm' tạo nỗi sợ mất mát cụ thể — tinh vi hơn chỉ nói 'tài khoản bị xóa'. Google không xóa tài khoản sau 72 giờ qua email.",
+        "learning_point": "Khi email liệt kê cụ thể những thứ bạn sẽ mất — đó là kỹ thuật Fear nâng cao. Kiểm tra tài khoản Google tại myaccount.google.com — gõ tay URL, không click link email.",
+        "psychology_display": "Fear",
+        "attack_type_display": "Account Takeover"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-003",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Authority",
+      "attack_type": "Government Impersonation",
+      "learning_objective": "Nhận diện ngôn từ hành chính giả — văn phong cứng nhắc và từ ngữ pháp lý được dùng để tạo uy quyền giả",
+      "email": {
+        "sender_name": "Tổng Cục Thuế — Bộ Tài Chính",
+        "sender_email": "thongbao@tongcuc-thue.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Thông báo vi phạm nghĩa vụ thuế — Yêu cầu giải trình",
+        "body": "Căn cứ Luật Quản lý thuế số 38/2019/QH14 và Nghị định 126/2020/NĐ-CP, Tổng cục Thuế thông báo tài khoản mã số thuế của bạn có dấu hiệu vi phạm nghĩa vụ kê khai.\n\nYêu cầu Quý đối tượng nộp thuế giải trình và cung cấp hồ sơ theo hướng dẫn tại đường link đính kèm trong vòng 7 ngày làm việc kể từ ngày nhận thông báo này.",
+        "cta_text": "Xem hướng dẫn giải trình",
+        "cta_link": "http://tongcuc-thue.com/giai-trinh"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "authority_impersonation",
+          "visible_text": "Luật Quản lý thuế số 38/2019/QH14 và Nghị định 126/2020/NĐ-CP",
+          "explanation": "Trích dẫn số luật và nghị định thật để tạo Authority — văn phong hành chính chính xác nhằm làm người dùng không dám đặt câu hỏi.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "thongbao@tongcuc-thue.com",
+          "explanation": "Tổng cục Thuế thật dùng domain gdt.gov.vn — 'tongcuc-thue.com' là domain tư nhân giả mạo cơ quan nhà nước.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong vòng 7 ngày làm việc",
+          "explanation": "Deadline 7 ngày nghe hợp lý hơn các email phishing thông thường — kỹ thuật Urgency tinh vi hơn để trông như thông báo hành chính thật.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "tongcuc-thue.com",
+        "Luật Quản lý thuế số 38/2019/QH14",
+        "vi phạm nghĩa vụ"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing giả mạo cơ quan thuế!",
+        "summary": "Văn phong hành chính cứng nhắc và trích dẫn số luật thật là kỹ thuật Authority tinh vi nhất. Người dùng thường không dám nghi ngờ khi thấy ngôn ngữ pháp lý chính xác.",
+        "learning_point": "Tổng cục Thuế liên hệ qua hệ thống eTax (etax.gdt.gov.vn) và văn bản giấy — không qua email với link. Domain thật kết thúc bằng .gov.vn, không phải .com.",
+        "psychology_display": "Authority",
+        "attack_type_display": "Government Impersonation"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-004",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "easy",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Curiosity",
+      "attack_type": "Prize Scam",
+      "learning_objective": "Nhận diện ngôn từ kích thích tò mò — lời mời hấp dẫn quá mức thực tế để thu hút sự chú ý",
+      "email": {
+        "sender_name": "Tiki Tri Ân",
+        "sender_email": "reward@tiki-triankhachhang.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Bạn được chọn nhận MacBook Air M3 — Xác nhận trong 24h",
+        "body": "Xin chào Nguyễn Thị Lan,\n\nChúc mừng! Tên của bạn được hệ thống Tiki chọn ngẫu nhiên trong số 500.000 khách hàng thân thiết để nhận phần thưởng MacBook Air M3 trị giá 29.990.000đ.\n\nĐây là chương trình tri ân đặc biệt chỉ dành cho nhóm khách hàng VIP. Xác nhận nhận thưởng trong 24 giờ — sau đó phần thưởng sẽ được trao cho người khác.",
+        "cta_text": "Nhận MacBook Air ngay",
+        "cta_link": "http://tiki-triankhachhang.com/claim-macbook"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "reward@tiki-triankhachhang.com",
+          "explanation": "'tiki-triankhachhang.com' là domain giả — Tiki thật dùng @tiki.vn. Domain riêng cho chương trình tri ân là dấu hiệu giả mạo.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "fear_tactic",
+          "visible_text": "phần thưởng sẽ được trao cho người khác",
+          "explanation": "FOMO (Fear Of Missing Out) — đe dọa mất phần thưởng nếu không hành động ngay, kết hợp với Curiosity về giải thưởng lớn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trong 24 giờ",
+          "explanation": "Deadline 24 giờ ngăn người dùng kiểm tra chương trình khuyến mãi thật trên app Tiki.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "MacBook Air M3",
+        "tiki-triankhachhang.com",
+        "phần thưởng sẽ được trao cho người khác"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing!",
+        "summary": "Giải thưởng quá hấp dẫn (MacBook Air 30 triệu) kết hợp FOMO 'trao cho người khác' là công thức Curiosity + Fear điển hình. Không có chương trình thật nào hoạt động kiểu này.",
+        "learning_point": "Quy tắc: phần thưởng càng lớn và càng bất ngờ — cần cảnh giác càng cao. Kiểm tra chương trình khuyến mãi trực tiếp trong app Tiki, không qua link email.",
+        "psychology_display": "Curiosity + Fear (FOMO)",
+        "attack_type_display": "Prize Scam"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-005",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Authority + Fear",
+      "attack_type": "HR Scam",
+      "learning_objective": "Nhận diện ngôn từ Authority kết hợp Fear trong môi trường công ty — email giả HR dùng từ ngữ nội bộ để tạo áp lực",
+      "email": {
+        "sender_name": "Phòng Nhân Sự — ABC Technology",
+        "sender_email": "hr-notice@abctech-hrsystem.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Cảnh báo: Hồ sơ nhân sự của bạn có bất thường — Xử lý trước 17:00",
+        "body": "Kính gửi Nhân viên Nguyễn Thị Lan,\n\nBộ phận Nhân sự phát hiện một số thông tin trong hồ sơ của bạn không khớp với dữ liệu hệ thống, bao gồm thông tin ngân hàng và mã số thuế cá nhân.\n\nNếu không xác minh và cập nhật trước 17:00 hôm nay, hệ thống sẽ tự động tạm dừng thanh toán lương tháng này theo quy trình kiểm soát nội bộ. Vui lòng đăng nhập vào cổng HR để xử lý.",
+        "cta_text": "Cập nhật hồ sơ HR",
+        "cta_link": "http://abctech-hrsystem.com/profile-update"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "fear_tactic",
+          "visible_text": "tạm dừng thanh toán lương tháng này",
+          "explanation": "Đe dọa mất lương tháng là Fear cực mạnh trong môi trường công ty — tác động trực tiếp đến tài chính cá nhân và tạo áp lực tuân thủ ngay lập tức.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "suspicious_sender_domain",
+          "visible_text": "hr-notice@abctech-hrsystem.com",
+          "explanation": "'abctech-hrsystem.com' là domain bên ngoài giả mạo HR nội bộ — email HR thật phải đến từ @abctech.com.vn.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "credential_request",
+          "visible_text": "thông tin ngân hàng và mã số thuế cá nhân",
+          "explanation": "HR hợp lệ không yêu cầu cập nhật thông tin ngân hàng và MST cá nhân qua link email — đây là mục tiêu thật của email: thu thập dữ liệu nhạy cảm.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2",
+        "rf3"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "tạm dừng thanh toán lương",
+        "abctech-hrsystem.com",
+        "trước 17:00 hôm nay"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là HR Scam nhắm vào nhân viên!",
+        "summary": "Đe dọa 'mất lương tháng này' là Fear hiệu quả nhất trong môi trường công ty vì tác động tài chính trực tiếp. Kết hợp với Authority (HR) và deadline cuối giờ làm việc — ba yếu tố gây áp lực tối đa.",
+        "learning_point": "HR thật không đe dọa tạm dừng lương qua email — họ liên hệ trực tiếp. Khi nhận email HR lạ: gọi điện trực tiếp cho HR hoặc hỏi đồng nghiệp, không click link.",
+        "psychology_display": "Authority + Fear",
+        "attack_type_display": "HR Scam"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-006",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "medium",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Urgency + Authority",
+      "attack_type": "Cloud Service Phishing",
+      "learning_objective": "Nhận diện ngôn từ kỹ thuật giả — dùng thuật ngữ IT chuyên nghiệp để tạo Authority và Urgency đồng thời",
+      "email": {
+        "sender_name": "Microsoft 365 Admin Center",
+        "sender_email": "admin-alert@microsoft365-admincenter.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Cảnh báo bảo mật: MFA token hết hạn — Kích hoạt lại trước 23:59",
+        "body": "Kính gửi Người dùng,\n\nHệ thống phát hiện Multi-Factor Authentication (MFA) token của tài khoản nguyen.thi.lan@abctech.com.vn đã hết hạn và không còn bảo vệ tài khoản khỏi các cuộc tấn công brute-force và credential stuffing.\n\nMicrosoft yêu cầu kích hoạt lại MFA trước 23:59 hôm nay để duy trì tuân thủ chính sách bảo mật Zero Trust của tổ chức. Tài khoản không tuân thủ sẽ bị tạm khóa theo Conditional Access Policy.",
+        "cta_text": "Kích hoạt lại MFA",
+        "cta_link": "http://microsoft365-admincenter.com/mfa-reactivate"
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "admin-alert@microsoft365-admincenter.com",
+          "explanation": "'microsoft365-admincenter.com' là domain giả — Microsoft Admin Center thật dùng portal.azure.com hoặc admin.microsoft.com, không có domain riêng.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "brute-force, credential stuffing, Zero Trust, Conditional Access Policy",
+          "explanation": "Dùng nhiều thuật ngữ IT chuyên nghiệp liên tiếp để tạo Authority kỹ thuật — người dùng không hiểu các từ này thường tin tưởng hơn vì nghĩ đây là thông báo hệ thống thật.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "urgency_language",
+          "visible_text": "trước 23:59 hôm nay",
+          "explanation": "Deadline cuối ngày tạo áp lực phải hành động hôm nay — kết hợp với thuật ngữ kỹ thuật làm email trông như thông báo hệ thống khẩn cấp thật.",
+          "severity": "medium"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2"
+      ],
+      "missable_flags": [
+        "rf3"
+      ],
+      "highlight_keywords": [
+        "microsoft365-admincenter.com",
+        "Zero Trust",
+        "Conditional Access Policy",
+        "trước 23:59"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là email phishing dùng thuật ngữ kỹ thuật giả!",
+        "summary": "Thuật ngữ IT như 'Zero Trust', 'Conditional Access Policy', 'credential stuffing' được dùng để tạo Authority kỹ thuật — người dùng không hiểu thường tin tưởng hơn. Nhưng domain vẫn là dấu hiệu rõ ràng nhất.",
+        "learning_point": "Thuật ngữ kỹ thuật phức tạp không làm email trở nên đáng tin hơn — domain vẫn là thứ cần kiểm tra đầu tiên. Microsoft Admin thật dùng portal.azure.com, không có domain 'microsoft365-admincenter.com'.",
+        "psychology_display": "Authority + Urgency",
+        "attack_type_display": "Cloud Service Phishing"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-007",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "hard",
+      "email_type": "malicious",
+      "category": "Emotional Language",
+      "psychology": "Fear + Authority + Urgency",
+      "attack_type": "BEC",
+      "learning_objective": "Nhận diện BEC dùng ngôn ngữ cảm xúc cá nhân — giả mạo sếp với văn phong thân mật để giảm cảnh giác",
+      "email": {
+        "sender_name": "Phạm Minh Tuấn — Giám đốc",
+        "sender_email": "pham.minh.tuan@abctech.com.vn.exec-office.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Lan — Cần em xử lý việc này ngay, anh tin tưởng em",
+        "body": "Lan ơi,\n\nAnh biết hỏi em hơi đột ngột nhưng tình huống này khá nhạy cảm. Anh đang ở sân bay Changi chờ bay về, không kết nối được VPN công ty.\n\nCần em chuyển gấp 65.000.000đ vào tài khoản đối tác để giữ hợp đồng không bị hủy — anh sẽ hoàn lại ngay khi về. Tuyệt đối không đề cập với ai trong văn phòng vì liên quan đến thỏa thuận M&A đang đàm phán.\n\nAnh cảm ơn em rất nhiều. Chuyển xong nhắn anh qua Zalo nhé.",
+        "cta_text": "",
+        "cta_link": ""
+      },
+      "red_flags": [
+        {
+          "id": "rf1",
+          "type": "suspicious_sender_domain",
+          "visible_text": "pham.minh.tuan@abctech.com.vn.exec-office.com",
+          "explanation": "Domain thật là 'exec-office.com' — 'abctech.com.vn' chỉ là subdomain giả. Kỹ thuật chèn domain công ty thật vào làm subdomain để qua mặt người đọc nhanh.",
+          "severity": "high"
+        },
+        {
+          "id": "rf2",
+          "type": "authority_impersonation",
+          "visible_text": "tuyệt đối không đề cập với ai trong văn phòng",
+          "explanation": "Yêu cầu bí mật tuyệt đối là Red Flag số 1 của BEC — cố tình ngăn nạn nhân xác minh với đồng nghiệp. Lý do 'M&A đang đàm phán' nghe hợp lý nhưng đây chính xác là chiến thuật cô lập.",
+          "severity": "high"
+        },
+        {
+          "id": "rf3",
+          "type": "fear_tactic",
+          "visible_text": "giữ hợp đồng không bị hủy",
+          "explanation": "Đe dọa mất hợp đồng quan trọng tạo áp lực trách nhiệm — nạn nhân cảm thấy nếu không làm theo sẽ gây hại cho công ty.",
+          "severity": "high"
+        }
+      ],
+      "correct_flags": [
+        "rf1",
+        "rf2",
+        "rf3"
+      ],
+      "missable_flags": [],
+      "highlight_keywords": [
+        "exec-office.com",
+        "tuyệt đối không đề cập với ai",
+        "giữ hợp đồng không bị hủy",
+        "anh tin tưởng em"
+      ],
+      "correct_answer": "phishing",
+      "feedback": {
+        "title": "Đây là BEC dùng ngôn ngữ cảm xúc cá nhân!",
+        "summary": "Email dùng văn phong thân mật ('anh tin tưởng em', 'Lan ơi') để giảm cảnh giác — khác với BEC thông thường dùng ngôn ngữ trang trọng. Kết hợp ba yếu tố: domain giả tinh vi, yêu cầu bí mật, và áp lực hợp đồng.",
+        "learning_point": "Văn phong thân mật trong email yêu cầu chuyển tiền KHÔNG làm tăng tính hợp lệ — ngược lại, 'anh tin tưởng em' trong ngữ cảnh tài chính là dấu hiệu thao túng cảm xúc. Mọi yêu cầu chuyển tiền đều cần xác nhận qua điện thoại.",
+        "psychology_display": "Fear + Authority + Urgency",
+        "attack_type_display": "BEC / CEO Fraud"
+      }
+    },
+    {
+      "simulation_id": "P2-EL-008",
+      "batch": "04",
+      "phase": 2,
+      "lesson": "2.2",
+      "difficulty": "hard",
+      "email_type": "legitimate",
+      "category": "Emotional Language",
+      "psychology": "N/A",
+      "attack_type": "N/A",
+      "learning_objective": "Nhận biết email hệ thống hợp lệ có ngôn từ khẩn cấp thật sự — không phải mọi email urgent đều là phishing",
+      "email": {
+        "sender_name": "Google Workspace Admin",
+        "sender_email": "admin-console@google.com",
+        "recipient_email": "nguyen.thi.lan@abctech.com.vn",
+        "subject": "Hành động bắt buộc: Gia hạn Google Workspace trước 30/06/2026",
+        "body": "Kính gửi Quản trị viên Nguyễn Thị Lan,\n\nGói Google Workspace Business Starter của tổ chức abctech.com.vn sẽ hết hạn vào ngày 30/06/2026. Nếu không gia hạn, tài khoản người dùng sẽ chuyển sang chế độ chỉ đọc và không thể gửi email hoặc tạo tài liệu mới.\n\nĐể gia hạn, đăng nhập vào Google Admin Console tại admin.google.com và vào Billing → Subscriptions. Hoặc liên hệ đối tác Google được ủy quyền của tổ chức bạn.\n\nMã khách hàng: C0a1b2c3d\nGói hiện tại: Business Starter — 15 người dùng"
+      },
+      "red_flags": [],
+      "correct_flags": [],
+      "missable_flags": [],
+      "highlight_keywords": [],
+      "correct_answer": "legitimate",
+      "suspicious_element": {
+        "element": "Email có chủ đề 'Hành động bắt buộc' và deadline 30/06 — người dùng có thể nhầm với phishing dạng cập nhật bắt buộc giả. Ngoài ra có đề cập hậu quả nếu không gia hạn.",
+        "why_legitimate": "Domain @google.com là chính thức. Hướng dẫn vào admin.google.com (subdomain hợp lệ) thay vì link đáng ngờ. Có mã khách hàng cụ thể (C0a1b2c3d) và thông tin gói dịch vụ thật. Không có CTA button — chỉ hướng dẫn vào Admin Console qua URL gõ tay. Email gia hạn dịch vụ thật có thể chứa ngôn từ khẩn cấp vì đây là thông tin quan trọng thật."
+      },
+      "feedback": {
+        "title": "Đây là email hợp lệ từ Google!",
+        "summary": "Email gia hạn dịch vụ hợp lệ CÓ THỂ dùng ngôn từ khẩn cấp vì deadline gia hạn là thật. Phân biệt với phishing: domain @google.com chính thức, hướng dẫn vào admin.google.com (không phải link button đáng ngờ), có mã khách hàng cụ thể.",
+        "learning_point": "Không phải mọi email 'urgent' đều là phishing — hãy kiểm tra tổng thể: domain hợp lệ + không yêu cầu mật khẩu + hướng dẫn vào website gõ tay thay vì click button = email đáng tin cậy dù có ngôn từ khẩn cấp.",
+        "psychology_display": "N/A — Email hợp lệ",
+        "attack_type_display": "N/A — Email hợp lệ"
+      }
+    }
+  ]
+}

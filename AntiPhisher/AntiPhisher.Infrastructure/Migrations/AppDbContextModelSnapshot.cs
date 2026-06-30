@@ -22,6 +22,69 @@ namespace AntiPhisher.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.AIExpandedKnowledge", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContextDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DifficultyId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("SampleEmailContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("SourceUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Tags")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("DifficultyId");
+
+                    b.ToTable("AIExpandedKnowledges");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.AIFeedback", b =>
                 {
                     b.Property<int>("FeedbackId")
@@ -862,6 +925,10 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
+                    b.Property<byte[]>("ContentHash")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -880,6 +947,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Property<string>("ExplanationHint")
                         .HasColumnType("text");
 
+                    b.Property<string>("GenerationStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Manual");
+
                     b.Property<bool>("IsAIGenerated")
                         .HasColumnType("boolean");
 
@@ -895,6 +968,12 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Property<string>("RecipientName")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SenderEmail")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -907,6 +986,10 @@ namespace AntiPhisher.Infrastructure.Migrations
 
                     b.Property<string>("SimulationMetaJson")
                         .HasColumnType("text");
+
+                    b.Property<string>("SourceScenarioIds")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Subject")
                         .HasMaxLength(500)
@@ -927,6 +1010,8 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("DifficultyId");
+
+                    b.HasIndex("ReviewedByUserId");
 
                     b.ToTable("Scenarios");
                 });
@@ -1268,6 +1353,90 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.ToTable("UserAttempts");
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.UserCertificate", b =>
+                {
+                    b.Property<int>("CertificateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertificateId"));
+
+                    b.Property<string>("CertificateCode")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("CompanyNameSnapshot")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<decimal>("CorrectRateSnapshot")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("FullNameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("TotalAttemptsSnapshot")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CertificateId");
+
+                    b.HasIndex("CertificateCode")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCertificates");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.UserFlawSummary", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CurrentRiskScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("LastAiAdviceJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastAnalyzedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TopTacticsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalFlaws")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserFlawSummaries");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.UserLessonProgress", b =>
                 {
                     b.Property<int>("ProgressId")
@@ -1298,6 +1467,51 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.ToTable("UserLessonProgresses", (string)null);
                 });
 
+            modelBuilder.Entity("AntiPhisher.Infrastructure.Data.UserCampaignResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Advice")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DetectedFlaw")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAction")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignId");
+
+                    b.ToTable("UserCampaignResults");
+                });
+
             modelBuilder.Entity("ScenarioPhishingTypes", b =>
                 {
                     b.Property<int>("PhishingTypeId")
@@ -1311,6 +1525,25 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.HasIndex("ScenarioId");
 
                     b.ToTable("ScenarioPhishingTypes");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.AIExpandedKnowledge", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AntiPhisher.Domain.Models.DifficultyLevel", "Difficulty")
+                        .WithMany()
+                        .HasForeignKey("DifficultyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Difficulty");
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.AIFeedback", b =>
@@ -1621,11 +1854,18 @@ namespace AntiPhisher.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AntiPhisher.Domain.Models.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Category");
 
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("Difficulty");
+
+                    b.Navigation("ReviewedByUser");
                 });
 
             modelBuilder.Entity("AntiPhisher.Domain.Models.Subscription", b =>
@@ -1736,6 +1976,28 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AntiPhisher.Domain.Models.UserCertificate", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Domain.Models.UserFlawSummary", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("AntiPhisher.Domain.Models.UserFlawSummary", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AntiPhisher.Domain.Models.UserLessonProgress", b =>
                 {
                     b.HasOne("AntiPhisher.Domain.Models.Lesson", "Lesson")
@@ -1753,6 +2015,17 @@ namespace AntiPhisher.Infrastructure.Migrations
                     b.Navigation("Lesson");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AntiPhisher.Infrastructure.Data.UserCampaignResult", b =>
+                {
+                    b.HasOne("AntiPhisher.Domain.Models.Campaign", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
                 });
 
             modelBuilder.Entity("ScenarioPhishingTypes", b =>

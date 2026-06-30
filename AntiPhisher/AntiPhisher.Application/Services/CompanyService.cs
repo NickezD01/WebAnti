@@ -295,6 +295,37 @@ namespace AntiPhisher.Application.Services
         }
 
         // =====================================================================
+        // UpdateCompanyName
+        // =====================================================================
+        public async Task<ApiResponse> UpdateCompanyNameAsync(string companyName)
+        {
+            try
+            {
+                var claim = _claimService.GetUserClaim();
+                if (claim == null)
+                    return new ApiResponse().SetBadRequest("Phiên đăng nhập không hợp lệ.");
+
+                var user = await _unitOfWork.Users.GetAsync(u => u.UserId == claim.Id);
+                if (user?.CompanyId == null)
+                    return new ApiResponse().SetBadRequest("Bạn chưa được gán vào công ty nào.");
+
+                var company = await _unitOfWork.Companies.GetAsync(c => c.CompanyId == user.CompanyId.Value);
+                if (company == null)
+                    return new ApiResponse().SetBadRequest("Không tìm thấy công ty.");
+
+                company.CompanyName = companyName.Trim();
+                company.UpdatedAt = DateTime.UtcNow;
+                await _unitOfWork.SaveChangeAsync();
+
+                return new ApiResponse().SetOk(new { message = "Đã cập nhật tên công ty.", companyName = company.CompanyName });
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse().SetBadRequest($"Lỗi cập nhật tên công ty: {ex.Message}");
+            }
+        }
+
+        // =====================================================================
         // Helpers
         // =====================================================================
         private static string GenerateTempPassword()

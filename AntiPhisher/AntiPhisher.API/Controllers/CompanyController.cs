@@ -2,7 +2,6 @@ using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Request.CompanyRequest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace AntiPhisher.API.Controllers
 {
@@ -52,6 +51,21 @@ namespace AntiPhisher.API.Controllers
         public async Task<IActionResult> AcceptInvite([FromQuery] string token)
         {
             var response = await _companyService.AcceptInvitationAsync(token);
+            return response.IsSuccess ? Ok(response) : BadRequest(response);
+        }
+
+        /// <summary>
+        /// Cập nhật tên công ty — cho phép bất kỳ user nào đang sở hữu công ty (kể cả trước khi role upgrade).
+        /// PUT /api/Company/update-name
+        /// </summary>
+        [Authorize]
+        [HttpPut("update-name")]
+        public async Task<IActionResult> UpdateCompanyName([FromBody] UpdateCompanyNameDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var response = await _companyService.UpdateCompanyNameAsync(dto.CompanyName);
             return response.IsSuccess ? Ok(response) : BadRequest(response);
         }
     }
