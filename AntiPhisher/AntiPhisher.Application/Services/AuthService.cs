@@ -3,6 +3,7 @@ using AntiPhisher.Application.Request.UserAccount;
 using AntiPhisher.Application.Response;
 using AntiPhisher.Domain;
 using AntiPhisher.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -21,10 +22,13 @@ namespace AntiPhisher.Application.Services
 
         private readonly IEmailService _emailService;
 
+        private readonly IConfiguration _configuration;
+
         public AuthService(
             IUnitOfWork unitOfWork,
             AppSetting appSettings,
-            IEmailService emailService
+            IEmailService emailService,
+            IConfiguration configuration
         )
         {
             _unitOfWork = unitOfWork;
@@ -32,6 +36,24 @@ namespace AntiPhisher.Application.Services
             _appSettings = appSettings;
 
             _emailService = emailService;
+
+            _configuration = configuration;
+        }
+
+        private string[] GetGoogleAudiences()
+        {
+            var raw = _configuration["Authentication:Google:ClientId"]
+                      ?? _configuration["GoogleAuth:ClientId"]
+                      ?? _configuration["Google:ClientId"];
+
+            if (string.IsNullOrWhiteSpace(raw)) return Array.Empty<string>();
+
+            return raw
+                .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
         }
 
         // =====================================================
@@ -141,7 +163,7 @@ namespace AntiPhisher.Application.Services
                 if (!emailResult.IsSuccess)
                 {
                     response.SetBadRequest(
-                        "Send email failed"
+                        message: emailResult.ErrorMessage ?? "Send email failed"
                     );
 
                     return response;
@@ -262,11 +284,17 @@ namespace AntiPhisher.Application.Services
 
             try
             {
+                var audiences = GetGoogleAudiences();
+                if (audiences.Length == 0)
+                {
+                    response.SetBadRequest("Google login is not configured. Missing Authentication:Google:ClientId.");
+                    return response;
+                }
+
                 // Verify Google token
                 var payload = await Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync(request.Credential, new Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings
                 {
-                    // You can specify your Client ID here or let it validate signature without checking audience.
-                    Audience = new[] { "87250051752-p12lltrop700iehbui5pije6r1h6jn4e.apps.googleusercontent.com" }
+                    Audience = audiences
                 });
 
                 if (payload == null)

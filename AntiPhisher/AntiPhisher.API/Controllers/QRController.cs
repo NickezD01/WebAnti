@@ -15,6 +15,28 @@ namespace AntiPhisher.API.Controllers
         private readonly IConfiguration _config;
         private readonly IClaimService _claimService;
 
+        private bool TryBuildQrUrl(decimal amount, string addInfo, out string qrUrl, out string error)
+        {
+            qrUrl = string.Empty;
+            error = string.Empty;
+
+            var bankBin = _config["SePay:BankBin"]?.Trim();
+            var accountNumber = _config["SePay:AccountNumber"]?.Trim();
+            var accountName = _config["SePay:AccountName"]?.Trim();
+
+            if (string.IsNullOrWhiteSpace(bankBin) ||
+                string.IsNullOrWhiteSpace(accountNumber) ||
+                string.IsNullOrWhiteSpace(accountName))
+            {
+                error = "Thiếu cấu hình SePay (BankBin/AccountNumber/AccountName). Liên hệ quản trị để cập nhật biến môi trường deploy.";
+                return false;
+            }
+
+            qrUrl = $"https://img.vietqr.io/image/{bankBin}-{accountNumber}-compact.png" +
+                    $"?amount={(long)amount}&addInfo={Uri.EscapeDataString(addInfo)}&accountName={Uri.EscapeDataString(accountName)}";
+            return true;
+        }
+
         public QRController(IUnitOfWork unitOfWork, IConfiguration config, IClaimService claimService)
         {
             _unitOfWork = unitOfWork;
@@ -47,9 +69,8 @@ namespace AntiPhisher.API.Controllers
             order.Note = $"ANTI{order.Id}";
             await _unitOfWork.SaveChangeAsync();
 
-            // URL VietQR (đúng chuẩn VietQR.io)
-            var qrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
-                        $"?amount={(long)order.Price}&addInfo={order.Note}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+            if (!TryBuildQrUrl(order.Price ?? 0, order.Note, out var qrUrl, out var qrError))
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = qrError });
 
             return Ok(new { orderId = order.Id, amount = order.Price, content = order.Note, qrUrl });
         }
@@ -79,8 +100,8 @@ namespace AntiPhisher.API.Controllers
                     o => o.SubscriptionId == existingSub.Id && o.Status == OrderStatus.Pending);
                 if (existingOrder != null)
                 {
-                    var existingQrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
-                                        $"?amount={(long)existingOrder.Price!}&addInfo={existingOrder.Note}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+                    if (!TryBuildQrUrl(existingOrder.Price ?? 0, existingOrder.Note ?? string.Empty, out var existingQrUrl, out var existingQrError))
+                        return StatusCode(StatusCodes.Status500InternalServerError, new { message = existingQrError });
                     return Ok(new { orderId = existingOrder.Id, amount = existingOrder.Price, content = existingOrder.Note, qrUrl = existingQrUrl });
                 }
             }
@@ -116,8 +137,8 @@ namespace AntiPhisher.API.Controllers
             order.Note = $"ANTI{order.Id}";
             await _unitOfWork.SaveChangeAsync();
 
-            var qrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
-                        $"?amount={(long)order.Price!}&addInfo={order.Note}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+            if (!TryBuildQrUrl(order.Price ?? 0, order.Note ?? string.Empty, out var qrUrl, out var qrError))
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = qrError });
 
             return Ok(new { orderId = order.Id, amount = order.Price, content = order.Note, qrUrl });
         }
@@ -237,8 +258,8 @@ namespace AntiPhisher.API.Controllers
                         o => o.SubscriptionId == existingSub.Id && o.Status == OrderStatus.Pending);
                     if (existingOrder != null)
                     {
-                        var existingQrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
-                                            $"?amount={(long)existingOrder.Price!}&addInfo={existingOrder.Note}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+                        if (!TryBuildQrUrl(existingOrder.Price ?? 0, existingOrder.Note ?? string.Empty, out var existingQrUrl, out var existingQrError))
+                            return StatusCode(StatusCodes.Status500InternalServerError, new { message = existingQrError });
                         return Ok(new { orderId = existingOrder.Id, amount = existingOrder.Price, content = existingOrder.Note, qrUrl = existingQrUrl });
                     }
                 }
@@ -292,8 +313,8 @@ namespace AntiPhisher.API.Controllers
             order.Note = $"ANTI{order.Id}";
             await _unitOfWork.SaveChangeAsync();
 
-            var qrUrl = $"https://img.vietqr.io/image/{_config["SePay:BankBin"]}-{_config["SePay:AccountNumber"]}-compact.png" +
-                        $"?amount={(long)order.Price!}&addInfo={order.Note}&accountName={Uri.EscapeDataString(_config["SePay:AccountName"]!)}";
+            if (!TryBuildQrUrl(order.Price ?? 0, order.Note ?? string.Empty, out var qrUrl, out var qrError))
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = qrError });
 
             return Ok(new { orderId = order.Id, amount = order.Price, content = order.Note, qrUrl });
         }
