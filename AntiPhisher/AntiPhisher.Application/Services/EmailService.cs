@@ -26,10 +26,25 @@ namespace AntiPhisher.Application.Services
             _smtpPort    = int.TryParse(configuration["EmailSettings:SmtpPort"], out var port) ? port : 465;
         }
 
+        private ApiResponse ValidateEmailConfig()
+        {
+            if (string.IsNullOrWhiteSpace(_sender) || string.IsNullOrWhiteSpace(_appPassword))
+            {
+                return new ApiResponse().SetBadRequest(
+                    message: "Email service is not configured. Please set EmailSettings:Sender and EmailSettings:AppPassword."
+                );
+            }
+
+            return new ApiResponse().SetOk();
+        }
+
         public async Task<ApiResponse> SendNotiMail(string recievedUser, string emailContent)
         {
             try
             {
+                var configState = ValidateEmailConfig();
+                if (!configState.IsSuccess) return configState;
+
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("AntiPhisher System", _sender));
                 message.To.Add(new MailboxAddress("", recievedUser));
@@ -61,6 +76,9 @@ namespace AntiPhisher.Application.Services
         {
             try
             {
+                var configState = ValidateEmailConfig();
+                if (!configState.IsSuccess) return configState;
+
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("AntiPhisher System", _sender));
                 message.To.Add(new MailboxAddress("", recievedUser));
