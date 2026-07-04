@@ -2,9 +2,9 @@
 using AntiPhisher.Application.Response;
 using MimeKit;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using MailKit.Net.Smtp;
+using MailKit.Security; // Thêm namespace này để dùng SecureSocketOptions
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +20,13 @@ namespace AntiPhisher.Application.Services
 
         public EmailService(IConfiguration configuration)
         {
-            _sender      = configuration["EmailSettings:Sender"]      ?? string.Empty;
-            _appPassword = configuration["EmailSettings:AppPassword"]  ?? string.Empty;
-            _smtpHost    = configuration["EmailSettings:SmtpHost"]     ?? "smtp.gmail.com";
-            _smtpPort    = int.TryParse(configuration["EmailSettings:SmtpPort"], out var port) ? port : 465;
+            // Sửa lại cách đọc cấu hình: Hỗ trợ cả dấu gạch dưới hai lần __ (Render dùng cách này) và dấu hai chấm :
+            _sender = configuration["EmailSettings__Sender"] ?? configuration["EmailSettings:Sender"] ?? string.Empty;
+            _appPassword = configuration["EmailSettings__AppPassword"] ?? configuration["EmailSettings:AppPassword"] ?? string.Empty;
+            _smtpHost = configuration["EmailSettings__SmtpHost"] ?? configuration["EmailSettings:SmtpHost"] ?? "smtp.gmail.com";
+
+            var portRaw = configuration["EmailSettings__SmtpPort"] ?? configuration["EmailSettings:SmtpPort"];
+            _smtpPort = int.TryParse(portRaw, out var port) ? port : 587; // Mặc định nên để 587 cho môi trường Cloud
         }
 
         private ApiResponse ValidateEmailConfig()
@@ -56,7 +59,8 @@ namespace AntiPhisher.Application.Services
 
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_smtpHost, _smtpPort, true);
+                    // SỬA TẠI ĐÂY: Thay 'true' bằng 'SecureSocketOptions.Auto' để tự tương thích cổng 587 trên Render
+                    await client.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.Auto);
                     await client.AuthenticateAsync(_sender, _appPassword);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
@@ -90,7 +94,8 @@ namespace AntiPhisher.Application.Services
 
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_smtpHost, _smtpPort, true);
+                    // SỬA TẠI ĐÂY: Thay 'true' bằng 'SecureSocketOptions.Auto'
+                    await client.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.Auto);
                     await client.AuthenticateAsync(_sender, _appPassword);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
