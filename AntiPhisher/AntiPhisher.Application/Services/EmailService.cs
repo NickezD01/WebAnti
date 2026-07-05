@@ -1,4 +1,4 @@
-﻿using AntiPhisher.Application.Interfaces;
+using AntiPhisher.Application.Interfaces;
 using AntiPhisher.Application.Response;
 using MimeKit;
 using System;
@@ -30,8 +30,14 @@ namespace AntiPhisher.Application.Services
         {
             if (string.IsNullOrWhiteSpace(_sender) || string.IsNullOrWhiteSpace(_appPassword))
             {
+                var detail = $"Sender={(string.IsNullOrWhiteSpace(_sender) ? "EMPTY" : "SET")}, " +
+                             $"AppPassword={(string.IsNullOrWhiteSpace(_appPassword) ? "EMPTY" : "SET")}, " +
+                             $"SmtpHost='{_smtpHost}', SmtpPort={_smtpPort}";
+                Console.Error.WriteLine($"[EMAIL CONFIG ERROR] {detail}");
+                Console.Error.WriteLine("[EMAIL CONFIG HINT] Trên Render, hãy set env: EmailSettings__Sender, EmailSettings__AppPassword");
+
                 return new ApiResponse().SetBadRequest(
-                    message: "Email service is not configured. Please set EmailSettings:Sender and EmailSettings:AppPassword."
+                    message: $"Email service is not configured. {detail}"
                 );
             }
 
