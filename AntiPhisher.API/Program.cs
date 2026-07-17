@@ -165,6 +165,37 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ======================================================
+// STARTUP DIAGNOSTICS — Log cấu hình quan trọng để debug production
+// ======================================================
+{
+    var startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+    var cfg = app.Configuration;
+
+    // Email config check
+    var emailSender = cfg["EmailSettings:Sender"];
+    var emailPwd = cfg["EmailSettings:AppPassword"];
+    var smtpHost = cfg["EmailSettings:SmtpHost"] ?? "smtp.gmail.com";
+    var smtpPort = cfg["EmailSettings:SmtpPort"] ?? "465";
+    if (string.IsNullOrWhiteSpace(emailSender) || string.IsNullOrWhiteSpace(emailPwd))
+        startupLogger.LogWarning("[CONFIG] EmailSettings is NOT configured! Sender='{Sender}', AppPassword={HasPwd}, SmtpHost='{SmtpHost}', SmtpPort='{SmtpPort}'. Register/ForgotPassword emails will FAIL.",
+            emailSender ?? "(empty)", !string.IsNullOrWhiteSpace(emailPwd) ? "SET" : "(empty)", smtpHost, smtpPort);
+    else
+        startupLogger.LogInformation("[CONFIG] EmailSettings OK — Sender='{Sender}', SmtpHost='{SmtpHost}', SmtpPort='{SmtpPort}'",
+            emailSender, smtpHost, smtpPort);
+
+    // Google Auth config check
+    var googleClientId = cfg["Authentication:Google:ClientId"];
+    if (string.IsNullOrWhiteSpace(googleClientId))
+        startupLogger.LogWarning("[CONFIG] Google ClientId is NOT configured! Google login will be DISABLED.");
+    else
+        startupLogger.LogInformation("[CONFIG] Google ClientId OK — '{ClientId}'", googleClientId[..Math.Min(20, googleClientId.Length)] + "...");
+
+    // FrontendUrl check
+    var frontendUrl = cfg["FrontendUrl"] ?? cfg["Frontend:BaseUrl"];
+    startupLogger.LogInformation("[CONFIG] FrontendUrl='{FrontendUrl}'", frontendUrl ?? "(default: http://localhost:5173)");
+}
+
+// ======================================================
 // MIDDLEWARE PIPELINE (Thứ tự chuẩn hóa toàn hệ thống)
 // ======================================================
 // Luôn đặt ExceptionMiddleware lên đầu tiên để bắt mọi lỗi ngoại lệ
