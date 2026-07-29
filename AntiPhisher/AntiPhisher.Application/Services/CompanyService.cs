@@ -4,6 +4,7 @@ using AntiPhisher.Application.Response;
 using AntiPhisher.Application.Response.CompanyResponse;
 using AntiPhisher.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,20 +18,20 @@ namespace AntiPhisher.Application.Services
         private readonly IClaimService _claimService;
         private readonly IAuthService _authService;
         private readonly IEmailService _emailService;
-
-        // Địa chỉ gốc FE — dùng để tạo link xác nhận trong email
-        private const string FE_BASE_URL = "http://localhost:5173";
+        private readonly IConfiguration _configuration;
 
         public CompanyService(
             IUnitOfWork unitOfWork,
             IClaimService claimService,
             IAuthService authService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration configuration)
         {
             _unitOfWork  = unitOfWork;
             _claimService = claimService;
             _authService  = authService;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         // =====================================================================
@@ -176,7 +177,7 @@ namespace AntiPhisher.Application.Services
                 await _unitOfWork.SaveChangeAsync();
 
                 // ── Gửi email ───────────────────────────────────────────────
-                string acceptLink = $"{FE_BASE_URL}/xac-nhan-moi?token={token}";
+                string acceptLink = $"{_configuration["Frontend:BaseUrl"]}/xac-nhan-moi?token={token}";
                 string companyName = company?.CompanyName ?? "công ty";
 
                 string emailBody = isNewUser

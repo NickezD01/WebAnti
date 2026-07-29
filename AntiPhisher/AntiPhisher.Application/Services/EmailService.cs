@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -62,7 +63,7 @@ namespace AntiPhisher.Application.Services
 
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_smtpHost, _smtpPort, true);
+                    await client.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.Auto);
                     await client.AuthenticateAsync(_sender, _appPassword);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
@@ -96,7 +97,7 @@ namespace AntiPhisher.Application.Services
 
                 using (var client = new SmtpClient())
                 {
-                    await client.ConnectAsync(_smtpHost, _smtpPort, true);
+                    await client.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.Auto);
                     await client.AuthenticateAsync(_sender, _appPassword);
                     await client.SendAsync(message);
                     await client.DisconnectAsync(true);
