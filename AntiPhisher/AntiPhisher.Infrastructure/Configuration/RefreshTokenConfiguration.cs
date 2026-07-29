@@ -33,7 +33,7 @@ namespace AntiPhisher.Infrastructure.Configuration
                    .HasDefaultValue(false);
 
             builder.Property(x => x.CreatedAt)
-                   .HasDefaultValueSql("GETUTCDATE()");
+                   .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // UNIQUE
             builder.HasIndex(x => x.Token)

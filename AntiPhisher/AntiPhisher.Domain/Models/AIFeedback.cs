@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AntiPhisher.Domain.Models;
 
-public partial class AIFeedback
+public partial class AIFeedback : Base
 {
     public int FeedbackId { get; set; }
 
@@ -21,7 +21,7 @@ public partial class AIFeedback
 
     public int? PromptTokensUsed { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    //public DateTime CreatedAt { get; set; }
 
     public virtual UserAttempt Attempt { get; set; }
 }

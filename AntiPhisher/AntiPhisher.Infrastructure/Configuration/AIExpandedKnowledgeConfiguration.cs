@@ -16,8 +16,8 @@ namespace AntiPhisher.Infrastructure.Configuration
             builder.Property(x => x.SourceUrl).HasMaxLength(500);
             builder.Property(x => x.Tags).HasMaxLength(300);
             builder.Property(x => x.IsActive).HasDefaultValue(true);
-            builder.Property(x => x.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-            builder.Property(x => x.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
+            builder.Property(x => x.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            builder.Property(x => x.ModifiedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             builder.HasOne(x => x.Difficulty)
                 .WithMany()

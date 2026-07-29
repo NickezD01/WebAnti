@@ -15,7 +15,7 @@ namespace AntiPhisher.Infrastructure.Configuration
                 .HasDefaultValue(0);
 
             builder.Property(x => x.UpdatedAt)
-                .HasDefaultValueSql("GETUTCDATE()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // 1-1 với User: UserId vừa là PK vừa là FK
             builder.HasOne(x => x.User)

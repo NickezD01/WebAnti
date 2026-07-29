@@ -614,14 +614,14 @@ namespace AntiPhisher.Application.Services
                 .SelectMany(a => a.AIFeedbacks
                     .Where(f => !string.IsNullOrWhiteSpace(f.FeedbackText))
                     .Select(f => new { Feedback = f, ScenarioTitle = a.Scenario?.Title ?? "N/A" }))
-                .OrderByDescending(x => x.Feedback.CreatedAt)
+                .OrderByDescending(x => x.Feedback.CreatedDate)
                 .Take(3)
                 .Select(x => new RecentFeedback
                 {
                     ScenarioTitle  = x.ScenarioTitle,
                     FeedbackText   = x.Feedback.FeedbackText   ?? "",
                     ImprovementTips = x.Feedback.ImprovementTips ?? "",
-                    CreatedAt      = TimeZoneInfo.ConvertTimeFromUtc(x.Feedback.CreatedAt, _vnTz)
+                    CreatedAt      = TimeZoneInfo.ConvertTimeFromUtc((DateTime)x.Feedback.CreatedDate, _vnTz)
                                         .ToString("dd/MM/yyyy HH:mm")
                 })
                 .ToList();

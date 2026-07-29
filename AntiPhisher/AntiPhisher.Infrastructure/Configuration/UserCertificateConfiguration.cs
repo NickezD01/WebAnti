@@ -28,7 +28,7 @@ namespace AntiPhisher.Infrastructure.Configuration
                 .HasMaxLength(256);
 
             builder.Property(x => x.IssuedAt)
-                .HasDefaultValueSql("GETUTCDATE()");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             builder.HasOne(x => x.User)
                 .WithMany()

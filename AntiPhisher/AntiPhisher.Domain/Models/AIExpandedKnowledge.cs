@@ -7,7 +7,7 @@ namespace AntiPhisher.Domain.Models;
 /// Kho kiến thức mới do Admin nạp (vd. trend lừa đảo Deepfake mới xuất hiện),
 /// dùng làm Few-shot example khi sinh Campaign/Scenario mới — không cần fine-tune model.
 /// </summary>
-public partial class AIExpandedKnowledge
+public partial class AIExpandedKnowledge : Base
 {
     public int Id { get; set; }
 
@@ -30,9 +30,9 @@ public partial class AIExpandedKnowledge
 
     public int CreatedByUserId { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    //public DateTime CreatedAt { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    //public DateTime UpdatedAt { get; set; }
 
     public virtual DifficultyLevel Difficulty { get; set; }
 

@@ -250,12 +250,32 @@ builder.Services.AddValidatorsFromAssemblyContaining<SubPlanValidator>();
 // ======================================================
 // DATABASE
 // ======================================================
+
+
+
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//{
+//    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//    options.UseSqlServer(connectionString);
+//    options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+//});
+
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString);
-    options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+    var connectionString =
+        Environment.GetEnvironmentVariable("CONNECTION_STRING_BASE")
+        ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+    Console.WriteLine($"DB Connection: {connectionString}");
+
+    options.UseNpgsql(connectionString);
+
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
 });
+
 
 // ======================================================
 // JWT AUTHENTICATION
